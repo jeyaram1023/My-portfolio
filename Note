@@ -1,0 +1,27 @@
+/portfolio-website
+|
+|-- index.html
+|-- projects.html
+|-- resume.html
+|-- about.html
+|-- contact.html
+|
+|-- /assets
+|   |-- /images
+|   |   |-- profile-pic.png       // Add your profile picture here
+|   |   |-- project1.png          // Add project images here
+|   |   |-- project2.png
+|   |   |-- ...etc
+|   |
+|   |-- /audio
+|   |   |-- home.mp3              // Add background music for each page
+|   |   |-- projects.mp3
+|   |   |-- resume.mp3
+|   |   |-- about.mp3
+|   |   |-- contact.mp3
+|
+|-- /css
+|   |-- style.css
+|
+|-- /js
+|   |-- script.js
