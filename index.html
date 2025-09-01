@@ -3,58 +3,564 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B. Jeyaram Reddy | Home</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>B. Jeyaram Reddy - ECE Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-hsl: 199 100% 50%; /* Electric Blue */
+            --secondary-hsl: 154 100% 50%; /* Neon Green */
+            --background-hsl: 225 100% 3%; /* Dark Navy */
+            --card-rgba: rgba(255, 255, 255, 0.05);
+            --primary-glow-hsl: 199 100% 70%;
+            --secondary-glow-hsl: 154 100% 70%;
+            
+            --primary: hsl(var(--primary-hsl));
+            --secondary: hsl(var(--secondary-hsl));
+            --background: hsl(var(--background-hsl));
+            --primary-glow: hsl(var(--primary-glow-hsl));
+            --secondary-glow: hsl(var(--secondary-glow-hsl));
+        }
+
+        body {
+            background-color: var(--background);
+            color: white;
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        /* --- Custom Animations --- */
+        @keyframes glitch {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+        }
+        .glitch-effect { animation: glitch 0.4s infinite; }
+        .glitch-effect-text::before, .glitch-effect-text::after {
+            content: 'JEYARAM';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--background);
+            overflow: hidden;
+        }
+        .glitch-effect-text::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--primary);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch-effect-text::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--secondary-glow), 2px 2px var(--primary);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-1 { 0% { clip-path: inset(15% 0 86% 0); } 100% { clip-path: inset(80% 0 1% 0); } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(68% 0 21% 0); } 100% { clip-path: inset(21% 0 71% 0); } }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px var(--primary); }
+            50% { transform: scale(1.05); box-shadow: 0 0 25px var(--primary-glow), 0 0 50px var(--primary); }
+        }
+        
+        @keyframes circuit-flow-enhanced {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1.2); opacity: 0; }
+        }
+
+        @keyframes matrix-rain {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100%); }
+        }
+
+        @keyframes neon-pulse {
+            0%, 100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), inset 0 0 5px var(--primary); }
+            50% { box-shadow: 0 0 15px var(--primary-glow), 0 0 30px var(--primary-glow), inset 0 0 10px var(--primary-glow); }
+        }
+
+        @keyframes skill-spark {
+            0% { width: 0%; box-shadow: 0 0 2px var(--secondary); }
+            100% { width: var(--skill-level); box-shadow: 0 0 10px var(--secondary-glow), 0 0 15px var(--secondary-glow); }
+        }
+
+        .skill-bar-inner {
+            animation: skill-spark 2s ease-out forwards;
+            animation-play-state: paused;
+        }
+        .skill-bar-inner.animate {
+            animation-play-state: running;
+        }
+
+        .glassmorphism {
+            background: var(--card-rgba);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .project-card .project-card-front, .project-card .project-card-back {
+            backface-visibility: hidden;
+            transition: transform 0.8s;
+        }
+        .project-card .project-card-back {
+            transform: rotateY(180deg);
+        }
+        .project-card:hover .project-card-front {
+            transform: rotateY(-180deg);
+        }
+        .project-card:hover .project-card-back {
+            transform: rotateY(0deg);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.375rem; /* Adjust based on icon size and line position */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary-glow), 0 0 20px var(--secondary);
+            z-index: 10;
+        }
+        
+        .timeline-line {
+             background: linear-gradient(to bottom, var(--primary) 50%, transparent 50%);
+             background-size: 2px 10px;
+        }
+
+        #music-player.playing {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-15px);
+            }
+            60% {
+                transform: translateY(-7px);
+            }
+        }
+    </style>
 </head>
-<body>
-    <div class="cursor"></div>
+<body class="bg-black text-gray-200">
+    <canvas id="circuit-canvas" class="fixed top-0 left-0 w-full h-full z-[-1]"></canvas>
 
-    <div class="audio-player">
-        <audio id="bg-music" src="assets/audio/home.mp3" loop></audio>
-        <button id="audio-btn"><i class="fas fa-play"></i></button>
+    <!-- HERO SECTION -->
+    <header id="home" class="h-screen flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div class="z-10 p-4">
+            <h1 class="text-7xl md:text-9xl font-orbitron font-bold relative glitch-effect-text" style="text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);">JEYARAM</h1>
+            <p id="tagline" class="text-xl md:text-2xl mt-4 text-green-300 font-mono"></p>
+            <div class="mt-8 flex gap-4 justify-center">
+                <a href="Jeyaram new Resume-2.pdf" download class="px-6 py-3 border-2 border-cyan-400 text-cyan-400 rounded-full font-bold uppercase tracking-wider transition-all duration-300 hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_var(--primary-glow)]" style="animation: neon-pulse 2s infinite alternate;">Download Resume</a>
+                <a href="#projects" class="px-6 py-3 border-2 border-green-400 text-green-400 rounded-full font-bold uppercase tracking-wider transition-all duration-300 hover:bg-green-400 hover:text-black hover:shadow-[0_0_20px_var(--secondary-glow)]">View Projects</a>
+            </div>
+        </div>
+        <div class="absolute bottom-10">
+            <a href="#about" class="scroll-indicator">
+                <div class="w-8 h-14 border-2 border-gray-400 rounded-full flex justify-center items-start p-1">
+                    <div class="w-1 h-3 bg-gray-400 rounded-full"></div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Social Icons (separated) -->
+    <div class="mt-10 flex justify-center gap-8">
+      
+      <!-- GitHub -->
+      <div>
+        <a href="https://github.com/yourusername" target="_blank"
+          class="text-3xl text-gray-400 hover:text-cyan-400 transition-all hover:drop-shadow-[0_0_8px_var(--primary-glow)]">
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+
+      <!-- Gmail -->
+      <div>
+        <a href="mailto:jesramram546@gmail.com"
+          class="text-3xl text-gray-400 hover:text-cyan-400 transition-all hover:drop-shadow-[0_0_8px_var(--primary-glow)]">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </div>
+
+      <!-- LinkedIn -->
+      <div>
+        <a href="https://www.linkedin.com/in/jeyaram-ece-reddy" target="_blank"
+          class="text-3xl text-gray-400 hover:text-cyan-400 transition-all hover:drop-shadow-[0_0_8px_var(--primary-glow)]">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </div>
+
     </div>
-
-    <header class="header">
-        <a href="index.html" class="logo">Jeyaram<span>.</span></a>
-        <nav class="navbar">
-            <a href="index.html" class="active">Home</a>
-            <a href="projects.html">Projects</a>
-            <a href="resume.html">Resume</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </nav>
+  </div>
+        
     </header>
 
-    <section class="home" id="home">
-        <div class="home-content" data-aos="fade-up">
-            <h3>Hello, I'm</h3>
-            <h1 class="typing-text"></h1>
-            <p>Fueling innovation with passion, blending technology with imagination, and crafting a world where ideas come to life.</p>
-            <div class="btn-group">
-                <a href="projects.html" class="btn">See Projects</a>
-                <a href="contact.html" class="btn">Contact Me</a>
+    <main class="container mx-auto px-6 md:px-12">
+        <!-- ABOUT SECTION -->
+        <section id="about" class="min-h-screen flex items-center justify-center py-20">
+            <div class="glassmorphism rounded-2xl p-8 md:p-12 w-full max-w-4xl relative" data-tilt>
+                <h2 class="text-4xl font-orbitron mb-6 text-center text-cyan-400">About Me</h2>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="text-lg">
+                        <p>I am an Electronics and Communication Engineering student fueling innovation with passion, blending technology with imagination to craft a world where ideas come to life. My interests lie in Robotics, AI, Web Development, and Home Automation. I am driven to develop innovative tech projects that solve real-world problems.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-orbitron mb-4 text-green-400">Core Interests</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center"><span class="w-4 h-4 mr-3 bg-cyan-400 rounded-full shadow-[0_0_8px_var(--primary-glow)]"></span> Robotics & AI</li>
+                            <li class="flex items-center"><span class="w-4 h-4 mr-3 bg-cyan-400 rounded-full shadow-[0_0_8px_var(--primary-glow)]"></span> IoT & Embedded Systems</li>
+                            <li class="flex items-center"><span class="w-4 h-4 mr-3 bg-cyan-400 rounded-full shadow-[0_0_8px_var(--primary-glow)]"></span> Web Development</li>
+                            <li class="flex items-center"><span class="w-4 h-4 mr-3 bg-cyan-400 rounded-full shadow-[0_0_8px_var(--primary-glow)]"></span> Home Automation</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="social-icons">
-                <a href="https://github.com/Ramu1023"><i class="fab fa-github"></i></a>
-                <a href="https://sites.google.com/view/jeyaram"><i class="fas fa-briefcase"></i></a>
-                <a href="mailto:jesramram546@gmail.com"><i class="fas fa-envelope"></i></a>
-                <a href="https://www.instagram.com/ramu_the_king_1023"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/918309631052"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-        <div class="home-img" data-aos="fade-left">
-            <img src="assets/images/profile-pic.png" alt="B. Jeyaram Reddy">
-        </div>
-    </section>
+        </section>
 
-    <div class="particles">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <!-- SKILLS SECTION -->
+        <section id="skills" class="min-h-screen py-20">
+            <h2 class="text-4xl font-orbitron mb-12 text-center text-cyan-400">My Skill Matrix</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Technical Skills -->
+                <div class="glassmorphism rounded-xl p-6 hover:shadow-[0_0_25px_var(--primary-glow)] hover:scale-105 transition-all duration-300">
+                    <h3 class="text-2xl font-orbitron mb-4 text-green-400">Programming & Web</h3>
+                    <div class="space-y-4">
+                        <div class="skill" data-level="90%"><span>Python</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-green-500 to-green-300"></div></div></div>
+                        <div class="skill" data-level="85%"><span>HTML</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-green-500 to-green-300"></div></div></div>
+                        <div class="skill" data-level="80%"><span>CSS</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-green-500 to-green-300"></div></div></div>
+                        <div class="skill" data-level="75%"><span>C++</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-green-500 to-green-300"></div></div></div>
+                         <div class="skill" data-level="70%"><span>Excel</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-green-500 to-green-300"></div></div></div>
+                    </div>
+                </div>
+                <!-- Hardware & IoT -->
+                <div class="glassmorphism rounded-xl p-6 hover:shadow-[0_0_25px_var(--primary-glow)] hover:scale-105 transition-all duration-300">
+                    <h3 class="text-2xl font-orbitron mb-4 text-green-400">Hardware & IoT</h3>
+                    <div class="space-y-4">
+                         <div class="skill" data-level="95%"><span>Arduino UNO</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-cyan-500 to-cyan-300"></div></div></div>
+                        <div class="skill" data-level="90%"><span>ESP32 & ESP32-CAM</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-cyan-500 to-cyan-300"></div></div></div>
+                        <div class="skill" data-level="85%"><span>GPS & GSM Modules</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-cyan-500 to-cyan-300"></div></div></div>
+                        <div class="skill" data-level="80%"><span>Sensors Integration</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-cyan-500 to-cyan-300"></div></div></div>
+                    </div>
+                </div>
+                <!-- Soft Skills -->
+                <div class="glassmorphism rounded-xl p-6 hover:shadow-[0_0_25px_var(--primary-glow)] hover:scale-105 transition-all duration-300">
+                    <h3 class="text-2xl font-orbitron mb-4 text-green-400">Soft Skills</h3>
+                    <div class="space-y-4">
+                        <div class="skill" data-level="95%"><span>Good Communication</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-purple-500 to-pink-500"></div></div></div>
+                        <div class="skill" data-level="90%"><span>Problem-Solving</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-purple-500 to-pink-500"></div></div></div>
+                        <div class="skill" data-level="85%"><span>Teamwork</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-purple-500 to-pink-500"></div></div></div>
+                        <div class="skill" data-level="100%"><span>Adaptability</span><div class="skill-bar"><div class="skill-bar-inner bg-gradient-to-r from-purple-500 to-pink-500"></div></div></div>
+                    </div>
+                </div>
+            </div>
+            <style>.skill { margin-bottom: 1rem; } .skill span { display: block; margin-bottom: 0.5rem; } .skill-bar { width: 100%; background: rgba(255,255,255,0.1); border-radius: 5px; height: 10px; } .skill-bar-inner { height: 100%; border-radius: 5px; }</style>
+        </section>
+
+        <!-- PROJECTS SECTION -->
+        <section id="projects" class="min-h-screen py-20">
+            <h2 class="text-4xl font-orbitron mb-12 text-center text-cyan-400">Innovations & Creations</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="perspective: 1000px;">
+                <!-- Project 1 -->
+                <div class="project-card h-96 rounded-xl relative" style="transform-style: preserve-3d;">
+                    <div class="project-card-front absolute w-full h-full glassmorphism p-6 flex flex-col justify-between items-center text-center rounded-xl bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://placehold.co/600x400/0a0a0f/00faff?text=Women%27s+Safety+Device')">
+                        <h3 class="text-2xl font-orbitron text-green-400">Women's Safety Device</h3>
+                        <p>Sends SOS messages with location details to emergency contacts.</p>
+                    </div>
+                    <div class="project-card-back absolute w-full h-full glassmorphism p-6 flex flex-col justify-center items-center text-center rounded-xl">
+                        <h4 class="text-xl font-bold mb-2">Tech Stack</h4>
+                        <p>SIM900A, Arduino UNO, GPS, JHT162A</p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="#" class="text-cyan-400 hover:text-cyan-200">GitHub</a>
+                            <a href="#" class="text-green-400 hover:text-green-200">Demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 2 -->
+                <div class="project-card h-96 rounded-xl relative" style="transform-style: preserve-3d;">
+                    <div class="project-card-front absolute w-full h-full glassmorphism p-6 flex flex-col justify-between items-center text-center rounded-xl bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://placehold.co/600x400/0a0a0f/00ff7f?text=Fish+Robot')">
+                        <h3 class="text-2xl font-orbitron text-green-400">Fish Robot (Aqua bot-X)</h3>
+                        <p>Biomimetic robot for water quality monitoring and live streaming.</p>
+                    </div>
+                    <div class="project-card-back absolute w-full h-full glassmorphism p-6 flex flex-col justify-center items-center text-center rounded-xl">
+                        <h4 class="text-xl font-bold mb-2">Tech Stack</h4>
+                        <p>ESP32, ESP32-CAM, Gas Sensor, Wi-Fi</p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="#" class="text-cyan-400 hover:text-cyan-200">GitHub</a>
+                            <a href="#" class="text-green-400 hover:text-green-200">Demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 3 -->
+                <div class="project-card h-96 rounded-xl relative" style="transform-style: preserve-3d;">
+                    <div class="project-card-front absolute w-full h-full glassmorphism p-6 flex flex-col justify-between items-center text-center rounded-xl bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://uploads.onecompiler.io/42q5e2pr5/43vc8nefz/IMG_20250901_073659.jpg')">
+                        <h3 class="text-2xl font-orbitron text-green-400">Tic-Tac-Toe(XOX) Game</h3>
+                        <p>Web-based game with animations and a colorful, custom design.</p>
+                    </div>
+                    <div class="project-card-back absolute w-full h-full glassmorphism p-6 flex flex-col justify-center items-center text-center rounded-xl">
+                        <h4 class="text-xl font-bold mb-2">Tech Stack</h4>
+                        <p>HTML, CSS, JavaScript</p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="https://github.com/jeyaram1023/Xox-game.git" class="text-cyan-400 hover:text-cyan-200">GitHub</a>
+                            <a href="https://jeyaram1023.github.io/Xox-game/" class="text-green-400 hover:text-green-200">Play</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Project 4 -->
+                <div class="project-card h-96 rounded-xl relative" style="transform-style: preserve-3d;">
+                    <div class="project-card-front absolute w-full h-full glassmorphism p-6 flex flex-col justify-between items-center text-center rounded-xl bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://uploads.onecompiler.io/42q5e2pr5/433anht9u/1000084234.png')">
+                        <h3 class="text-2xl font-orbitron text-green-400">Money Notebook App</h3>
+                        <p>A web-based finance tracking application for managing daily expenses.</p>
+                    </div>
+                    <div class="project-card-back absolute w-full h-full glassmorphism p-6 flex flex-col justify-center items-center text-center rounded-xl">
+                        <h4 class="text-xl font-bold mb-2">Tech Stack</h4>
+                        <p>HTML, CSS, JavaScript</p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="#" class="text-cyan-400 hover:text-cyan-200">GitHub</a>
+                            <a href="#" class="text-green-400 hover:text-green-200">Demo</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Project 5 -->
+                <div class="project-card h-96 rounded-xl relative" style="transform-style: preserve-3d;">
+                    <div class="project-card-front absolute w-full h-full glassmorphism p-6 flex flex-col justify-between items-center text-center rounded-xl bg-cover bg-center" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://uploads.onecompiler.io/42q5e2pr5/43m4t5ddk/1000130216.png')">
+                        <h3 class="text-2xl font-orbitron text-green-400">StreetR customer web app</h3>
+                        <p> online grocery or food delivery app and unique animations.</p>
+                    </div>
+                    <div class="project-card-back absolute w-full h-full glassmorphism p-6 flex flex-col justify-center items-center text-center rounded-xl">
+                        <h4 class="text-xl font-bold mb-2">Tech Stack</h4>
+                        <p>HTML, CSS, JavaScript, supabase</p>
+                        <div class="mt-4 flex gap-4">
+                            <a href="https://github.com/jeyaram1023/StreetR-customer-app-.git" class="text-cyan-400 hover:text-cyan-200">GitHub</a>
+                            <a href="https://jeyaram1023.github.io/StreetR-customer-app-/" class="text-green-400 hover:text-green-200">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EDUCATION SECTION -->
+        <section id="education" class="min-h-screen py-20">
+            <h2 class="text-4xl font-orbitron mb-20 text-center text-cyan-400">Educational Trajectory</h2>
+            <div class="relative w-full max-w-2xl mx-auto pl-10">
+                <div class="timeline-line absolute left-0 top-0 h-full w-0.5"></div>
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item mb-12">
+                    <h3 class="text-2xl font-orbitron text-green-400">B.Tech in ECE</h3>
+                    <p class="text-cyan-400">PBR Visvodaya Institute Of Technology & Science, Kavali | 2023 - 2027</p>
+                    <p class="mt-2">Currently in my third year, specializing in Electronics and Communication Engineering.</p>
+                </div>
+                <!-- Timeline Item 2 -->
+                <div class="timeline-item mb-12">
+                    <h3 class="text-2xl font-orbitron text-green-400">Intermediate (MPC)</h3>
+                    <p class="text-cyan-400">A.P. Model Jr. College, A.S.Peta | 2021 - 2023</p>
+                    <p class="mt-2">Completed Higher Secondary Education in the MPC group.</p>
+                </div>
+                 <!-- Timeline Item 3 -->
+                <div class="timeline-item mb-12">
+                    <h3 class="text-2xl font-orbitron text-green-400">SSC</h3>
+                    <p class="text-cyan-400">Tagore EM High School, A.S.Peta | 2016 - 2021</p>
+                    <p class="mt-2">Completed my secondary school education.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+<section id="contact" class="min-h-screen flex items-center justify-center py-20 relative">
+    <div class="glassmorphism rounded-2xl p-8 md:p-12 w-full max-w-2xl text-center">
+        <h2 class="text-4xl font-orbitron mb-6 text-cyan-400">Get In Touch</h2>
+        <p class="mb-8">Have a project idea or want to collaborate? My inbox is always open.</p>
+        
+        <form action="mailto:jesramram546@gmail.com" method="post" enctype="text/plain" class="space-y-6">
+            <input type="text" name="name" placeholder="Your Name" class="w-full bg-transparent border-b-2 border-cyan-400 p-3 focus:outline-none focus:border-green-400 transition-colors">
+            <input type="email" name="email" placeholder="Your Email" class="w-full bg-transparent border-b-2 border-cyan-400 p-3 focus:outline-none focus:border-green-400 transition-colors">
+            <textarea name="message" placeholder="Your Message" rows="4" class="w-full bg-transparent border-b-2 border-cyan-400 p-3 focus:outline-none focus:border-green-400 transition-colors"></textarea>
+            <button type="submit" class="px-8 py-3 border-2 border-green-400 text-green-400 rounded-full font-bold uppercase tracking-wider transition-all duration-300 hover:bg-green-400 hover:text-black hover:shadow-[0_0_20px_var(--secondary-glow)]">Send Signal</button>
+        </form>
+        
+        <!-- Social Icons -->
+        <div class="mt-10 flex justify-center gap-6">
+            <!-- GitHub -->
+            <a href="https://github.com/yourusername" target="_blank" 
+               class="text-3xl text-gray-400 hover:text-cyan-400 transition-all hover:drop-shadow-[0_0_8px_var(--primary-glow)]">
+               <i class="fab fa-github"></i>
+            </a>
+            
+            <!-- Gmail -->
+            <a href="mailto:jesramram546@gmail.com" 
+               class="text-3xl text-gray-400 hover:text-cyan-400 transition-all hover:drop-shadow-[0_0_8px_var(--primary-glow)]">
+               <i class="fas fa-envelope"></i>
+            </a>
+            
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/in/yourusername" target="_blank" 
+               class="text-3xl text-gray-400 hover:text-cyan-400 transition-all hover:drop-shadow-[0_0_8px_var(--primary-glow)]">
+               <i class="fab fa-linkedin"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+    <!-- FOOTER -->
+    <footer class="py-6 text-center text-gray-500 border-t border-gray-800">
+        <p>&copy; <span id="year"></span> B. Jeyaram Reddy. All rights reserved. Encoded with passion.</p>
+    </footer>
+
+    <!-- MUSIC PLAYER -->
+    <div id="music-player" class="fixed bottom-5 right-5 glassmorphism rounded-full p-3 cursor-pointer">
+        <audio id="background-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+        <button id="play-pause-btn" class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white">
+            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
     </div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
-    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Typewriter Effect ---
+            const taglineEl = document.getElementById('tagline');
+            const taglineText = "Fueling innovation with passion, blending technology with imagination.";
+            let i = 0;
+            function typewriter() {
+                if (i < taglineText.length) {
+                    taglineEl.innerHTML += taglineText.charAt(i);
+                    i++;
+                    setTimeout(typewriter, 50);
+                }
+            }
+            typewriter();
+
+            // --- Footer Year ---
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // --- Circuit Canvas Animation ---
+            const canvas = document.getElementById('circuit-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const particleCount = 100;
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        size: Math.random() * 2 + 1,
+                        speed: Math.random() * 1 + 0.5,
+                        color: Math.random() > 0.5 ? 'hsl(var(--primary-hsl))' : 'hsl(var(--secondary-hsl))',
+                    });
+                }
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    let p = particles[i];
+                    p.y -= p.speed;
+                    if (p.y < 0) {
+                        p.y = canvas.height;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    ctx.beginPath();
+                    ctx.fillStyle = p.color;
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+            
+            initParticles();
+            animateParticles();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                initParticles();
+            });
+
+            // --- Skill Bar Animation on Scroll ---
+            const skillsSection = document.getElementById('skills');
+            const skillBars = document.querySelectorAll('.skill-bar-inner');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        skillBars.forEach(bar => {
+                            const level = bar.closest('.skill').dataset.level;
+                            bar.style.setProperty('--skill-level', level);
+                            bar.classList.add('animate');
+                        });
+                        observer.unobserve(skillsSection);
+                    }
+                });
+            }, { threshold: 0.3 });
+            observer.observe(skillsSection);
+
+
+            // --- 3D Tilt Effect for Cards ---
+            const tiltElements = document.querySelectorAll('[data-tilt]');
+            tiltElements.forEach(el => {
+                el.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = el.getBoundingClientRect();
+                    const x = (e.clientX - left) / width - 0.5;
+                    const y = (e.clientY - top) / height - 0.5;
+                    
+                    const rotateX = y * -20; // Max rotation
+                    const rotateY = x * 20;
+                    
+                    el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                    el.style.boxShadow = `${x * -30}px ${y * -30}px 50px rgba(0, 255, 255, 0.1)`;
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                    el.style.boxShadow = 'none';
+                });
+            });
+
+            // --- Music Player ---
+            const musicPlayer = document.getElementById('music-player');
+            const audio = document.getElementById('background-music');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+
+            playPauseBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play();
+                    musicPlayer.classList.add('playing');
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                } else {
+                    audio.pause();
+                    musicPlayer.classList.remove('playing');
+                    playIcon.classList.remove('hidden');
+                    pauseIcon.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+
+
