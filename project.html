@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>Projects | B. Jeyaram Reddy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4' },
+                        neon: { 
+                            pink: '#ff00ff', 
+                            blue: '#00f3ff', 
+                            green: '#39ff14', 
+                            yellow: '#facc15' 
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'modal-zoom': 'modalZoom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'scanline': 'scanline 2s linear infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        modalZoom: {
+                            '0%': { opacity: '0', transform: 'scale(0.8) translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        },
+                        scanline: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --primary: #ff00ff;
+            --secondary: #00f3ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            overflow-x: hidden;
+            font-family: 'Roboto Mono', monospace;
+            cursor: none; /* Custom cursor */
+        }
+
+        /* Digital Rain Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot, .cursor-circle {
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background-color: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+        }
+        .cursor-circle {
+            width: 40px; height: 40px;
+            border: 1px solid var(--primary);
+            transition: width 0.2s, height 0.2s, border-color 0.2s;
+        }
+        body:hover .cursor-circle {
+            width: 60px; height: 60px;
+            border-color: var(--secondary);
+            opacity: 0.5;
+        }
+
+        /* Filter Tab */
+        .filter-tab {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+        
+        .filter-tab.active {
+            background: rgba(255, 0, 255, 0.2);
+            color: var(--secondary);
+            border-color: var(--secondary);
+            text-shadow: 0 0 8px var(--secondary);
+        }
+        
+        .filter-tab::before {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 2px;
+            background: var(--primary); transition: width 0.3s;
+        }
+        .filter-tab:hover::before { width: 100%; }
+
+        /* 3D Holographic Card */
+        .card-wrapper {
+            perspective: 1000px;
+        }
+        
+        .project-card {
+            background: rgba(15, 15, 25, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glowing Border on Hover */
+        .project-card:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Scanner Effect */
+        .scanner-bar {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 50%;
+            background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.1), transparent);
+            transform: translateY(-100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .project-card:hover .scanner-bar {
+            animation: scanline 1.5s linear infinite;
+        }
+
+        /* Tech Tag */
+        .tech-tag {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        .project-card:hover .tech-tag {
+            border-color: var(--secondary);
+            color: var(--secondary);
+            box-shadow: 0 0 5px var(--secondary);
+        }
+
+        /* Glitch Text Animation */
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        .glitch-hover:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: var(--primary);
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed; inset: 0; z-index: 9999;
+            background: black; display: flex; flex-direction: column;
+            justify-content: center; items-center;
+            transition: opacity 0.5s ease-out;
+        }
+        .loader-bar {
+            width: 200px; height: 4px; background: #333; margin-top: 20px;
+            position: relative; overflow: hidden;
+        }
+        .loader-fill {
+            position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+            background: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary);
+            animation: load 1.5s ease-in-out forwards;
+        }
+        @keyframes load { 100% { width: 100%; } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="font-orbitron text-cyan-400 text-2xl tracking-widest">INITIALIZING ARCHIVE</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div class="font-mono text-gray-500 text-xs mt-2">Loading Assets...</div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-circle hidden md:block"></div>
+
+    <!-- Background Matrix Rain -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Canvas for Confetti -->
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 p-4 transition-all duration-300">
+        <div class="container mx-auto">
+            <div class="bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex justify-between items-center shadow-[0_0_20px_rgba(0,243,255,0.2)]">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-full border border-pink-500 flex items-center justify-center bg-pink-900/20 group-hover:bg-pink-500/20 transition-all">
+                        <span class="font-orbitron font-bold text-pink-400">JR</span>
+                    </div>
+                    <span class="font-orbitron font-bold text-gray-300 group-hover:text-pink-400 transition-colors">PROJECTS</span>
+                </a>
+                
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex gap-6 text-xs font-orbitron">
+                    <a href="index.html" class="text-gray-400 hover:text-cyan-400 transition-colors hover:scale-110 transform">HOME</a>
+                    <a href="index.html#" class="text-gray-400 hover:text-cyan-400 transition-colors hover:scale-110 transform">CERTIFICATES</a>
+                    <a href="index.html#experience" class="text-gray-400 hover:text-cyan-400 transition-colors hover:scale-110 transform">EXPERIENCE</a>
+                    <a href="index.html#contact" class="text-gray-400 hover:text-cyan-400 transition-colors hover:scale-110 transform">CONTACT</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-pink-400" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Nav Dropdown -->
+        <div id="mobile-nav" class="hidden absolute top-20 left-4 right-4 bg-black/90 border border-pink-500/30 rounded-xl p-4 flex flex-col gap-4 text-center font-orbitron text-sm backdrop-blur-xl z-50">
+            <a href="index.html" class="text-gray-300 hover:text-pink-400">HOME</a>
+            <a href="certificates.html" class="text-gray-300 hover:text-pink-400">CERTIFICATES</a>
+            <a href="index.html#experience" class="text-gray-300 hover:text-pink-400">EXPERIENCE</a>
+            <a href="index.html#contact" class="text-gray-300 hover:text-pink-400">CONTACT</a>
+        </div>
+    </nav>
+
+    <!-- Hero / Header -->
+    <header class="pt-32 pb-8 px-4 text-center relative z-10">
+        <h1 class="glitch-hover text-4xl md:text-7xl font-orbitron font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-neon-pink via-neon-blue to-neon-yellow drop-shadow-[0_0_20px_rgba(255,0,255,0.5)] cursor-default">
+            PROJECT ARCHIVE
+        </h1>
+        
+        <!-- Top Get Up Button -->
+        <div class="mb-10 animate-float">
+            <a href="https://github.com/jeyaram1023" target="_blank" class="inline-flex items-center gap-3 px-8 py-3 bg-black/50 border border-pink-500 text-pink-400 font-orbitron font-bold rounded-sm hover:bg-pink-500 hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,0,255,0.2)] hover:shadow-[0_0_40px_rgba(255,0,255,0.8)] clip-path-polygon">
+                <i class="fab fa-github text-xl"></i>
+                GITHUB PROFILE
+            </a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="flex flex-wrap justify-center gap-4 max-w-5xl mx-auto mb-10">
+            <button class="filter-tab active px-6 py-2 border border-gray-700 text-gray-400 text-xs md:text-sm font-orbitron hover:text-white transition-all" data-filter="all">ALL_SYSTEMS</button>
+            <button class="filter-tab px-6 py-2 border border-gray-700 text-gray-400 text-xs md:text-sm font-orbitron hover:text-white transition-all" data-filter="hardware">HARDWARE</button>
+            <button class="filter-tab px-6 py-2 border border-gray-700 text-gray-400 text-xs md:text-sm font-orbitron hover:text-white transition-all" data-filter="software">SOFTWARE</button>
+            <button class="filter-tab px-6 py-2 border border-gray-700 text-gray-400 text-xs md:text-sm font-orbitron hover:text-white transition-all" data-filter="n8n">n8n_AUTO</button>
+            <button class="filter-tab px-6 py-2 border border-gray-700 text-gray-400 text-xs md:text-sm font-orbitron hover:text-white transition-all" data-filter="android">ANDROID</button>
+        </div>
+    </header>
+
+    <!-- Projects Grid -->
+    <main class="container mx-auto px-4 pb-20 flex-grow relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="project-grid">
+            
+            <!-- Project 1: Women's Safety (Hardware) -->
+            <div class="card-wrapper project-item" data-category="hardware">
+                <div class="project-card rounded-xl overflow-hidden group cursor-pointer h-full" onclick="openModal('safety')">
+                    <div class="scanner-bar"></div>
+                    <div class="relative h-48 overflow-hidden bg-black">
+                        <img src="https://i.ibb.co/TMZ443tJ/women-safety-device-banner.jpg" alt="Safety Device" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 border border-pink-500 text-pink-400 text-[10px] font-orbitron px-2 py-1 rounded backdrop-blur-md">HARDWARE</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-2 group-hover:text-pink-400 transition-colors truncate">Women Safety Wearable</h3>
+                        <p class="text-gray-400 text-xs font-mono mb-4 line-clamp-3">Smart IoT ecosystem with watch & slippers for emergency alerts and defense.</p>
+                        <div class="flex flex-wrap gap-2 mt-auto">
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">ESP32</span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">GPS/GSM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2: Aqua Bot (Hardware/Robotics) -->
+            <div class="card-wrapper project-item" data-category="hardware">
+                <div class="project-card rounded-xl overflow-hidden group cursor-pointer h-full" onclick="openModal('aqua')">
+                    <div class="scanner-bar"></div>
+                    <div class="relative h-48 overflow-hidden bg-black">
+                        <img src="https://i.ibb.co/yF3BZjNc/aqua-bot-x.jpg" alt="Aqua Bot" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 border border-cyan-500 text-cyan-400 text-[10px] font-orbitron px-2 py-1 rounded backdrop-blur-md">ROBOTICS</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors truncate">Aqua Bot-X</h3>
+                        <p class="text-gray-400 text-xs font-mono mb-4 line-clamp-3">Biomimetic fish robot for underwater surveillance and water quality monitoring.</p>
+                        <div class="flex flex-wrap gap-2 mt-auto">
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">ESP32-CAM</span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">Biomimicry</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 3: street R (Software/AI) -->
+            <div class="card-wrapper project-item" data-category="software">
+                <div class="project-card rounded-xl overflow-hidden group cursor-pointer h-full" onclick="openModal('streetr')">
+                    <div class="scanner-bar"></div>
+                    <div class="relative h-48 overflow-hidden bg-black">
+                        <img src="https://i.ibb.co/0yfqxpVW/68747470733a2f2f75706c6f6164732e6f6e65636f6d70696c65722e696f2f3432713565327072352f34336d34743564646b.png" alt="AI Robot" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 border border-green-500 text-green-400 text-[10px] font-orbitron px-2 py-1 rounded backdrop-blur-md">Start-up </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-2 group-hover:text-green-400 transition-colors truncate">Street R </h3>
+                        <p class="text-gray-400 text-xs font-mono mb-4 line-clamp-3">A modern mobile app that helps users discover and connect with nearby street-side service providers with ease.</p>
+                        <div class="flex flex-wrap gap-2 mt-auto">
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono"> MVP </span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">supabase </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 4: Smart Wheelchair (Hardware) -->
+            <div class="card-wrapper project-item" data-category="hardware">
+                <div class="project-card rounded-xl overflow-hidden group cursor-pointer h-full" onclick="openModal('wheelchair')">
+                    <div class="scanner-bar"></div>
+                    <div class="relative h-48 overflow-hidden bg-black">
+                        <img src="https://i.ibb.co/ks2BNWxk/wheelchair-img.jpg" alt="Wheelchair" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 border border-yellow-500 text-yellow-400 text-[10px] font-orbitron px-2 py-1 rounded backdrop-blur-md">HARDWARE</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors truncate">Smart Wheelchair</h3>
+                        <p class="text-gray-400 text-xs font-mono mb-4 line-clamp-3">This is an assistive mobility solution that enables independent and safe wheelchair control using voice and eye-based commands through a mobile application.</p>
+                        <div class="flex flex-wrap gap-2 mt-auto">
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">Raspberry Pi</span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">IoT</span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">Android studio</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 5: n8n Workflow (n8n) -->
+            <div class="card-wrapper project-item" data-category="n8n">
+                <div class="project-card rounded-xl overflow-hidden group cursor-pointer h-full" onclick="openModal('n8n')">
+                    <div class="scanner-bar"></div>
+                    <div class="relative h-48 overflow-hidden bg-black">
+                        <img src="https://i.ibb.co/hxL6HYVp/517456652-7bc232be-b878-40e0-817a-23899b9f5cff.png" alt="Automation" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 border border-orange-500 text-orange-400 text-[10px] font-orbitron px-2 py-1 rounded backdrop-blur-md">AUTOMATION</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-2 group-hover:text-orange-400 transition-colors truncate">Stock Market</h3>
+                        <p class="text-gray-400 text-xs font-mono mb-4 line-clamp-3">Automated Stock Market Analyst built using n8n workflow automation, Telegram Bot, and AI-powered chart/image analysis.</p>
+                        <div class="flex flex-wrap gap-2 mt-auto">
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">n8n</span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">Webhooks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 6: Home Automation App (Android) -->
+            <div class="card-wrapper project-item" data-category="android">
+                <div class="project-card rounded-xl overflow-hidden group cursor-pointer h-full" onclick="openModal('android')">
+                    <div class="scanner-bar"></div>
+                    <div class="relative h-48 overflow-hidden bg-black">
+                        <img src="https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?w=500" alt="App" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 right-3 bg-black/80 border border-purple-500 text-purple-400 text-[10px] font-orbitron px-2 py-1 rounded backdrop-blur-md">ANDROID</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-2 group-hover:text-purple-400 transition-colors truncate">Smart Home App</h3>
+                        <p class="text-gray-400 text-xs font-mono mb-4 line-clamp-3">Custom Android application for controlling IoT devices and monitoring sensor data.</p>
+                        <div class="flex flex-wrap gap-2 mt-auto">
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">Java</span>
+                            <span class="tech-tag text-[10px] text-cyan-300 px-2 py-1 rounded font-mono">Firebase</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Get Up Button -->
+    <footer class="py-12 bg-black/80 text-center relative z-10 border-t border-gray-800">
+        <div class="mb-8">
+            <a href="https://github.com/jeyaram1023" target="_blank" class="inline-flex items-center gap-3 px-8 py-3 bg-black/50 border border-cyan-500 text-cyan-400 font-orbitron font-bold rounded-sm hover:bg-cyan-500 hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,243,255,0.4)] hover:shadow-[0_0_40px_rgba(0,243,255,0.8)]">
+                <i class="fab fa-github text-xl"></i>
+                GITHUB PROFILE
+            </a>
+        </div>
+        <p class="font-mono text-xs text-gray-500">
+            &copy; <script>document.write(new Date().getFullYear())</script> B. JEYARAM REDDY. <span class="text-pink-500">ARCHIVE SECURE.</span>
+        </p>
+    </footer>
+
+    <!-- Project Modal -->
+    <div id="project-modal" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center backdrop-blur-md p-4" onclick="closeModal()">
+        <div class="relative max-w-3xl w-full bg-gray-900 border border-cyan-500/30 rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(0,243,255,0.15)] flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+            <!-- Dynamic Content Injected Here -->
+            <div id="modal-content" class="p-0 overflow-auto"></div>
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-300 hover:text-white transition-colors z-20 bg-black/50 hover:bg-red-500/80 rounded-full w-8 h-8 flex items-center justify-center border border-white/20">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Custom Cursor Logic ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorCircle = document.querySelector('.cursor-circle');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Dot follows instantly
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            // Circle follows with delay (handled by CSS transition usually, but let's force position)
+            cursorCircle.style.left = `${posX}px`;
+            cursorCircle.style.top = `${posY}px`;
+        });
+
+        // --- Data Store ---
+        const projects = {
+            'safety': {
+                title: "Women Safety Wearable Device",
+                img: "https://i.ibb.co/TMZ443tJ/women-safety-device-banner.jpg",
+                desc: "An advanced IoT-based safety system featuring dual modules: a Smart Watch and Smart Slippers. Emergency mode activates via button press or abnormal movement, triggering GPS/GSM alerts to contacts, real-time health monitoring, and a static electric deterrent to safely repel attackers.",
+                tech: ["ESP32", "ESP8266", "GPS/GSM", "Sensors", "C++"],
+                link: "https://github.com/jeyaram1023/Women-safety-wearable-device"
+            },
+            'aqua': {
+                title: "Aqua Bot-X (Fish Robot)",
+                img: "https://i.ibb.co/yF3BZjNc/aqua-bot-x.jpg",
+                desc: "Biomimetic robot designed to mimic fish movement for stealthy underwater surveillance. Equipped with ESP32-CAM for live streaming and sensors for monitoring water quality metrics like pH and turbidity.",
+                tech: ["ESP32-CAM", "Servo Motors", "Biomimicry", "Robotics"],
+                link: "https://github.com/jeyaram1023/Fish-Robot-Aqua-bot-X-/"
+            },
+            'streetr': {
+                title: "Street R Native Mobile App",
+                img: "https://i.ibb.co/twddz0YV/Gemini-Generated-Image-o9xbimo9xbimo9xb.png",
+                desc: "The Streeter customer app is a user-friendly platform that lets customers easily place orders, track deliveries, and manage their accounts in real time. It focuses on convenience, seamless navigation, and a smooth overall user experience.",
+                tech: ["HTML", "CSS", "JS", "supabase","startup idea"],
+                link: "https://github.com/jeyaram1023/StreetR-customer-app-.git"
+            },
+            'wheelchair': {
+                title: "Smart Wheelchair",
+                img: "https://i.ibb.co/ymZzFJZR/wheelchair-banner.jpg",
+                desc: "Smart Wheelchair Project addresses the challenge of dependent mobility faced by people with disabilities. Before technology, movement required constant assistance and limited control. With eye-tracking and voice-based control through a mobile application, users can now operate the wheelchair independently. This solution transforms mobility into a dignified, user-controlled experience.",
+                tech: ["Raspberry Pi", "NodeMCU", "Bluetooth", "Sensors", " Android studio"],
+                link: "#"
+            },
+            'n8n': {
+                title: "n8n Automation Pipelines",
+                img: "https://i.ibb.co/hxL6HYVp/517456652-7bc232be-b878-40e0-817a-23899b9f5cff.png",
+                desc: "Designed and maintained complex workflow automations using n8n. Integrated various APIs to preprocess datasets for ML models and automate reporting tasks.",
+                tech: ["n8n", "JSON", "APIs", "Webhooks"],
+                link: "https://github.com/jeyaram1023/stock-market-analyst-n8n.git"
+            },
+            'android': {
+                title: "Smart Home Controller App",
+                img: "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?w=500",
+                desc: "A native Android application designed to interface with IoT projects. Allows users to toggle switches, view sensor data in real-time, and manage device settings via Firebase.",
+                tech: ["Android Studio", "Java/Kotlin", "Firebase"],
+                link: "#"
+            }
+        };
+
+        // --- Matrix Rain Effect ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(5, 5, 5, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#0F0"; // Default, will override
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                // Randomize colors for cyberpunk feel
+                ctx.fillStyle = Math.random() > 0.5 ? "#22d3ee" : "#ff00ff";
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        // --- Confetti Effect ---
+        function fireConfetti() {
+            var myConfetti = confetti.create(document.getElementById('confetti-canvas'), {
+                resize: true,
+                useWorker: true
+            });
+
+            myConfetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff00ff', '#00f3ff', '#39ff14', '#facc15'],
+                disableForReducedMotion: true
+            });
+        }
+
+        // --- Loading Animation ---
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    fireConfetti();
+                }, 500);
+            }, 1500); // Simulate load time
+        });
+
+        // --- Filter Logic with Animation ---
+        const tabs = document.querySelectorAll('.filter-tab');
+        const items = document.querySelectorAll('.project-item');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Active state
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const filter = tab.dataset.filter;
+                
+                // Animation Stagger
+                let delayCounter = 0;
+
+                items.forEach(item => {
+                    const card = item.querySelector('.project-card');
+                    
+                    if (filter === 'all' || item.dataset.category === filter) {
+                        item.style.display = 'block';
+                        // Reset animation
+                        card.style.animation = 'none';
+                        card.offsetHeight; /* trigger reflow */
+                        card.style.animation = `modalZoom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards`;
+                        card.style.animationDelay = `${delayCounter * 0.1}s`;
+                        delayCounter++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // --- 3D Tilt Logic ---
+        const cards = document.querySelectorAll('.project-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                // Tilt math
+                const rotateX = ((y - centerY) / centerY) * -5; 
+                const rotateY = ((x - centerX) / centerX) * 5;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('project-modal');
+        const modalContent = document.getElementById('modal-content');
+
+        function openModal(id) {
+            const project = projects[id];
+            if (!project) return;
+
+            modalContent.innerHTML = `
+                <div class="relative h-64 overflow-hidden">
+                    <img src="${project.img}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6">
+                        <h2 class="text-3xl font-orbitron font-bold text-white drop-shadow-lg glitch-hover">${project.title}</h2>
+                        <div class="h-1 w-20 bg-pink-500 mt-2"></div>
+                    </div>
+                </div>
+                <div class="p-8 bg-gray-900">
+                    <p class="text-gray-300 font-mono leading-relaxed mb-6 text-sm md:text-base border-l-2 border-cyan-500 pl-4">${project.desc}</p>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-pink-400 font-orbitron text-xs tracking-widest mb-3 border-b border-gray-800 pb-2">SYSTEM_COMPONENTS</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${project.tech.map(t => `<span class="px-3 py-1 bg-gray-800 border border-gray-600 rounded text-cyan-300 text-xs font-mono hover:bg-cyan-900/30 transition-colors cursor-default">${t}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <a href="${project.link}" target="_blank" class="group block w-full text-center py-4 bg-transparent border border-pink-500 text-pink-400 font-orbitron font-bold rounded-sm hover:bg-pink-500 hover:text-black transition-all relative overflow-hidden">
+                        <span class="relative z-10">ACCESS SOURCE CODE <i class="fas fa-code-branch ml-2"></i></span>
+                        <div class="absolute inset-0 bg-pink-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 z-0"></div>
+                    </a>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            // Animation
+            const contentDiv = modal.querySelector('.relative');
+            contentDiv.style.animation = 'none';
+            contentDiv.offsetHeight;
+            contentDiv.style.animation = 'modalZoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
