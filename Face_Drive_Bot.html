@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Drive Bot | AI Eye Control</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Orbitron', 'sans-serif'],
+                        body: ['Rajdhani', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#050b14',
+                            panel: 'rgba(20, 30, 50, 0.6)',
+                            primary: 'var(--primary)',
+                            accent: 'var(--accent)',
+                        }
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            /* 🎨 APP COLORS */
+            --primary: #00f3ff;   /* Bright Cyan/Blue */
+            --accent: #bc13fe;    /* Purple/Pink Accent */
+            --bg-deep: #030712;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Grid */
+        .bg-tech-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Glassmorphism Cards */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-panel:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+        }
+
+        /* Scanner Animation */
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: scan 3s ease-in-out infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        
+        /* Logo glow effect */
+        .logo-glow {
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.4));
+        }
+    </style>
+</head>
+<body class="font-body bg-tech-grid min-h-screen relative">
+
+    <!-- Ambient Glows -->
+    <div class="fixed top-0 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-[var(--primary)] rounded-full blur-[100px] md:blur-[150px] opacity-10 pointer-events-none"></div>
+    <div class="fixed bottom-0 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-[var(--accent)] rounded-full blur-[100px] md:blur-[150px] opacity-10 pointer-events-none"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <!-- Logo Area -->
+                <div class="flex items-center gap-3">
+                    <div class="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl bg-slate-900/50 border border-white/10 overflow-hidden group flex-shrink-0">
+                        <!-- App Icon Image -->
+                        <img src="https://uploads.onecompiler.io/42q5e2pr5/44bbang88/1000182335.png" alt="App Icon" class="w-full h-full object-cover logo-glow" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <!-- Fallback Icon if image missing -->
+                        <div class="hidden w-full h-full items-center justify-center text-[var(--primary)] text-2xl">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                    </div>
+                    <span class="font-display text-lg md:text-2xl tracking-wider text-white">FACE<span class="text-[var(--primary)]">DRIVE</span></span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#problem" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">Mission</a>
+                    <a href="#controls" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">Controls</a>
+                    <a href="#hardware" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">Hardware</a>
+                    
+                    <!-- Top Play Store Button -->
+                    <a href="#" class="flex items-center gap-3 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg hover:border-[var(--primary)] hover:bg-slate-800 transition-all group">
+                        <i class="fab fa-google-play text-2xl text-[var(--primary)] group-hover:scale-110 transition-transform"></i>
+                        <div class="flex flex-col leading-none text-left">
+                            <span class="text-[0.6rem] uppercase font-bold text-slate-400 tracking-wider">GET IT ON</span>
+                            <span class="text-sm font-display font-bold text-white group-hover:text-[var(--primary)] transition-colors">Google Play</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Mobile Hamburger Button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-[var(--primary)] text-2xl p-2 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-white/5 absolute w-full left-0 top-16 transition-all duration-300 ease-in-out">
+            <div class="flex flex-col p-6 space-y-6 bg-slate-950/95 backdrop-blur-xl">
+                <a href="#problem" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
+                    <i class="fas fa-bullseye w-6 text-[var(--primary)]"></i> Mission
+                </a>
+                <a href="#controls" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
+                    <i class="fas fa-gamepad w-6 text-[var(--primary)]"></i> Controls
+                </a>
+                <a href="#hardware" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
+                    <i class="fas fa-microchip w-6 text-[var(--primary)]"></i> Hardware
+                </a>
+                
+                <!-- Mobile Menu Play Store Button -->
+                <a href="#" class="flex items-center justify-center gap-3 px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg hover:border-[var(--primary)] transition-all">
+                    <i class="fab fa-google-play text-2xl text-[var(--primary)]"></i>
+                    <div class="flex flex-col leading-none text-left">
+                        <span class="text-[0.6rem] uppercase font-bold text-slate-400 tracking-wider">GET IT ON</span>
+                        <span class="text-sm font-display font-bold text-white">Google Play</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-12 md:pt-48 md:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            
+            <!-- Left: Text -->
+            <div class="relative z-10 order-2 lg:order-1 text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded border border-[var(--primary)]/30 bg-[var(--primary)]/10 text-[var(--primary)] text-xs md:text-sm font-bold tracking-widest mb-4 md:mb-6 font-display">
+                    <span class="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse"></span>
+                    SYSTEM ONLINE V2025.1
+                </div>
+                
+                <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4 md:mb-6">
+                    MIND <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] text-glow">OVER</span><br>
+                    MACHINE
+                </h1>
+                
+                <p class="text-base md:text-xl text-slate-400 mb-6 md:mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed lg:border-l-2 lg:border-[var(--primary)] lg:pl-6">
+                    The bridge between human gaze and robotic motion. Control hardware using nothing but eye movements and AI.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="#hardware" class="group relative px-6 py-3 md:px-8 md:py-4 bg-transparent overflow-hidden rounded-none border border-[var(--primary)] text-white font-display font-bold tracking-wider text-sm md:text-base">
+                        <div class="absolute inset-0 w-0 bg-[var(--primary)] transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
+                        <span class="relative flex items-center justify-center gap-3">
+                            INITIALIZE CODE <i class="fas fa-terminal text-xs"></i>
+                        </span>
+                    </a>
+                    <a href="#problem" class="px-6 py-3 md:px-8 md:py-4 text-slate-300 hover:text-white font-display font-bold tracking-wider flex items-center justify-center gap-2 transition-colors border border-transparent hover:border-slate-700 text-sm md:text-base">
+                        LEARN MORE <i class="fas fa-arrow-down text-[var(--primary)]"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Visual -->
+            <div class="relative order-1 lg:order-2 flex justify-center">
+                <!-- Decorative Circles -->
+                <div class="absolute -inset-4 border border-[var(--primary)]/20 rounded-full animate-[spin_10s_linear_infinite] w-full h-full max-w-[280px] max-h-[280px] md:max-w-[350px] md:max-h-[350px]"></div>
+                
+                <!-- Main Glass Card -->
+                <div class="glass-panel p-1 rounded-2xl relative overflow-hidden transform rotate-3 hover:rotate-0 transition-transform duration-500 max-w-[260px] md:max-w-[320px] w-full">
+                    <div class="bg-black/80 rounded-xl p-6 md:p-8 aspect-square flex flex-col items-center justify-center relative">
+                        <div class="scanner-line"></div>
+                        
+                        <!-- Eye Visualization -->
+                        <div class="relative w-20 h-20 md:w-32 md:h-32 mb-6 md:mb-8">
+                            <div class="absolute inset-0 border-4 border-[var(--primary)] rounded-full opacity-20"></div>
+                            <div class="absolute inset-0 border-t-4 border-[var(--primary)] rounded-full animate-spin"></div>
+                            <div class="absolute inset-4 bg-[var(--primary)] rounded-full opacity-20 animate-pulse"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-eye text-2xl md:text-4xl text-white"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 w-full">
+                            <div class="flex justify-between text-xs font-mono text-[var(--primary)]">
+                                <span>TRACKING</span>
+                                <span>ACTIVE</span>
+                            </div>
+                            <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-[var(--primary)] w-3/4 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MISSION LOG (Problem & Solution) -->
+    <section id="problem" class="py-12 md:py-16 bg-black/30 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col gap-16">
+                
+                <!-- 1. PROBLEM STATEMENT (TOP) -->
+                <div class="grid md:grid-cols-12 gap-6 md:gap-12 items-center">
+                    <div class="md:col-span-5 relative">
+                        <div class="absolute -top-10 -left-10 text-[10rem] font-display font-bold text-white/5 select-none z-0">01</div>
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-3 text-[var(--accent)] mb-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span class="font-display font-bold tracking-widest text-sm">PROBLEM STATEMENT</span>
+                            </div>
+                            <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">THE ACCESSIBILITY <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">BARRIER</span></h2>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-7">
+                        <div class="glass-panel p-6 md:p-8 rounded-xl border-l-4 border-l-[var(--accent)] hover:translate-x-2 transition-transform duration-300">
+                            <p class="text-slate-300 leading-relaxed text-base md:text-lg">
+                                Traditional robot interfaces—joysticks, keyboards, and touchscreens—require <span class="text-white font-bold">manual dexterity</span>. 
+                                This creates an insurmountable wall for individuals with physical disabilities, paralysis, or upper-limb amputations. 
+                                Even in industrial settings, operators often lack a "third hand" for control.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arrow Divider -->
+                <div class="flex justify-center text-white/10 text-2xl">
+                    <i class="fas fa-chevron-down animate-bounce"></i>
+                </div>
+
+                <!-- 2. WHAT I DID (BELOW) -->
+                <div class="grid md:grid-cols-12 gap-6 md:gap-12 items-center">
+                    <div class="md:col-span-5 md:order-2 relative">
+                        <div class="absolute -top-10 -right-10 text-[10rem] font-display font-bold text-white/5 select-none z-0">02</div>
+                        <div class="relative z-10 text-left md:text-right">
+                            <div class="flex items-center gap-3 text-[var(--primary)] mb-3 md:justify-end">
+                                <i class="fas fa-check-circle"></i>
+                                <span class="font-display font-bold tracking-widest text-sm">THE SOLUTION</span>
+                            </div>
+                            <h2 class="font-display text-3xl md:text-4xl font-bold text-white leading-tight">WHAT I <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-[var(--primary)]">ENGINEERED</span></h2>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-7 md:order-1">
+                        <div class="glass-panel p-6 md:p-8 rounded-xl border-l-4 border-l-[var(--primary)] hover:-translate-x-2 transition-transform duration-300">
+                            <p class="text-slate-300 leading-relaxed text-base md:text-lg mb-6">
+                                I developed a <span class="text-white font-bold">Hands-Free Control System</span> utilizing computer vision directly on a smartphone.
+                            </p>
+                            <ul class="space-y-4 font-mono text-sm text-slate-400">
+                                <li class="flex items-start gap-3 bg-black/20 p-3 rounded border border-white/5">
+                                    <i class="fas fa-code text-[var(--primary)] mt-1"></i>
+                                    <span>Integrated <strong class="text-white">Android ML Kit</strong> for real-time iris tracking without cloud latency.</span>
+                                </li>
+                                <li class="flex items-start gap-3 bg-black/20 p-3 rounded border border-white/5">
+                                    <i class="fas fa-signal text-[var(--primary)] mt-1"></i>
+                                    <span>Built a custom Bluetooth bridge to communicate with <strong class="text-white">Arduino & ESP32</strong> microcontrollers.</span>
+                                </li>
+                                <li class="flex items-start gap-3 bg-black/20 p-3 rounded border border-white/5">
+                                    <i class="fas fa-shield-alt text-[var(--primary)] mt-1"></i>
+                                    <span>Implemented a <strong class="text-white">"Double-Blink" Safety Protocol</strong> to pause/resume the robot instantly.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Controls Dashboard -->
+    <section id="controls" class="py-16 md:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 md:mb-16 text-center md:text-left">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2">COMMAND <span class="text-[var(--primary)]">INTERFACE</span></h2>
+                <div class="h-1 w-20 bg-[var(--primary)] mx-auto md:mx-0"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Control Cards -->
+                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-arrow-left text-3xl md:text-4xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">LEFT GAZING</h3>
+                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Iris deviation > 15° Left</p>
+                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
+                            OUTPUT: "LEFT"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-arrow-right text-3xl md:text-4xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">RIGHT GAZING</h3>
+                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Iris deviation > 15° Right</p>
+                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
+                            OUTPUT: "RIGHT"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-arrow-up text-3xl md:text-4xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">UPWARD GAZING</h3>
+                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Eyelid Lift / Look Up</p>
+                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
+                            CMD: "DOWN"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-arrow-down text-3xl md:text-4xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">DOWN GAZING</h3>
+                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Look Down</p>
+                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
+                            CMD: "UP"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pause Mode Banner -->
+            <div class="mt-8 glass-panel border border-[var(--accent)]/50 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                <div class="w-12 h-12 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[var(--accent)] animate-pulse flex-shrink-0">
+                    <i class="fas fa-lock text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white font-display text-lg">EMERGENCY STOP PROTOCOL</h3>
+                    <p class="text-sm text-slate-300">Blink rapidly (2x) to engage/disengage safety lock.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hardware / Code Section -->
+    <section id="hardware" class="py-16 md:py-20 bg-black/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-12">
+                <div class="w-full md:w-auto text-center md:text-left mb-6 md:mb-0">
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2">FIRMWARE <span class="text-[var(--primary)]">UPLOAD</span></h2>
+                    <p class="text-slate-400 text-sm md:text-base">Select microcontroller architecture</p>
+                </div>
+                
+                <!-- Custom Tabs -->
+                <div class="flex w-full md:w-auto bg-slate-900/50 p-1 rounded-lg md:bg-transparent md:p-0 md:gap-4">
+                    <button onclick="switchTab('arduino')" id="tab-arduino" class="flex-1 md:flex-none px-4 md:px-6 py-2 bg-[var(--primary)] text-black font-bold font-display rounded md:skew-x-[-10deg] hover:scale-105 transition-transform text-sm md:text-base shadow-lg">
+                        <span class="md:skew-x-[10deg] inline-block">ARDUINO</span>
+                    </button>
+                    <button onclick="switchTab('esp32')" id="tab-esp32" class="flex-1 md:flex-none px-4 md:px-6 py-2 text-slate-400 font-bold font-display rounded md:skew-x-[-10deg] hover:text-white transition-colors text-sm md:text-base">
+                        <span class="md:skew-x-[10deg] inline-block">ESP32 (BLE)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Wiring Diagram Card -->
+                <div class="glass-panel p-6 rounded-xl h-fit order-2 lg:order-1">
+                    <h3 class="font-display text-lg text-white mb-4 md:mb-6 border-b border-white/10 pb-2">PINOUT CONFIGURATION</h3>
+                    
+                    <div id="wiring-content" class="space-y-4 font-mono text-sm">
+                        <!-- Arduino Wiring -->
+                        <div id="wiring-arduino">
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-[var(--primary)]">BT TX</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">Pin 2</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-[var(--primary)]">BT RX</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">Pin 3</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-emerald-400">IN1</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">Pin 8</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-emerald-400">IN2</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">Pin 9</span>
+                            </div>
+                            <div class="mt-6 p-3 bg-[var(--accent)]/10 border border-[var(--accent)]/30 rounded text-center text-[var(--accent)] text-xs md:text-sm">
+                                BT PAIR KEY: 1234
+                            </div>
+                        </div>
+
+                        <!-- ESP32 Wiring -->
+                        <div id="wiring-esp32" class="hidden">
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-[var(--primary)]">BLUETOOTH</span> <i class="fas fa-check text-gray-600"></i> <span class="text-white">INTERNAL</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-emerald-400">IN1</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">GPIO 26</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-emerald-400">IN2</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">GPIO 27</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-white/5">
+                                <span class="text-emerald-400">IN3</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">GPIO 14</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Editor Window -->
+                <div class="lg:col-span-2 order-1 lg:order-2">
+                    <div class="bg-[#0d1117] rounded-xl overflow-hidden border border-white/10 shadow-2xl relative group">
+                        <!-- Code Header -->
+                        <div class="bg-[#161b22] px-4 py-3 flex items-center justify-between border-b border-white/5">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                            </div>
+                            <div class="text-xs text-slate-500 font-mono" id="filename">main.ino</div>
+                            <button onclick="copyCode()" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                                <span class="hidden md:inline text-xs">COPY</span> <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+
+                        <!-- Code Content -->
+                        <div class="p-4 md:p-6 overflow-x-auto custom-scrollbar h-[350px] md:h-[500px]">
+<pre id="code-arduino" class="font-mono text-xs md:text-sm leading-6 text-slate-300">
+<span class="text-[#ff7b72]">#include</span> &lt;SoftwareSerial.h&gt;
+
+<span class="text-[#8b949e]">// BLUETOOTH CONFIGURATION</span>
+SoftwareSerial myBT(2, 3); <span class="text-[#8b949e]">// RX, TX</span>
+const int IN1 = 8;
+const int IN2 = 9;
+const int IN3 = 10;
+const int IN4 = 11;
+String command = "";
+
+void setup() {
+  Serial.begin(9600);
+  myBT.begin(9600);
+  
+  <span class="text-[#8b949e]">// Initialize Motor Pins</span>
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  
+  Serial.println("SYSTEM READY");
+}
+
+void loop() {
+  if (myBT.available()) {
+    char c = myBT.read();
+    command += c;
+    
+    <span class="text-[#d2a8ff]">if</span> (command.indexOf("UP") >= 0) { 
+        moveForward(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("DOWN") >= 0) { 
+        moveBackward(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("LEFT") >= 0) { 
+        turnLeft(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RIGHT") >= 0) { 
+        turnRight(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("STOP") >= 0) { 
+        stopRobot(); command = ""; 
+    }
+  }
+}
+
+<span class="text-[#8b949e]">// DRIVER LOGIC</span>
+void moveForward() {
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+void moveBackward() {
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+void turnLeft() {
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH); 
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);  
+}
+void turnRight() {
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);  
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH); 
+}
+void stopRobot() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+</pre>
+
+<pre id="code-esp32" class="font-mono text-xs md:text-sm leading-6 text-slate-300 hidden">
+<span class="text-[#ff7b72]">#include</span> "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+<span class="text-[#8b949e]">// ESP32 GPIO MAP</span>
+const int IN1 = 26;
+const int IN2 = 27;
+const int IN3 = 14;
+const int IN4 = 12;
+String command = "";
+
+void setup() {
+  Serial.begin(115200);
+  
+  <span class="text-[#8b949e]">// Advertise as ESP32_Eye_Robot</span>
+  SerialBT.begin("ESP32_Eye_Robot"); 
+  
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    char c = SerialBT.read();
+    command += c;
+
+    <span class="text-[#d2a8ff]">if</span> (command.indexOf("UP") >= 0) { 
+        moveForward(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("DOWN") >= 0) { 
+        moveBackward(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("LEFT") >= 0) { 
+        turnLeft(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RIGHT") >= 0) { 
+        turnRight(); command = ""; 
+    } 
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("STOP") >= 0) { 
+        stopRobot(); command = ""; 
+    }
+  }
+}
+
+void moveForward() {
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+void moveBackward() {
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+void turnLeft() {
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH); 
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW); 
+}
+void turnRight() {
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW); 
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+void stopRobot() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-12 bg-black/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <div class="flex flex-col items-center justify-center gap-6 mb-8">
+                <div class="flex items-center gap-4">
+                    <!-- Footer Logo -->
+                    <div class="w-10 h-10 rounded-lg overflow-hidden border border-white/10">
+                        <img src="https://uploads.onecompiler.io/42q5e2pr5/44bbang88/1000182335.png" alt="Logo" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="font-display font-bold text-xl text-white">FACE DRIVE BOT</h3>
+                </div>
+
+                <!-- Footer Play Store Button -->
+                <a href="#" class="inline-flex items-center gap-3 px-6 py-3 bg-slate-900 border border-slate-700 rounded-lg hover:border-[var(--primary)] hover:scale-105 transition-all group">
+                    <i class="fab fa-google-play text-3xl text-[var(--primary)] group-hover:text-white transition-colors"></i>
+                    <div class="flex flex-col leading-none text-left">
+                        <span class="text-[0.6rem] uppercase font-bold text-slate-400 tracking-wider">GET IT ON</span>
+                        <span class="text-base font-display font-bold text-white">Google Play</span>
+                    </div>
+                </a>
+            </div>
+            
+            <p class="text-slate-500 text-sm mb-6">
+                Developed by Jeyaram B <br>
+                <span class="text-[var(--primary)]">Powered by Android ML Kit & TensorFlow Lite</span>
+            </p>
+            
+            <div class="flex justify-center gap-6">
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[var(--primary)] transition-all">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[var(--accent)] transition-all">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:text-white hover:bg-emerald-500 transition-all">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function switchTab(type) {
+            const ardBtn = document.getElementById('tab-arduino');
+            const espBtn = document.getElementById('tab-esp32');
+            const ardWire = document.getElementById('wiring-arduino');
+            const espWire = document.getElementById('wiring-esp32');
+            const ardCode = document.getElementById('code-arduino');
+            const espCode = document.getElementById('code-esp32');
+            const filename = document.getElementById('filename');
+
+            // Reset Styles
+            ardBtn.className = "flex-1 md:flex-none px-4 md:px-6 py-2 rounded md:skew-x-[-10deg] hover:scale-105 transition-transform text-sm md:text-base font-bold font-display";
+            espBtn.className = "flex-1 md:flex-none px-4 md:px-6 py-2 rounded md:skew-x-[-10deg] hover:scale-105 transition-transform text-sm md:text-base font-bold font-display";
+
+            if(type === 'arduino') {
+                // Active Arduino
+                ardBtn.classList.add('bg-[var(--primary)]', 'text-black', 'shadow-lg');
+                espBtn.classList.add('text-slate-400', 'hover:text-white');
+
+                ardWire.classList.remove('hidden');
+                espWire.classList.add('hidden');
+                ardCode.classList.remove('hidden');
+                espCode.classList.add('hidden');
+                filename.textContent = 'main.ino';
+            } else {
+                // Active ESP32
+                espBtn.classList.add('bg-[var(--primary)]', 'text-black', 'shadow-lg');
+                ardBtn.classList.add('text-slate-400', 'hover:text-white');
+
+                espWire.classList.remove('hidden');
+                ardWire.classList.add('hidden');
+                espCode.classList.remove('hidden');
+                ardCode.classList.add('hidden');
+                filename.textContent = 'esp32_firmware.ino';
+            }
+        }
+
+        function copyCode() {
+            const activeCode = document.querySelector('pre:not(.hidden)').innerText;
+            navigator.clipboard.writeText(activeCode);
+            alert("Code Copied to Clipboard!");
+        }
+    </script>
+</body>
+</html>
+
+
