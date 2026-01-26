@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Bridge | The Ultimate IoT Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fonts: Inter for UI, JetBrains Mono for Code/Headers -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            900: '#0b0c15',
+                            800: '#151725',
+                            700: '#1e293b',
+                            accent: '#00f0ff', // Cyan Neon
+                            purple: '#bd00ff', // Violet Neon
+                            pink: '#ff0055',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'pulse-glow': 'pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'scan': 'scan 3s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)' },
+                            '50%': { opacity: .8, boxShadow: '0 0 40px rgba(0, 240, 255, 0.5)' },
+                        },
+                        scan: {
+                            '0%': { top: '-10%', opacity: 0 },
+                            '50%': { opacity: 1 },
+                            '100%': { top: '110%', opacity: 0 },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Cyberpunk Grid Background */
+        .cyber-bg {
+            background-color: #0b0c15;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(189, 0, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        /* Glass Panel Dark */
+        .glass-dark {
+            background: rgba(21, 23, 37, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Glowing Text */
+        .text-glow {
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+
+        .code-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .code-scroll::-webkit-scrollbar-track { background: #0b0c15; }
+        .code-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .code-scroll::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* Nav Highlight */
+        .nav-btn.active {
+            color: #00f0ff;
+            background: rgba(0, 240, 255, 0.05);
+            border-bottom: 2px solid #00f0ff;
+        }
+        
+        /* Mobile Scroll Hide */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Phone Mockup CSS */
+        .phone-mockup {
+            border: 8px solid #2a2a2a;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px #333;
+        }
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 20px;
+            background: #2a2a2a;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 20;
+        }
+        .scan-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.5), transparent);
+            z-index: 25;
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="cyber-bg text-slate-300 font-sans min-h-screen flex flex-col selection:bg-cyber-accent selection:text-black overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="glass-dark sticky top-0 z-50 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 group cursor-pointer" onclick="switchTab('home')">
+                    <!-- CHANGED: Replaced icon with Custom Image Logo, fully rounded -->
+                    <img src="https://i.ibb.co/zTjCqnNL/gyroscope-icon.png" alt="Sensor Bridge Logo" class="w-10 h-10 rounded-full object-cover shadow-lg shadow-cyber-purple/20 group-hover:shadow-cyber-purple/40 transition-all border border-white/10">
+                    <div>
+                        <span class="text-xl font-bold tracking-tight text-white block leading-none font-mono">SENSOR<span class="text-cyber-accent">BRIDGE</span></span>
+                        <span class="text-[10px] text-slate-500 font-mono tracking-widest uppercase">IoT Ecosystem</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center gap-6">
+                    <button onclick="switchTab('home')" id="nav-home" class="nav-btn active py-2 text-sm font-medium transition-all duration-300 hover:text-white">
+                        Mission Control
+                    </button>
+                    <button onclick="switchTab('connections')" id="nav-connections" class="nav-btn py-2 text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">
+                        Blueprints
+                    </button>
+                    <button onclick="switchTab('code')" id="nav-code" class="nav-btn py-2 text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">
+                        Firmware
+                    </button>
+                    <button onclick="switchTab('privacy')" id="nav-privacy" class="nav-btn py-2 text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">
+                        Privacy
+                    </button>
+                </div>
+
+                <!-- Action -->
+                <a href="#" class="hidden md:flex items-center gap-3 bg-white text-black hover:bg-cyber-accent hover:scale-105 px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    <i class="fa-brands fa-google-play"></i>
+                    <span>Get App</span>
+                </a>
+            </div>
+            
+            <!-- Mobile Nav (Scrollable) -->
+            <div class="md:hidden flex space-x-2 overflow-x-auto pb-3 pt-1 no-scrollbar border-t border-white/5 mt-2 px-2">
+                <button onclick="switchTab('home')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-white border border-white/10 active:bg-cyber-accent active:text-black">Home</button>
+                <button onclick="switchTab('connections')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black">Wiring</button>
+                <button onclick="switchTab('code')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black">Code</button>
+                <button onclick="switchTab('privacy')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black">Privacy</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 flex-grow relative z-10">
+        
+        <!-- HOME SECTION -->
+        <div id="home-section" class="fade-in space-y-24">
+            
+            <!-- Hero Area -->
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+                <!-- Text Content -->
+                <div class="space-y-8 order-2 lg:order-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple text-xs font-mono font-bold tracking-wider">
+                        <span class="w-2 h-2 rounded-full bg-cyber-purple animate-pulse"></span>
+                        VERSION 2.0 LIVE
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight tracking-tight">
+                        Build Smarter. <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-accent via-blue-500 to-cyber-purple text-glow">Debug Faster.</span>
+                    </h1>
+                    
+                    <!-- UPDATED PROBLEM STATEMENT -->
+                    <p class="text-lg text-slate-400 leading-relaxed max-w-lg border-l-2 border-cyber-accent pl-6">
+                        "Electronics projects shouldn’t depend on costly and unreliable hardware sensors. We transform smartphones into powerful virtual sensors, making experimentation simpler, cheaper, and more accessible."
+                    </p>
+                    
+                    <!-- HERO BUTTONS -->
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#" class="flex items-center gap-3 bg-gradient-to-r from-cyber-accent to-blue-600 text-black font-bold px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+                            <i class="fa-brands fa-google-play text-xl"></i>
+                            <div class="text-left leading-tight">
+                                <span class="block text-[10px] uppercase opacity-70">Get it on</span>
+                                <span class="block text-sm">Google Play</span>
+                            </div>
+                        </a>
+                        
+                        <a href="#" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-3 group">
+                             <i class="fa-brands fa-github text-xl text-slate-300 group-hover:text-white"></i>
+                             <span>GitHub</span>
+                        </a>
+
+                        <button onclick="document.getElementById('video-modal').classList.remove('hidden')" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-3 group">
+                            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-cyber-purple group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-play text-xs"></i>
+                            </div>
+                            Demo
+                        </button>
+                        
+                        <!-- NEW FEEDBACK BUTTON -->
+                        <a href="#" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-3 group">
+                             <i class="fa-regular fa-comments text-xl text-slate-300 group-hover:text-white"></i>
+                             <span>Feedback</span>
+                        </a>
+                    </div>
+
+                    <!-- Dynamic Features Mini-Grid -->
+                    <div class="grid grid-cols-3 gap-4 pt-8">
+                        <div class="text-center">
+                            <div class="w-10 h-10 mx-auto rounded-full bg-cyber-accent/10 flex items-center justify-center text-cyber-accent mb-2">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <span class="text-xs font-mono text-slate-400">Zero Latency</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-10 h-10 mx-auto rounded-full bg-cyber-purple/10 flex items-center justify-center text-cyber-purple mb-2">
+                                <i class="fa-solid fa-wifi"></i>
+                            </div>
+                            <span class="text-xs font-mono text-slate-400">Bluetooth 5.0</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-10 h-10 mx-auto rounded-full bg-pink-500/10 flex items-center justify-center text-cyber-pink mb-2">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <span class="text-xs font-mono text-slate-400">Open Source</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Phone Mockup -->
+                <div class="relative order-1 lg:order-2 flex justify-center lg:justify-end">
+                    <!-- Background blobs -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-cyber-purple/20 to-cyber-accent/20 rounded-full blur-[80px] animate-pulse-slow"></div>
+                    
+                    <!-- The Phone -->
+                    <div class="phone-mockup w-[280px] h-[580px] md:w-[320px] md:h-[650px] animate-float relative z-10 bg-gray-900 border-gray-800">
+                        <div class="phone-notch"></div>
+                        <!-- Screen Content -->
+                        <div class="w-full h-full bg-[#111] overflow-hidden flex flex-col relative">
+                            <!-- Scanning Animation -->
+                            <div class="scan-line"></div>
+                            
+                            <!-- Status Bar -->
+                            <div class="h-6 w-full bg-black/50 flex justify-between px-4 items-center text-[10px] text-white pt-1 absolute top-0 left-0 z-30">
+                                <span id="phone-clock">12:00</span>
+                                <div class="flex gap-1"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></div>
+                            </div>
+                            
+                            <!-- App Header -->
+                            <div class="bg-gradient-to-r from-cyber-purple to-blue-600 p-4 pt-8 pb-6 shadow-lg relative z-20 flex items-center gap-3">
+                                <!-- CHANGED: Real Icon in Phone Header -->
+                                <img src="https://i.ibb.co/zTjCqnNL/gyroscope-icon.png" alt="App Icon" class="w-8 h-8 rounded-full border-2 border-white/20">
+                                <div>
+                                    <h3 class="text-white font-bold text-lg leading-none">Sensor Bridge</h3>
+                                    <p class="text-white/70 text-[10px]">Connected: ESP32_DEVICE_01</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Actual App Image -->
+                            <div class="flex-grow bg-black relative">
+                                <img src="https://i.ibb.co/v6Mdy36h/Screenshot-2026-0126-193714.jpg" alt="Sensor Bridge App Interface" class="w-full h-full object-cover opacity-90">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Badge -->
+                    <div class="absolute bottom-10 -left-10 glass-dark p-4 rounded-xl border border-cyber-accent/30 animate-float-delayed hidden md:block">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">System Online</h4>
+                                <p class="text-xs text-slate-400">Latency: 12ms</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="relative rounded-3xl overflow-hidden border border-white/10 group cursor-pointer" onclick="document.getElementById('video-modal').classList.remove('hidden')">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyber-purple to-blue-900 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                <div class="absolute inset-0 flex items-center justify-center z-20">
+                    <div class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-play text-3xl text-white ml-2"></i>
+                    </div>
+                </div>
+                <div class="h-64 md:h-80 bg-black flex items-center justify-center text-slate-600">
+                    <!-- Placeholder for video thumbnail -->
+                    <span class="font-mono text-sm tracking-widest uppercase">Application Demo Video</span>
+                </div>
+                <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black to-transparent">
+                    <h3 class="text-xl font-bold text-white">See What's Possible</h3>
+                    <p class="text-sm text-slate-300">Watch the full walkthrough of RC control and Home Automation features.</p>
+                </div>
+            </div>
+            
+            <!-- Features Cards -->
+             <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-dark p-8 rounded-2xl hover:border-cyber-accent/50 transition-colors">
+                    <i class="fa-solid fa-microchip text-4xl text-cyber-accent mb-4"></i>
+                    <h3 class="text-xl font-bold text-white mb-2">Universal Handshake</h3>
+                    <p class="text-sm text-slate-400">One protocol for ESP32 and Arduino. Say goodbye to writing custom Android apps for every single project.</p>
+                </div>
+                <div class="glass-dark p-8 rounded-2xl hover:border-cyber-purple/50 transition-colors">
+                    <i class="fa-solid fa-wand-magic-sparkles text-4xl text-cyber-purple mb-4"></i>
+                    <h3 class="text-xl font-bold text-white mb-2">Dynamic UI</h3>
+                    <p class="text-sm text-slate-400">Interfaces that adapt to your needs. Switch between Gamepad, Terminal, and Sensor plots instantly.</p>
+                </div>
+                <div class="glass-dark p-8 rounded-2xl hover:border-pink-500/50 transition-colors">
+                    <i class="fa-solid fa-layer-group text-4xl text-cyber-pink mb-4"></i>
+                    <h3 class="text-xl font-bold text-white mb-2">Knowledge Hub</h3>
+                    <p class="text-sm text-slate-400">Built-in documentation, wiring diagrams, and copy-paste code snippets right in the app.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CONNECTIONS SECTION -->
+        <div id="connections-section" class="fade-in hidden max-w-5xl mx-auto space-y-16">
+            
+            <!-- Quick Start Guide (New) -->
+            <div class="glass-dark p-8 md:p-12 rounded-3xl border border-white/10 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber-accent via-cyber-purple to-pink-500"></div>
+                
+                <div class="text-center mb-10">
+                    <span class="text-cyber-accent font-mono text-xs tracking-widest uppercase">Quick Start</span>
+                    <h2 class="text-3xl font-bold text-white mt-2">How to Launch</h2>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 relative z-10">
+                    <!-- Connecting Line (Desktop) -->
+                    <div class="hidden md:block absolute top-12 left-[16%] w-[68%] h-0.5 bg-white/10 -z-10 border-t border-dashed border-white/20"></div>
+                    
+                    <!-- Step 1 -->
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-cyber-accent/10 group-hover:border-cyber-accent group-hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all duration-300">
+                            <i class="fa-solid fa-microchip text-3xl text-cyber-accent group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="text-white font-bold text-lg mb-2">1. Upload Code</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed px-4">Copy the driver code from the <strong>Firmware</strong> tab and flash it to your ESP32 or Arduino board.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-cyber-purple/10 group-hover:border-cyber-purple group-hover:shadow-[0_0_30px_rgba(189,0,255,0.4)] transition-all duration-300">
+                            <i class="fa-brands fa-bluetooth-b text-3xl text-cyber-purple group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="text-white font-bold text-lg mb-2">2. Permission & Pair</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed px-4">Launch app, grant <strong>Location/Bluetooth</strong> permissions, and tap the Bluetooth icon to connect.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-pink-500/10 group-hover:border-pink-500 group-hover:shadow-[0_0_30px_rgba(255,0,85,0.4)] transition-all duration-300">
+                            <i class="fa-solid fa-power-off text-3xl text-pink-500 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h4 class="text-white font-bold text-lg mb-2">3. Run System</h4>
+                        <p class="text-sm text-slate-400 leading-relaxed px-4">Select your module (e.g., RC Car) from the dashboard and start controlling instantly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Hardware Schematics</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Precise hardware configurations for optimal signal integrity.</p>
+            </div>
+        
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- ESP32 Card -->
+                <div class="glass-dark rounded-2xl overflow-hidden hover:border-cyber-accent/50 transition-colors group">
+                    <div class="bg-black/40 p-6 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-microchip text-2xl text-cyber-accent"></i>
+                            <h3 class="font-bold text-xl text-white">ESP32 (Native)</h3>
+                        </div>
+                        <span class="text-xs font-mono bg-cyber-accent/20 text-cyber-accent px-2 py-1 rounded">BT BUILT-IN</span>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <p class="text-sm text-slate-400">The preferred microcontroller. Fast, dual-core, and requires no external modules.</p>
+                        
+                        <div class="bg-black/30 p-5 rounded-xl border border-white/5">
+                            <h4 class="font-mono text-white text-sm mb-4">PINOUT CONFIGURATION</h4>
+                            <div class="space-y-3 font-mono text-sm">
+                                <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <span class="text-slate-500">L298N Motor</span>
+                                    <span class="text-cyber-accent">GPIO 26, 27, 14, 12</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <span class="text-slate-500">Relays (Switch)</span>
+                                    <span class="text-cyber-accent">GPIO 25, 26, 27</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-500">RGB LED</span>
+                                    <span class="text-cyber-accent">GPIO 25(R), 26(G), 27(B)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Arduino Card -->
+                <div class="glass-dark rounded-2xl overflow-hidden hover:border-cyber-purple/50 transition-colors group">
+                    <div class="bg-black/40 p-6 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-server text-2xl text-cyber-purple"></i>
+                            <h3 class="font-bold text-xl text-white">Arduino Uno</h3>
+                        </div>
+                        <span class="text-xs font-mono bg-cyber-purple/20 text-cyber-purple px-2 py-1 rounded">REQUIRES HC-05</span>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <p class="text-sm text-slate-400">Classic architecture. Requires an external HC-05 or HC-06 Bluetooth module.</p>
+
+                        <div class="bg-black/30 p-5 rounded-xl border border-white/5">
+                            <h4 class="font-mono text-white text-sm mb-4">CONNECTION MAP</h4>
+                            <div class="space-y-3 font-mono text-sm">
+                                <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <span class="text-slate-500">HC-05 VCC/GND</span>
+                                    <span class="text-white">5V / GND</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <span class="text-slate-500">HC-05 TX Pin</span>
+                                    <span class="text-cyber-purple font-bold">Pin 10 (RX)</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-500">HC-05 RX Pin</span>
+                                    <span class="text-cyber-purple font-bold">Pin 11 (TX)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CODE SECTION -->
+        <div id="code-section" class="fade-in hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Firmware Repository</h2>
+                    <p class="text-slate-400 mt-1">Select a module to load the driver code.</p>
+                </div>
+                <!-- Module Selector (Wrapping on mobile for better visibility) -->
+                <!-- CHANGED: flex-wrap ensures buttons wrap on small screens -->
+                <div class="flex flex-wrap justify-center md:justify-start gap-2 w-full md:w-auto" id="module-buttons">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+      
+            <!-- Code Display Area -->
+            <!-- CHANGED: Added max-w-[90vw] to force container width constraints on mobile -->
+            <div class="glass-dark rounded-2xl overflow-hidden border border-white/10 flex flex-col h-[60vh] md:h-[700px] w-full max-w-[90vw] md:max-w-full mx-auto">
+                
+                <!-- Header -->
+                <div class="bg-black/40 border-b border-white/5 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                         <div class="flex gap-1.5 flex-shrink-0">
+                             <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500"></div>
+                             <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500"></div>
+                             <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500"></div>
+                         </div>
+                         <div class="h-6 w-[1px] bg-white/10 mx-2 hidden sm:block"></div>
+                         <div class="min-w-0">
+                            <h3 id="code-title" class="font-mono font-bold text-cyber-accent text-xs md:text-sm tracking-wide break-words">INITIALIZING...</h3>
+                         </div>
+                    </div>
+                    
+                    <div class="flex bg-black/50 rounded-lg p-1 border border-white/10 w-full sm:w-auto">
+                        <button onclick="setPlatform('esp32')" id="btn-esp32" class="flex-1 sm:flex-none px-3 md:px-6 py-2 rounded-md text-[10px] md:text-xs font-bold font-mono transition-all text-center">
+                            ESP32
+                        </button>
+                        <button onclick="setPlatform('arduino')" id="btn-arduino" class="flex-1 sm:flex-none px-3 md:px-6 py-2 rounded-md text-[10px] md:text-xs font-bold font-mono transition-all text-center">
+                            ARDUINO
+                        </button>
+                    </div>
+                </div>
+      
+                <!-- Code Area -->
+                <!-- CHANGED: overflow-x-auto ensures code scrolls horizontally inside the box -->
+                <div class="relative flex-grow bg-[#05060a] group overflow-hidden">
+                    <button onclick="copyCode()" class="absolute top-4 right-4 bg-white/5 hover:bg-white/10 text-slate-300 p-2 rounded-md backdrop-blur-sm transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 border border-white/5 z-10" title="Copy Code">
+                        <i id="copy-icon" class="fa-regular fa-copy"></i>
+                    </button>
+                    <pre class="p-4 md:p-6 text-xs md:text-sm font-mono text-slate-300 overflow-auto h-full code-scroll leading-relaxed w-full"><code id="code-content">Loading code...</code></pre>
+                </div>
+                
+                <div class="bg-black/40 p-3 text-center border-t border-white/5">
+                     <p id="code-desc" class="text-[10px] md:text-xs text-slate-500 font-mono tracking-wider">SELECT A MODULE TO VIEW DOCUMENTATION</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRIVACY SECTION (Updated) -->
+        <div id="privacy-section" class="fade-in hidden space-y-12 max-w-4xl mx-auto">
+            <div class="text-center">
+                <span class="text-cyber-accent font-mono text-sm tracking-widest uppercase">Legal</span>
+                <h2 class="text-4xl font-bold text-white mt-2">Privacy Policy</h2>
+                <p class="text-slate-400 mt-2">Transparency is our priority. Last updated: January 2026.</p>
+            </div>
+
+            <div class="glass-dark p-8 md:p-12 rounded-3xl space-y-10 border border-white/10">
+                <!-- 1. No Backend -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-server text-cyber-purple"></i> 
+                        1. No Backend & Offline Operation
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        **Sensor Bridge** functions entirely **offline**. We do not have a backend server, cloud database, or API that collects your data. All sensor data processing, voice recognition, and command generation happen locally on your smartphone's processor. Your project data never leaves your device.
+                    </p>
+                </div>
+
+                <!-- 2. Permissions -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-lock text-cyber-accent"></i> 
+                        2. Permissions & Usage
+                    </h3>
+                    <p class="text-slate-400 text-sm mb-4">We request sensitive permissions solely to enable specific hardware features. Here is exactly how we use them:</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <!-- Location -->
+                        <div class="bg-black/40 p-5 rounded-xl border-l-4 border-yellow-500">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-location-dot text-yellow-500"></i>
+                                <h4 class="text-white font-bold text-sm">Location (Fine/Coarse)</h4>
+                            </div>
+                            <p class="text-xs text-slate-400">
+                                <strong class="text-white">Required for Bluetooth Scanning.</strong> Android mandates location permission to detect nearby BLE devices (like your ESP32). We <u>do not</u> track, store, or share your physical GPS location.
+                            </p>
+                        </div>
+
+                        <!-- Microphone -->
+                        <div class="bg-black/40 p-5 rounded-xl border-l-4 border-blue-500">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-microphone text-blue-500"></i>
+                                <h4 class="text-white font-bold text-sm">Microphone</h4>
+                            </div>
+                            <p class="text-xs text-slate-400">
+                                <strong class="text-white">Voice Command Module.</strong> Used exclusively to convert your spoken words into text commands (e.g., "Light On") locally. Audio is processed in real-time and never recorded.
+                            </p>
+                        </div>
+
+                        <!-- SMS -->
+                        <div class="bg-black/40 p-5 rounded-xl border-l-4 border-green-500">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-comment-sms text-green-500"></i>
+                                <h4 class="text-white font-bold text-sm">Send SMS</h4>
+                            </div>
+                            <p class="text-xs text-slate-400">
+                                <strong class="text-white">GSM/Alert Module.</strong> Used only when you explicitly configure the app to send an alert string to a specific number (e.g., IoT emergency triggers). We never read your inbox.
+                            </p>
+                        </div>
+
+                        <!-- Camera -->
+                        <div class="bg-black/40 p-5 rounded-xl border-l-4 border-pink-500">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-camera text-pink-500"></i>
+                                <h4 class="text-white font-bold text-sm">Camera</h4>
+                            </div>
+                            <p class="text-xs text-slate-400">
+                                <strong class="text-white">Optical Sensors.</strong> Used for features like Color Detection or Flashlight control. Video feeds are processed locally for sensor values and are never saved to the gallery.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Children's Privacy -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-child-reaching text-teal-500"></i> 
+                        3. Children's Privacy
+                    </h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        While this app is an educational tool suitable for students of all ages, we do not knowingly collect personal information from children. Since the app works offline and has no account system, no personal data profiles are created.
+                    </p>
+                </div>
+
+                <!-- Contact -->
+                <div class="pt-8 border-t border-white/10 text-center">
+                    <p class="text-slate-500 text-sm">Questions? Contact us via the in-app Feedback button.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-lg hidden flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+            <button onclick="document.getElementById('video-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white hover:text-cyber-accent z-10 bg-black/50 rounded-full p-2 w-10 h-10 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="aspect-video flex items-center justify-center bg-[#111]">
+                <p class="text-slate-500 font-mono"><i class="fa-regular fa-circle-play text-4xl mb-4 block text-center"></i>VIDEO PLAYER PLACEHOLDER</p>
+                <!-- Embed YouTube/Video here: <iframe ...></iframe> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-dark border-t border-white/5 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center flex flex-col md:flex-row items-center justify-center gap-3">
+            <!-- ADDED FOOTER LOGO -->
+            <!-- CHANGED: Replaced icon with Custom Image Logo, fully rounded -->
+            <img src="https://i.ibb.co/Z1bskSTz/Picsart-25-12-10-18-00-40-426.png" alt="Sensor Bridge Logo" class="w-8 h-8 rounded-full object-cover shadow-md shadow-cyber-purple/20 border border-cyber-accent/30">
+            <p class="text-slate-500 text-sm font-mono">SYSTEM V2.0 // © SENSOR BRIDGE PROJECT 2026</p>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- DATA STORE ---
+        const modules = [
+            { id: 'rc', label: 'RC Car', icon: 'fa-gamepad' },
+            { id: 'rgb', label: 'Smart Light', icon: 'fa-lightbulb' },
+            { id: 'switch', label: 'Automation', icon: 'fa-house-signal' },
+            { id: 'sensors', label: 'Sensors', icon: 'fa-gauge-high' },
+            { id: 'terminal', label: 'Terminal', icon: 'fa-terminal' },
+            { id: 'keypad', label: 'Keypad', icon: 'fa-border-all' },
+            { id: 'gps', label: 'GPS / GSM', icon: 'fa-map-pin' },
+        ];
+
+        const codes = {
+            rc: {
+                title: "RC_CONTROLLER_V1.ino",
+                desc: "Handles directional buttons (UP/DOWN) and Voice Commands (Strings).",
+                esp32: `// ESP32 RC CAR + VOICE CONTROL
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+// Motor Driver Pins (L298N)
+const int IN1 = 26;
+const int IN2 = 27;
+const int IN3 = 14;
+const int IN4 = 12;
+
+String command = "";
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartCar_ESP32"); 
+  
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  stopRobot();
+  
+  Serial.println("System Ready. Waiting for App...");
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    char c = SerialBT.read();
+    // Simple parser for strings
+    if (c == '\\n' || c == '\\r') return; 
+    command += c;
+    checkCommand();
+  }
+}
+
+void checkCommand() {
+  // BUTTONS
+  if (command.indexOf("UP") >= 0) { moveForward(); command = ""; } 
+  else if (command.indexOf("DOWN") >= 0) { moveBackward(); command = ""; } 
+  else if (command.indexOf("LEFT") >= 0) { turnLeft(); command = ""; } 
+  else if (command.indexOf("RIGHT") >= 0) { turnRight(); command = ""; } 
+  else if (command.indexOf("STOP") >= 0) { stopRobot(); command = ""; }
+  
+  // VOICE
+  else if (command.indexOf("forward") >= 0 || command.indexOf("go") >= 0) { moveForward(); command = ""; }
+  else if (command.indexOf("back") >= 0 || command.indexOf("reverse") >= 0) { moveBackward(); command = ""; }
+  else if (command.indexOf("left") >= 0) { turnLeft(); command = ""; }
+  else if (command.indexOf("right") >= 0) { turnRight(); command = ""; }
+  else if (command.indexOf("stop") >= 0) { stopRobot(); command = ""; }
+  
+  if (command.length() > 50) command = "";
+}
+
+void moveForward() {
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+}
+void moveBackward() {
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+void turnLeft() {
+  digitalWrite(IN1, LOW);  digitalWrite(IN2, HIGH); 
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW); 
+}
+void turnRight() {
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW); 
+  digitalWrite(IN3, LOW);  digitalWrite(IN4, HIGH);
+}
+void stopRobot() {
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}`,
+                arduino: `// ARDUINO UNO RC CAR
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTSerial(10, 11); // RX, TX
+
+const int IN1 = 3; const int IN2 = 4;
+const int IN3 = 5; const int IN4 = 6;
+String command = "";
+
+void setup() {
+  BTSerial.begin(9600);
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  stopRobot();
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    char c = BTSerial.read();
+    command += c;
+    checkCommand();
+  }
+}
+
+void checkCommand() {
+  if (command.indexOf("UP") >= 0) { moveForward(); command = ""; } 
+  else if (command.indexOf("DOWN") >= 0) { moveBackward(); command = ""; } 
+  else if (command.indexOf("LEFT") >= 0) { turnLeft(); command = ""; } 
+  else if (command.indexOf("RIGHT") >= 0) { turnRight(); command = ""; } 
+  else if (command.indexOf("STOP") >= 0) { stopRobot(); command = ""; }
+  
+  if (command.length() > 50) command = "";
+}
+
+// ... Movement functions same as ESP32 but with mapped pins ...
+void moveForward() { digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW); digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW); }
+void moveBackward() { digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH); digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH); }
+void turnLeft() { digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH); digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW); }
+void turnRight() { digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW); digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH); }
+void stopRobot() { digitalWrite(IN1, LOW); digitalWrite(IN2, LOW); digitalWrite(IN3, LOW); digitalWrite(IN4, LOW); }`
+            },
+            rgb: {
+                title: "RGB_LED_CONTROL.ino",
+                desc: "Parses 9-digit RGB color strings (e.g. '255000125') via PWM.",
+                esp32: `// ESP32 RGB LED CONTROL
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+// Pins
+#define redPin   25
+#define greenPin 26
+#define bluePin  27
+
+// PWM Settings
+#define redChannel   0
+#define greenChannel 1
+#define blueChannel  2
+#define pwmFreq 5000
+#define pwmResolution 8
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartLight_ESP32");
+
+  ledcSetup(redChannel, pwmFreq, pwmResolution);
+  ledcSetup(greenChannel, pwmFreq, pwmResolution);
+  ledcSetup(blueChannel, pwmFreq, pwmResolution);
+
+  ledcAttachPin(redPin, redChannel);
+  ledcAttachPin(greenPin, greenChannel);
+  ledcAttachPin(bluePin, blueChannel);
+
+  setColor(0, 0, 0);
+  Serial.println("RGB Ready.");
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    String command = SerialBT.readStringUntil('\\n');
+    command.trim();
+
+    // Expecting 9 chars: "RRRGGGBBB" -> "255000128"
+    if (command.length() == 9) {
+      int r = command.substring(0, 3).toInt();
+      int g = command.substring(3, 6).toInt();
+      int b = command.substring(6, 9).toInt();
+      setColor(r, g, b);
+      Serial.printf("Color set: R%d G%d B%d\\n", r, g, b);
+    }
+  }
+}
+
+void setColor(int r, int g, int b) {
+  ledcWrite(redChannel, r);
+  ledcWrite(greenChannel, g);
+  ledcWrite(blueChannel, b);
+}`,
+                arduino: `// ARDUINO UNO RGB LED CONTROL
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTSerial(10, 11); // RX, TX
+
+// PWM Pins on Uno
+#define redPin   3
+#define greenPin 5
+#define bluePin  6
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  
+  setColor(0, 0, 0);
+  Serial.println("Arduino RGB Ready.");
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    String command = BTSerial.readStringUntil('\\n');
+    command.trim();
+
+    if (command.length() == 9) {
+      int r = command.substring(0, 3).toInt();
+      int g = command.substring(3, 6).toInt();
+      int b = command.substring(6, 9).toInt();
+      setColor(r, g, b);
+    }
+  }
+}
+
+void setColor(int r, int g, int b) {
+  analogWrite(redPin, r);
+  analogWrite(greenPin, g);
+  analogWrite(bluePin, b);
+}`
+            },
+            switch: {
+                title: "HOME_AUTOMATION_RELAY.ino",
+                desc: "Controls 3-Channel Relays via string commands (e.g. 'TV_ON').",
+                esp32: `// ESP32 HOME AUTOMATION (RELAYS)
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+
+#define RELAY_TV    25
+#define RELAY_LIGHT 26
+#define RELAY_FAN   27
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartHome_ESP32");
+
+  pinMode(RELAY_TV, OUTPUT);
+  pinMode(RELAY_LIGHT, OUTPUT);
+  pinMode(RELAY_FAN, OUTPUT);
+
+  // Initial State: OFF
+  digitalWrite(RELAY_TV, LOW);
+  digitalWrite(RELAY_LIGHT, LOW);
+  digitalWrite(RELAY_FAN, LOW);
+  
+  Serial.println("Home Automation Ready.");
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    String command = SerialBT.readStringUntil('\\n');
+    command.trim();
+
+    if (command == "TV_ON") digitalWrite(RELAY_TV, HIGH);
+    else if (command == "TV_OFF") digitalWrite(RELAY_TV, LOW);
+    
+    else if (command == "LIGHT_ON") digitalWrite(RELAY_LIGHT, HIGH);
+    else if (command == "LIGHT_OFF") digitalWrite(RELAY_LIGHT, LOW);
+    
+    else if (command == "FAN_ON") digitalWrite(RELAY_FAN, HIGH);
+    else if (command == "FAN_OFF") digitalWrite(RELAY_FAN, LOW);
+    
+    Serial.println("Cmd Executed: " + command);
+  }
+}`,
+                arduino: `// ARDUINO HOME AUTOMATION (RELAYS)
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTSerial(10, 11);
+
+#define RELAY_TV    2
+#define RELAY_LIGHT 3
+#define RELAY_FAN   4
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+
+  pinMode(RELAY_TV, OUTPUT);
+  pinMode(RELAY_LIGHT, OUTPUT);
+  pinMode(RELAY_FAN, OUTPUT);
+
+  digitalWrite(RELAY_TV, LOW);
+  digitalWrite(RELAY_LIGHT, LOW);
+  digitalWrite(RELAY_FAN, LOW);
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    String command = BTSerial.readStringUntil('\\n');
+    command.trim();
+
+    if (command == "TV_ON") digitalWrite(RELAY_TV, HIGH);
+    else if (command == "TV_OFF") digitalWrite(RELAY_TV, LOW);
+    
+    else if (command == "LIGHT_ON") digitalWrite(RELAY_LIGHT, HIGH);
+    else if (command == "LIGHT_OFF") digitalWrite(RELAY_LIGHT, LOW);
+    
+    else if (command == "FAN_ON") digitalWrite(RELAY_FAN, HIGH);
+    else if (command == "FAN_OFF") digitalWrite(RELAY_FAN, LOW);
+  }
+}`
+            },
+            keypad: {
+                title: "MATRIX_KEYPAD_READER.ino",
+                desc: "Decodes Keypad ID strings.",
+                esp32: `// ESP32 KEYPAD
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartSensor_ESP32"); 
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    String data = SerialBT.readStringUntil('\\n');
+    data.trim(); 
+    if (data.startsWith("KEY:")) {
+      String key = data.substring(4); 
+      Serial.println("Key: " + key);
+    }
+  }
+}`,
+                arduino: `// ARDUINO KEYPAD
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(10, 11);
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    String data = BTSerial.readStringUntil('\\n');
+    data.trim();
+    if (data.startsWith("KEY:")) {
+      String key = data.substring(4);
+      Serial.println("Key: " + key);
+    }
+  }
+}`
+            },
+            sensors: {
+                title: "SENSOR_DATA_RX.ino",
+                desc: "Receives Accelerometer X,Y,Z strings.",
+                esp32: `// ESP32 SENSOR RECEIVER
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartSensor_ESP32"); 
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    String incoming = SerialBT.readStringUntil('\\n');
+    incoming.trim();
+    if (incoming.length() > 0) {
+      Serial.println("Data: " + incoming);
+      // Format: X0.50Y-2.10Z9.80
+    }
+  }
+}`,
+                arduino: `// ARDUINO SENSOR RECEIVER
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(10, 11);
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    String incoming = BTSerial.readStringUntil('\\n');
+    incoming.trim();
+    if (incoming.length() > 0) {
+      Serial.println("Data: " + incoming);
+    }
+  }
+}`
+            },
+            gps: {
+                title: "GPS_GSM_TEST.ino",
+                desc: "Tests SMS and JSON triggers.",
+                esp32: `// ESP32 GPS/GSM
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartSensor_ESP32"); 
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    Serial.println("App says: " + SerialBT.readStringUntil('\\n'));
+  }
+  // Send trigger
+  if (Serial.available()) {
+    char key = Serial.read();
+    if (key == 's') SerialBT.println("SMS");
+  }
+}`,
+                arduino: `// ARDUINO GPS/GSM
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(10, 11);
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    Serial.println("App says: " + BTSerial.readStringUntil('\\n'));
+  }
+  if (Serial.available()) {
+    char key = Serial.read();
+    if (key == 's') BTSerial.println("SMS");
+  }
+}`
+            },
+            terminal: {
+                title: "TERMINAL_ECHO.ino",
+                desc: "Bi-directional text echo for debugging.",
+                esp32: `// ESP32 TERMINAL ECHO
+#include "BluetoothSerial.h"
+BluetoothSerial SerialBT;
+
+void setup() {
+  Serial.begin(115200);
+  SerialBT.begin("SmartSensor_ESP32");
+}
+
+void loop() {
+  if (SerialBT.available()) Serial.write(SerialBT.read());
+  if (Serial.available()) SerialBT.write(Serial.read());
+}`,
+                arduino: `// ARDUINO TERMINAL ECHO
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(10, 11);
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+}
+
+void loop() {
+  if (BTSerial.available()) Serial.write(BTSerial.read());
+  if (Serial.available()) BTSerial.write(Serial.read());
+}`
+            }
+        };
+
+        // --- STATE ---
+        let currentTab = 'home';
+        let currentModule = 'rc';
+        let currentPlatform = 'esp32';
+
+        window.onload = function() {
+            renderModuleButtons();
+            updateCodeView();
+            switchTab('home');
+            
+            // Start clock
+            setInterval(updateClock, 1000);
+            updateClock();
+        };
+        
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const clockElement = document.getElementById('phone-clock');
+            if(clockElement) {
+                clockElement.innerText = `${hours}:${minutes}`;
+            }
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.getElementById('home-section').classList.add('hidden');
+            document.getElementById('connections-section').classList.add('hidden');
+            document.getElementById('code-section').classList.add('hidden');
+            document.getElementById('privacy-section').classList.add('hidden');
+            
+            document.getElementById(tabId + '-section').classList.remove('hidden');
+
+            // Nav Styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'text-white');
+                activeBtn.classList.remove('text-slate-400');
+            }
+        }
+
+        function renderModuleButtons() {
+            const container = document.getElementById('module-buttons');
+            container.innerHTML = modules.map(m => `
+                <button onclick="setModule('${m.id}')" id="mod-btn-${m.id}" 
+                    class="whitespace-nowrap flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg border transition-all text-xs md:text-sm font-medium ${currentModule === m.id ? 'bg-cyber-accent text-black border-cyber-accent shadow-[0_0_15px_rgba(0,240,255,0.4)]' : 'bg-black/40 text-slate-400 border-white/10 hover:border-white/30 hover:text-white'}">
+                    <i class="fa-solid ${m.icon}"></i>
+                    ${m.label}
+                </button>
+            `).join('');
+        }
+
+        function setModule(moduleId) {
+            currentModule = moduleId;
+            renderModuleButtons();
+            updateCodeView();
+        }
+
+        function setPlatform(platform) {
+            currentPlatform = platform;
+            updatePlatformButtons();
+            updateCodeView();
+        }
+
+        function updatePlatformButtons() {
+            const btnEsp = document.getElementById('btn-esp32');
+            const btnArd = document.getElementById('btn-arduino');
+
+            if (currentPlatform === 'esp32') {
+                btnEsp.className = "flex-1 sm:flex-none px-3 md:px-6 py-2 rounded-md text-[10px] md:text-xs font-bold font-mono transition-all bg-cyber-accent text-black shadow-lg shadow-cyber-accent/20";
+                btnArd.className = "flex-1 sm:flex-none px-3 md:px-6 py-2 rounded-md text-[10px] md:text-xs font-bold font-mono transition-all text-slate-500 hover:text-white";
+            } else {
+                btnEsp.className = "flex-1 sm:flex-none px-3 md:px-6 py-2 rounded-md text-[10px] md:text-xs font-bold font-mono transition-all text-slate-500 hover:text-white";
+                btnArd.className = "flex-1 sm:flex-none px-3 md:px-6 py-2 rounded-md text-[10px] md:text-xs font-bold font-mono transition-all bg-cyber-purple text-white shadow-lg shadow-cyber-purple/20";
+            }
+        }
+
+        function updateCodeView() {
+            const data = codes[currentModule];
+            
+            // Fade effect
+            const codeBlock = document.getElementById('code-content');
+            codeBlock.style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('code-title').innerText = data.title;
+                document.getElementById('code-desc').innerText = data.desc;
+                const codeText = currentPlatform === 'esp32' ? data.esp32 : data.arduino;
+                codeBlock.textContent = codeText;
+                codeBlock.style.opacity = '1';
+            }, 150);
+        }
+
+        function copyCode() {
+            const codeText = document.getElementById('code-content').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const icon = document.getElementById('copy-icon');
+                icon.className = "fa-solid fa-check text-green-400";
+                setTimeout(() => {
+                    icon.className = "fa-regular fa-copy";
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
