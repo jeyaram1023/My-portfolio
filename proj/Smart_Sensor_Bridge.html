@@ -626,12 +626,32 @@
     </div>
 
     <!-- Footer -->
-    <footer class="glass-dark border-t border-white/5 mt-12 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center flex flex-col md:flex-row items-center justify-center gap-3">
-            <!-- ADDED FOOTER LOGO -->
-            <!-- CHANGED: Replaced icon with Custom Image Logo, fully rounded -->
-            <img src="https://i.ibb.co/Z1bskSTz/Picsart-25-12-10-18-00-40-426.png" alt="Sensor Bridge Logo" class="w-8 h-8 rounded-full object-cover shadow-md shadow-cyber-purple/20 border border-cyber-accent/30">
-            <p class="text-slate-500 text-sm font-mono">SYSTEM V2.0 // © SENSOR BRIDGE PROJECT 2026</p>
+    <footer class="glass-dark border-t border-white/5 mt-12 py-8 relative overflow-hidden">
+        <!-- Background glow for footer -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyber-accent/5 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4">
+            
+            <!-- Tags Container -->
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-cyber-accent hover:text-cyber-accent transition-colors cursor-default">#firmware</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-cyber-purple hover:text-cyber-purple transition-colors cursor-default">#privacy</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-blue-500 hover:text-blue-500 transition-colors cursor-default">#rc_car</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-green-500 hover:text-green-500 transition-colors cursor-default">#gps_gsm</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-pink-500 hover:text-pink-500 transition-colors cursor-default">#keypad</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-yellow-500 hover:text-yellow-500 transition-colors cursor-default">#sensors</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-orange-500 hover:text-orange-500 transition-colors cursor-default">#iot_control</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-teal-500 hover:text-teal-500 transition-colors cursor-default">#esp32</span>
+                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-indigo-500 hover:text-indigo-500 transition-colors cursor-default">#arduino</span>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="text-center flex flex-col md:flex-row items-center justify-center gap-3 border-t border-white/5 pt-8">
+                <!-- ADDED FOOTER LOGO -->
+                <!-- CHANGED: Replaced icon with Custom Image Logo, fully rounded -->
+                <img src="https://i.ibb.co/Z1bskSTz/Picsart-25-12-10-18-00-40-426.png" alt="Sensor Bridge Logo" class="w-8 h-8 rounded-full object-cover shadow-md shadow-cyber-purple/20 border border-cyber-accent/30">
+                <p class="text-slate-500 text-sm font-mono">SYSTEM V2.0 // © SENSOR BRIDGE PROJECT 2026</p>
+            </div>
         </div>
     </footer>
 
