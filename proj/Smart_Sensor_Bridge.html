@@ -33,6 +33,8 @@
                         'pulse-glow': 'pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'spin-slow': 'spin 12s linear infinite',
                         'scan': 'scan 3s linear infinite',
+                        'grid-scroll': 'gridScroll 40s linear infinite',
+                        'text-shimmer': 'textShimmer 3s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -47,6 +49,15 @@
                             '0%': { top: '-10%', opacity: 0 },
                             '50%': { opacity: 1 },
                             '100%': { top: '110%', opacity: 0 },
+                        },
+                        gridScroll: {
+                            '0%': { backgroundPosition: '0 0' },
+                            '100%': { backgroundPosition: '50px 50px' },
+                        },
+                        textShimmer: {
+                            '0%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                            '100%': { backgroundPosition: '0% 50%' },
                         }
                     }
                 }
@@ -60,7 +71,8 @@
             background-image: 
                 linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px), 
                 linear-gradient(90deg, rgba(189, 0, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+            background-size: 50px 50px;
+            animation: gridScroll 20s linear infinite; /* Added moving grid animation */
         }
         
         /* Glass Panel Dark */
@@ -69,11 +81,19 @@
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
 
-        /* Glowing Text */
-        .text-glow {
-            text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        .glass-card-hover:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.15);
+            border-color: rgba(0, 240, 255, 0.3);
+        }
+
+        /* Glowing Text Animation Class */
+        .animate-gradient-text {
+            background-size: 200% auto;
+            animation: textShimmer 4s linear infinite;
         }
 
         .code-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -85,11 +105,20 @@
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
         /* Nav Highlight */
-        .nav-btn.active {
-            color: #00f0ff;
-            background: rgba(0, 240, 255, 0.05);
-            border-bottom: 2px solid #00f0ff;
+        .nav-btn { position: relative; }
+        .nav-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #00f0ff;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
         }
+        .nav-btn.active::after { width: 100%; }
+        .nav-btn.active { color: #00f0ff; }
         
         /* Mobile Scroll Hide */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -103,6 +132,10 @@
             position: relative;
             background: #000;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px #333;
+            transition: transform 0.5s ease;
+        }
+        .phone-mockup:hover {
+            transform: rotateY(5deg) rotateX(5deg);
         }
         .phone-notch {
             position: absolute;
@@ -120,10 +153,10 @@
             position: absolute;
             left: 0;
             width: 100%;
-            height: 20px;
-            background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.5), transparent);
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.4), transparent);
             z-index: 25;
-            animation: scan 3s linear infinite;
+            animation: scan 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             pointer-events: none;
         }
     </style>
@@ -135,33 +168,24 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <!-- Logo -->
-                <div class="flex items-center space-x-3 group cursor-pointer" onclick="switchTab('home')">
-                    <!-- CHANGED: Replaced icon with Custom Image Logo, fully rounded -->
-                    <img src="https://i.ibb.co/zTjCqnNL/gyroscope-icon.png" alt="Sensor Bridge Logo" class="w-10 h-10 rounded-full object-cover shadow-lg shadow-cyber-purple/20 group-hover:shadow-cyber-purple/40 transition-all border border-white/10">
+                <div class="flex items-center space-x-3 group cursor-pointer" onclick="updateRoute('home')">
+                    <img src="https://i.ibb.co/d0qZ6s8n/fcfd8d2479c140fbafa7ee498dbf1ddf.gif" alt="Sensor Bridge Logo" class="w-10 h-10 rounded-full object-cover shadow-[0_0_15px_rgba(189,0,255,0.5)] group-hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] transition-all duration-500 border border-white/10">
                     <div>
-                        <span class="text-xl font-bold tracking-tight text-white block leading-none font-mono">SENSOR<span class="text-cyber-accent">BRIDGE</span></span>
+                        <span class="text-xl font-bold tracking-tight text-white block leading-none font-mono">SENSOR<span class="text-cyber-accent animate-gradient-text bg-gradient-to-r from-cyber-accent via-white to-cyber-accent bg-clip-text text-transparent">BRIDGE</span></span>
                         <span class="text-[10px] text-slate-500 font-mono tracking-widest uppercase">IoT Ecosystem</span>
                     </div>
                 </div>
 
                 <!-- Desktop Nav -->
-                <div class="hidden md:flex items-center gap-6">
-                    <button onclick="switchTab('home')" id="nav-home" class="nav-btn active py-2 text-sm font-medium transition-all duration-300 hover:text-white">
-                        Mission Control
-                    </button>
-                    <button onclick="switchTab('connections')" id="nav-connections" class="nav-btn py-2 text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">
-                        Blueprints
-                    </button>
-                    <button onclick="switchTab('code')" id="nav-code" class="nav-btn py-2 text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">
-                        Firmware
-                    </button>
-                    <button onclick="switchTab('privacy')" id="nav-privacy" class="nav-btn py-2 text-sm font-medium transition-all duration-300 hover:text-white text-slate-400">
-                        Privacy
-                    </button>
+                <div class="hidden md:flex items-center gap-8">
+                    <button onclick="updateRoute('home')" id="nav-home" class="nav-btn active py-2 text-sm font-medium transition-colors hover:text-white">Mission Control</button>
+                    <button onclick="updateRoute('connections')" id="nav-connections" class="nav-btn py-2 text-sm font-medium transition-colors hover:text-white text-slate-400">Blueprints</button>
+                    <button onclick="updateRoute('firmware')" id="nav-firmware" class="nav-btn py-2 text-sm font-medium transition-colors hover:text-white text-slate-400">Firmware</button>
+                    <button onclick="updateRoute('privacy')" id="nav-privacy" class="nav-btn py-2 text-sm font-medium transition-colors hover:text-white text-slate-400">Privacy</button>
                 </div>
 
                 <!-- Action -->
-                <a href="#" class="hidden md:flex items-center gap-3 bg-white text-black hover:bg-cyber-accent hover:scale-105 px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                <a href="#" class="hidden md:flex items-center gap-3 bg-white text-black hover:bg-cyber-accent hover:scale-105 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] duration-300">
                     <i class="fa-brands fa-google-play"></i>
                     <span>Get App</span>
                 </a>
@@ -169,10 +193,10 @@
             
             <!-- Mobile Nav (Scrollable) -->
             <div class="md:hidden flex space-x-2 overflow-x-auto pb-3 pt-1 no-scrollbar border-t border-white/5 mt-2 px-2">
-                <button onclick="switchTab('home')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-white border border-white/10 active:bg-cyber-accent active:text-black">Home</button>
-                <button onclick="switchTab('connections')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black">Wiring</button>
-                <button onclick="switchTab('code')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black">Code</button>
-                <button onclick="switchTab('privacy')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black">Privacy</button>
+                <button onclick="updateRoute('home')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-white border border-white/10 active:bg-cyber-accent active:text-black transition-colors">Home</button>
+                <button onclick="updateRoute('connections')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black transition-colors">Wiring</button>
+                <button onclick="updateRoute('firmware')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black transition-colors">Code</button>
+                <button onclick="updateRoute('privacy')" class="whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-slate-300 border border-white/10 active:bg-cyber-accent active:text-black transition-colors">Privacy</button>
             </div>
         </div>
     </nav>
@@ -187,14 +211,15 @@
             <div class="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
                 <!-- Text Content -->
                 <div class="space-y-8 order-2 lg:order-1">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple text-xs font-mono font-bold tracking-wider">
-                        <span class="w-2 h-2 rounded-full bg-cyber-purple animate-pulse"></span>
-                        VERSION 2.0 LIVE
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-purple/10 border border-cyber-purple/30 text-cyber-purple text-xs font-mono font-bold tracking-wider hover:bg-cyber-purple/20 transition-colors cursor-default">
+                        <span class="w-2 h-2 rounded-full bg-cyber-purple animate-ping"></span>
+                        <span class="w-2 h-2 rounded-full bg-cyber-purple absolute"></span>
+                        <span class="ml-2">VERSION 2.0 LIVE</span>
                     </div>
                     
                     <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight tracking-tight">
                         Build Smarter. <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-accent via-blue-500 to-cyber-purple text-glow">Debug Faster.</span>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-accent via-white to-cyber-purple animate-gradient-text">Debug Faster.</span>
                     </h1>
                     
                     <!-- UPDATED PROBLEM STATEMENT -->
@@ -204,7 +229,7 @@
                     
                     <!-- HERO BUTTONS -->
                     <div class="flex flex-wrap gap-4">
-                        <a href="#" class="flex items-center gap-3 bg-gradient-to-r from-cyber-accent to-blue-600 text-black font-bold px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+                        <a href="#" class="flex items-center gap-3 bg-gradient-to-r from-cyber-accent to-blue-600 text-black font-bold px-8 py-4 rounded-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_50px_rgba(0,240,255,0.6)] duration-300">
                             <i class="fa-brands fa-google-play text-xl"></i>
                             <div class="text-left leading-tight">
                                 <span class="block text-[10px] uppercase opacity-70">Get it on</span>
@@ -212,50 +237,50 @@
                             </div>
                         </a>
                         
-                        <a href="#" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-3 group">
-                             <i class="fa-brands fa-github text-xl text-slate-300 group-hover:text-white"></i>
+                        <a href="#" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 hover:border-white/30 transition-all border border-white/10 flex items-center gap-3 group">
+                             <i class="fa-brands fa-github text-xl text-slate-300 group-hover:text-white transition-colors"></i>
                              <span>GitHub</span>
                         </a>
 
-                        <button onclick="document.getElementById('video-modal').classList.remove('hidden')" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-3 group">
-                            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-cyber-purple group-hover:text-white transition-colors">
+                        <button onclick="document.getElementById('video-modal').classList.remove('hidden')" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 hover:border-white/30 transition-all border border-white/10 flex items-center gap-3 group">
+                            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-cyber-purple group-hover:text-white transition-colors duration-300">
                                 <i class="fa-solid fa-play text-xs"></i>
                             </div>
                             Demo
                         </button>
                         
                         <!-- NEW FEEDBACK BUTTON -->
-                        <a href="#" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-3 group">
-                             <i class="fa-regular fa-comments text-xl text-slate-300 group-hover:text-white"></i>
+                        <a href="#" class="px-8 py-4 glass-dark text-white font-bold rounded-xl hover:bg-white/10 hover:border-white/30 transition-all border border-white/10 flex items-center gap-3 group">
+                             <i class="fa-regular fa-comments text-xl text-slate-300 group-hover:text-white transition-colors"></i>
                              <span>Feedback</span>
                         </a>
                     </div>
 
                     <!-- Dynamic Features Mini-Grid -->
                     <div class="grid grid-cols-3 gap-4 pt-8">
-                        <div class="text-center">
-                            <div class="w-10 h-10 mx-auto rounded-full bg-cyber-accent/10 flex items-center justify-center text-cyber-accent mb-2">
-                                <i class="fa-solid fa-bolt"></i>
+                        <div class="text-center group cursor-default">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-cyber-accent/10 flex items-center justify-center text-cyber-accent mb-2 group-hover:scale-110 group-hover:bg-cyber-accent/20 transition-all duration-300">
+                                <i class="fa-solid fa-bolt text-xl"></i>
                             </div>
-                            <span class="text-xs font-mono text-slate-400">Zero Latency</span>
+                            <span class="text-xs font-mono text-slate-400 group-hover:text-cyber-accent transition-colors">Zero Latency</span>
                         </div>
-                        <div class="text-center">
-                            <div class="w-10 h-10 mx-auto rounded-full bg-cyber-purple/10 flex items-center justify-center text-cyber-purple mb-2">
-                                <i class="fa-solid fa-wifi"></i>
+                        <div class="text-center group cursor-default">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-cyber-purple/10 flex items-center justify-center text-cyber-purple mb-2 group-hover:scale-110 group-hover:bg-cyber-purple/20 transition-all duration-300">
+                                <i class="fa-solid fa-wifi text-xl"></i>
                             </div>
-                            <span class="text-xs font-mono text-slate-400">Bluetooth 5.0</span>
+                            <span class="text-xs font-mono text-slate-400 group-hover:text-cyber-purple transition-colors">Bluetooth 5.0</span>
                         </div>
-                        <div class="text-center">
-                            <div class="w-10 h-10 mx-auto rounded-full bg-pink-500/10 flex items-center justify-center text-cyber-pink mb-2">
-                                <i class="fa-solid fa-code"></i>
+                        <div class="text-center group cursor-default">
+                            <div class="w-12 h-12 mx-auto rounded-full bg-pink-500/10 flex items-center justify-center text-cyber-pink mb-2 group-hover:scale-110 group-hover:bg-pink-500/20 transition-all duration-300">
+                                <i class="fa-solid fa-code text-xl"></i>
                             </div>
-                            <span class="text-xs font-mono text-slate-400">Open Source</span>
+                            <span class="text-xs font-mono text-slate-400 group-hover:text-cyber-pink transition-colors">Open Source</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 3D Phone Mockup -->
-                <div class="relative order-1 lg:order-2 flex justify-center lg:justify-end">
+                <div class="relative order-1 lg:order-2 flex justify-center lg:justify-end perspective-[1000px]">
                     <!-- Background blobs -->
                     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-cyber-purple/20 to-cyber-accent/20 rounded-full blur-[80px] animate-pulse-slow"></div>
                     
@@ -268,7 +293,7 @@
                             <div class="scan-line"></div>
                             
                             <!-- Status Bar -->
-                            <div class="h-6 w-full bg-black/50 flex justify-between px-4 items-center text-[10px] text-white pt-1 absolute top-0 left-0 z-30">
+                            <div class="h-6 w-full bg-black/50 flex justify-between px-4 items-center text-[10px] text-white pt-1 absolute top-0 left-0 z-30 backdrop-blur-sm">
                                 <span id="phone-clock">12:00</span>
                                 <div class="flex gap-1"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></div>
                             </div>
@@ -276,29 +301,32 @@
                             <!-- App Header -->
                             <div class="bg-gradient-to-r from-cyber-purple to-blue-600 p-4 pt-8 pb-6 shadow-lg relative z-20 flex items-center gap-3">
                                 <!-- CHANGED: Real Icon in Phone Header -->
-                                <img src="https://i.ibb.co/zTjCqnNL/gyroscope-icon.png" alt="App Icon" class="w-8 h-8 rounded-full border-2 border-white/20">
+                                <img src="https://i.ibb.co/KBwtZ0v/Screenshot-2026-0104-020409.png" alt="App Icon" class="w-8 h-8 rounded-full border-2 border-white/20">
                                 <div>
                                     <h3 class="text-white font-bold text-lg leading-none">Sensor Bridge</h3>
-                                    <p class="text-white/70 text-[10px]">Connected: ESP32_DEVICE_01</p>
+                                    <p class="text-white/70 text-[10px] flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                        Connected: ESP32_DEVICE_01
+                                    </p>
                                 </div>
                             </div>
                             
                             <!-- Actual App Image -->
                             <div class="flex-grow bg-black relative">
-                                <img src="https://i.ibb.co/v6Mdy36h/Screenshot-2026-0126-193714.jpg" alt="Sensor Bridge App Interface" class="w-full h-full object-cover opacity-90">
+                                <img src="https://i.ibb.co/v6Mdy36h/Screenshot-2026-0126-193714.jpg" alt="Sensor Bridge App Interface" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300">
                             </div>
                         </div>
                     </div>
                     
                     <!-- Floating Badge -->
-                    <div class="absolute bottom-10 -left-10 glass-dark p-4 rounded-xl border border-cyber-accent/30 animate-float-delayed hidden md:block">
+                    <div class="absolute bottom-10 -left-10 glass-dark p-4 rounded-xl border border-cyber-accent/30 animate-float-delayed hidden md:block backdrop-blur-md">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center shadow-[0_0_15px_rgba(74,222,128,0.3)]">
                                 <i class="fa-solid fa-check"></i>
                             </div>
                             <div>
                                 <h4 class="text-white font-bold text-sm">System Online</h4>
-                                <p class="text-xs text-slate-400">Latency: 12ms</p>
+                                <p class="text-xs text-slate-400 font-mono">Latency: <span class="text-green-400">12ms</span></p>
                             </div>
                         </div>
                     </div>
@@ -306,39 +334,84 @@
             </div>
 
             <!-- Video Section -->
-            <div class="relative rounded-3xl overflow-hidden border border-white/10 group cursor-pointer" onclick="document.getElementById('video-modal').classList.remove('hidden')">
-                <div class="absolute inset-0 bg-gradient-to-r from-cyber-purple to-blue-900 opacity-20 group-hover:opacity-30 transition-opacity"></div>
+            <div class="relative rounded-3xl overflow-hidden border border-white/10 group cursor-pointer glass-card-hover" onclick="document.getElementById('video-modal').classList.remove('hidden')">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyber-purple to-blue-900 opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
                 <div class="absolute inset-0 flex items-center justify-center z-20">
-                    <div class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-play text-3xl text-white ml-2"></i>
+                    <div class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 group-hover:bg-cyber-accent group-hover:text-black group-hover:border-transparent transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                        <i class="fa-solid fa-play text-3xl ml-1"></i>
                     </div>
                 </div>
-                <div class="h-64 md:h-80 bg-black flex items-center justify-center text-slate-600">
-                    <!-- Placeholder for video thumbnail -->
-                    <span class="font-mono text-sm tracking-widest uppercase">Application Demo Video</span>
+                <div class="h-64 md:h-80 bg-black flex items-center justify-center text-slate-600 relative">
+                    <!-- Grid pattern overlay -->
+                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px;"></div>
+                    <span class="font-mono text-sm tracking-widest uppercase z-10">Application Demo Video</span>
                 </div>
-                <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black to-transparent">
-                    <h3 class="text-xl font-bold text-white">See What's Possible</h3>
+                <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
+                    <h3 class="text-xl font-bold text-white group-hover:text-cyber-accent transition-colors">See What's Possible</h3>
                     <p class="text-sm text-slate-300">Watch the full walkthrough of RC control and Home Automation features.</p>
                 </div>
             </div>
             
             <!-- Features Cards -->
              <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass-dark p-8 rounded-2xl hover:border-cyber-accent/50 transition-colors">
-                    <i class="fa-solid fa-microchip text-4xl text-cyber-accent mb-4"></i>
+                <div class="glass-dark p-8 rounded-2xl border border-white/5 glass-card-hover">
+                    <i class="fa-solid fa-microchip text-4xl text-cyber-accent mb-4 drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]"></i>
                     <h3 class="text-xl font-bold text-white mb-2">Universal Handshake</h3>
                     <p class="text-sm text-slate-400">One protocol for ESP32 and Arduino. Say goodbye to writing custom Android apps for every single project.</p>
                 </div>
-                <div class="glass-dark p-8 rounded-2xl hover:border-cyber-purple/50 transition-colors">
-                    <i class="fa-solid fa-wand-magic-sparkles text-4xl text-cyber-purple mb-4"></i>
+                <div class="glass-dark p-8 rounded-2xl border border-white/5 glass-card-hover">
+                    <i class="fa-solid fa-wand-magic-sparkles text-4xl text-cyber-purple mb-4 drop-shadow-[0_0_10px_rgba(189,0,255,0.5)]"></i>
                     <h3 class="text-xl font-bold text-white mb-2">Dynamic UI</h3>
                     <p class="text-sm text-slate-400">Interfaces that adapt to your needs. Switch between Gamepad, Terminal, and Sensor plots instantly.</p>
                 </div>
-                <div class="glass-dark p-8 rounded-2xl hover:border-pink-500/50 transition-colors">
-                    <i class="fa-solid fa-layer-group text-4xl text-cyber-pink mb-4"></i>
+                <div class="glass-dark p-8 rounded-2xl border border-white/5 glass-card-hover">
+                    <i class="fa-solid fa-layer-group text-4xl text-cyber-pink mb-4 drop-shadow-[0_0_10px_rgba(255,0,85,0.5)]"></i>
                     <h3 class="text-xl font-bold text-white mb-2">Knowledge Hub</h3>
                     <p class="text-sm text-slate-400">Built-in documentation, wiring diagrams, and copy-paste code snippets right in the app.</p>
+                </div>
+            </div>
+
+            <!-- FUTURE SCOPE SECTION (New) -->
+            <div class="space-y-12 pt-12 border-t border-white/5 relative">
+                <div class="text-center relative z-10">
+                    <span class="text-cyber-accent font-mono text-xs tracking-widest uppercase bg-cyber-accent/10 px-3 py-1 rounded-full">Roadmap</span>
+                    <h2 class="text-4xl font-bold text-white mt-4">Future Scope</h2>
+                    <p class="text-slate-400 mt-2">The evolution of Sensor Bridge continues. Coming soon to your lab.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+                    <!-- Card 1: AI Vision -->
+                    <div class="glass-dark p-6 rounded-2xl border border-white/5 glass-card-hover group">
+                        <div class="w-14 h-14 bg-cyber-purple/20 rounded-2xl flex items-center justify-center text-cyber-purple mb-6 group-hover:rotate-12 transition-transform duration-300">
+                            <i class="fa-solid fa-face-viewfinder text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 group-hover:text-cyber-purple transition-colors">Face Recognition</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">Unlock security projects with onboard AI vision processing directly from the app.</p>
+                    </div>
+                    <!-- Card 2: Line Follower -->
+                    <div class="glass-dark p-6 rounded-2xl border border-white/5 glass-card-hover group">
+                        <div class="w-14 h-14 bg-cyber-accent/20 rounded-2xl flex items-center justify-center text-cyber-accent mb-6 group-hover:-rotate-12 transition-transform duration-300">
+                            <i class="fa-solid fa-road text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 group-hover:text-cyber-accent transition-colors">Line Follower</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">Advanced PID algorithms for autonomous robot navigation using camera input.</p>
+                    </div>
+                    <!-- Card 3: Cloud Backend -->
+                    <div class="glass-dark p-6 rounded-2xl border border-white/5 glass-card-hover group">
+                        <div class="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:rotate-12 transition-transform duration-300">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 group-hover:text-blue-500 transition-colors">Backend Cloud</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">Cloud telemetry storage and remote IoT dashboarding for data analysis.</p>
+                    </div>
+                    <!-- Card 4: Voice I/O -->
+                    <div class="glass-dark p-6 rounded-2xl border border-white/5 glass-card-hover group">
+                        <div class="w-14 h-14 bg-pink-500/20 rounded-2xl flex items-center justify-center text-pink-500 mb-6 group-hover:-rotate-12 transition-transform duration-300">
+                            <i class="fa-solid fa-microphone-lines text-2xl"></i>
+                        </div>
+                        <h3 class="text-white font-bold mb-2 group-hover:text-pink-500 transition-colors">Voice I/O</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">Bi-directional audio communication. Speak to your robot, and it speaks back.</p>
+                    </div>
                 </div>
             </div>
 
@@ -348,8 +421,8 @@
         <div id="connections-section" class="fade-in hidden max-w-5xl mx-auto space-y-16">
             
             <!-- Quick Start Guide (New) -->
-            <div class="glass-dark p-8 md:p-12 rounded-3xl border border-white/10 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber-accent via-cyber-purple to-pink-500"></div>
+            <div class="glass-dark p-8 md:p-12 rounded-3xl border border-white/10 relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber-accent via-cyber-purple to-pink-500 group-hover:h-1.5 transition-all duration-500"></div>
                 
                 <div class="text-center mb-10">
                     <span class="text-cyber-accent font-mono text-xs tracking-widest uppercase">Quick Start</span>
@@ -361,27 +434,27 @@
                     <div class="hidden md:block absolute top-12 left-[16%] w-[68%] h-0.5 bg-white/10 -z-10 border-t border-dashed border-white/20"></div>
                     
                     <!-- Step 1 -->
-                    <div class="text-center group">
-                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-cyber-accent/10 group-hover:border-cyber-accent group-hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all duration-300">
-                            <i class="fa-solid fa-microchip text-3xl text-cyber-accent group-hover:scale-110 transition-transform"></i>
+                    <div class="text-center group/step">
+                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-cyber-accent/10 group-hover/step:border-cyber-accent group-hover/step:shadow-[0_0_30px_rgba(0,240,255,0.4)] transition-all duration-300">
+                            <i class="fa-solid fa-microchip text-3xl text-cyber-accent group-hover/step:scale-110 transition-transform"></i>
                         </div>
                         <h4 class="text-white font-bold text-lg mb-2">1. Upload Code</h4>
                         <p class="text-sm text-slate-400 leading-relaxed px-4">Copy the driver code from the <strong>Firmware</strong> tab and flash it to your ESP32 or Arduino board.</p>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="text-center group">
-                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-cyber-purple/10 group-hover:border-cyber-purple group-hover:shadow-[0_0_30px_rgba(189,0,255,0.4)] transition-all duration-300">
-                            <i class="fa-brands fa-bluetooth-b text-3xl text-cyber-purple group-hover:scale-110 transition-transform"></i>
+                    <div class="text-center group/step">
+                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-cyber-purple/10 group-hover/step:border-cyber-purple group-hover/step:shadow-[0_0_30px_rgba(189,0,255,0.4)] transition-all duration-300">
+                            <i class="fa-brands fa-bluetooth-b text-3xl text-cyber-purple group-hover/step:scale-110 transition-transform"></i>
                         </div>
                         <h4 class="text-white font-bold text-lg mb-2">2. Permission & Pair</h4>
                         <p class="text-sm text-slate-400 leading-relaxed px-4">Launch app, grant <strong>Location/Bluetooth</strong> permissions, and tap the Bluetooth icon to connect.</p>
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="text-center group">
-                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-pink-500/10 group-hover:border-pink-500 group-hover:shadow-[0_0_30px_rgba(255,0,85,0.4)] transition-all duration-300">
-                            <i class="fa-solid fa-power-off text-3xl text-pink-500 group-hover:scale-110 transition-transform"></i>
+                    <div class="text-center group/step">
+                        <div class="w-24 h-24 mx-auto bg-[#0b0c15] rounded-full border border-white/10 flex items-center justify-center mb-6 shadow-lg shadow-pink-500/10 group-hover/step:border-pink-500 group-hover/step:shadow-[0_0_30px_rgba(255,0,85,0.4)] transition-all duration-300">
+                            <i class="fa-solid fa-power-off text-3xl text-pink-500 group-hover/step:scale-110 transition-transform"></i>
                         </div>
                         <h4 class="text-white font-bold text-lg mb-2">3. Run System</h4>
                         <p class="text-sm text-slate-400 leading-relaxed px-4">Select your module (e.g., RC Car) from the dashboard and start controlling instantly.</p>
@@ -469,15 +542,13 @@
                     <p class="text-slate-400 mt-1">Select a module to load the driver code.</p>
                 </div>
                 <!-- Module Selector (Wrapping on mobile for better visibility) -->
-                <!-- CHANGED: flex-wrap ensures buttons wrap on small screens -->
                 <div class="flex flex-wrap justify-center md:justify-start gap-2 w-full md:w-auto" id="module-buttons">
                     <!-- Injected via JS -->
                 </div>
             </div>
       
             <!-- Code Display Area -->
-            <!-- CHANGED: Added max-w-[90vw] to force container width constraints on mobile -->
-            <div class="glass-dark rounded-2xl overflow-hidden border border-white/10 flex flex-col h-[60vh] md:h-[700px] w-full max-w-[90vw] md:max-w-full mx-auto">
+            <div class="glass-dark rounded-2xl overflow-hidden border border-white/10 flex flex-col h-[60vh] md:h-[700px] w-full max-w-[90vw] md:max-w-full mx-auto shadow-2xl">
                 
                 <!-- Header -->
                 <div class="bg-black/40 border-b border-white/5 p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -504,7 +575,6 @@
                 </div>
       
                 <!-- Code Area -->
-                <!-- CHANGED: overflow-x-auto ensures code scrolls horizontally inside the box -->
                 <div class="relative flex-grow bg-[#05060a] group overflow-hidden">
                     <button onclick="copyCode()" class="absolute top-4 right-4 bg-white/5 hover:bg-white/10 text-slate-300 p-2 rounded-md backdrop-blur-sm transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 border border-white/5 z-10" title="Copy Code">
                         <i id="copy-icon" class="fa-regular fa-copy"></i>
@@ -521,8 +591,8 @@
         <!-- PRIVACY SECTION (Updated) -->
         <div id="privacy-section" class="fade-in hidden space-y-12 max-w-4xl mx-auto">
             <div class="text-center">
-                <span class="text-cyber-accent font-mono text-sm tracking-widest uppercase">Legal</span>
-                <h2 class="text-4xl font-bold text-white mt-2">Privacy Policy</h2>
+                <span class="text-cyber-accent font-mono text-sm tracking-widest uppercase bg-cyber-accent/10 px-3 py-1 rounded-full">Legal</span>
+                <h2 class="text-4xl font-bold text-white mt-4">Privacy Policy</h2>
                 <p class="text-slate-400 mt-2">Transparency is our priority. Last updated: January 2026.</p>
             </div>
 
@@ -613,45 +683,27 @@
     </main>
 
     <!-- Video Modal -->
-    <div id="video-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-lg hidden flex items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-            <button onclick="document.getElementById('video-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white hover:text-cyber-accent z-10 bg-black/50 rounded-full p-2 w-10 h-10 flex items-center justify-center">
+    <div id="video-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-lg hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl transform transition-transform duration-300 scale-95">
+            <button onclick="document.getElementById('video-modal').classList.add('hidden')" class="absolute top-4 right-4 text-white hover:text-cyber-accent z-10 bg-black/50 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="aspect-video flex items-center justify-center bg-[#111]">
-                <p class="text-slate-500 font-mono"><i class="fa-regular fa-circle-play text-4xl mb-4 block text-center"></i>VIDEO PLAYER PLACEHOLDER</p>
+                <p class="text-slate-500 font-mono flex flex-col items-center gap-4">
+                    <i class="fa-regular fa-circle-play text-5xl opacity-50"></i>
+                    VIDEO PLAYER PLACEHOLDER
+                </p>
                 <!-- Embed YouTube/Video here: <iframe ...></iframe> -->
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="glass-dark border-t border-white/5 mt-12 py-8 relative overflow-hidden">
-        <!-- Background glow for footer -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyber-accent/5 rounded-full blur-[80px] pointer-events-none"></div>
-
-        <div class="max-w-7xl mx-auto px-4">
-            
-            <!-- Tags Container -->
-            <div class="flex flex-wrap justify-center gap-3 mb-8">
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-cyber-accent hover:text-cyber-accent transition-colors cursor-default">#firmware</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-cyber-purple hover:text-cyber-purple transition-colors cursor-default">#privacy</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-blue-500 hover:text-blue-500 transition-colors cursor-default">#rc_car</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-green-500 hover:text-green-500 transition-colors cursor-default">#gps_gsm</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-pink-500 hover:text-pink-500 transition-colors cursor-default">#keypad</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-yellow-500 hover:text-yellow-500 transition-colors cursor-default">#sensors</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-orange-500 hover:text-orange-500 transition-colors cursor-default">#iot_control</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-teal-500 hover:text-teal-500 transition-colors cursor-default">#esp32</span>
-                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-slate-400 font-mono hover:border-indigo-500 hover:text-indigo-500 transition-colors cursor-default">#arduino</span>
-            </div>
-
-            <!-- Footer Bottom -->
-            <div class="text-center flex flex-col md:flex-row items-center justify-center gap-3 border-t border-white/5 pt-8">
-                <!-- ADDED FOOTER LOGO -->
-                <!-- CHANGED: Replaced icon with Custom Image Logo, fully rounded -->
-                <img src="https://i.ibb.co/Z1bskSTz/Picsart-25-12-10-18-00-40-426.png" alt="Sensor Bridge Logo" class="w-8 h-8 rounded-full object-cover shadow-md shadow-cyber-purple/20 border border-cyber-accent/30">
-                <p class="text-slate-500 text-sm font-mono">SYSTEM V2.0 // © SENSOR BRIDGE PROJECT 2026</p>
-            </div>
+    <footer class="glass-dark border-t border-white/5 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center flex flex-col md:flex-row items-center justify-center gap-3">
+            <!-- ADDED FOOTER LOGO -->
+            <img src="https://i.ibb.co/Gv9VWdkM/Picsart-25-12-10-18-00-40-426.png" alt="Sensor Bridge Logo" class="w-8 h-8 rounded-full object-cover shadow-md shadow-cyber-purple/20 border border-cyber-accent/30 hover:scale-110 transition-transform">
+            <p class="text-slate-500 text-sm font-mono hover:text-white transition-colors">SYSTEM V2.0 // ©️SENSOR BRIDGE PROJECT 2026</p>
         </div>
     </footer>
 
@@ -1128,12 +1180,57 @@ void loop() {
         let currentModule = 'rc';
         let currentPlatform = 'esp32';
 
+        // --- ROUTING LOGIC ---
+        function updateRoute(route) {
+            if (route) {
+                history.pushState(null, null, '#' + route);
+                handleHash();
+            }
+        }
+
+        function handleHash() {
+            const hash = window.location.hash.substring(1); 
+            
+            if (!hash) {
+                switchTab('home');
+                return;
+            }
+
+            const moduleMap = {
+                'rc_car': 'rc',
+                'smart_light': 'rgb',
+                'automation': 'switch',
+                'sensors': 'sensors',
+                'terminal': 'terminal',
+                'keypad': 'keypad',
+                'gps_gsm': 'gps'
+            };
+
+            if (['home', 'connections', 'firmware', 'privacy'].includes(hash)) {
+                switchTab(hash);
+            } 
+            else if (moduleMap[hash]) {
+                switchTab('firmware');
+                setModule(moduleMap[hash]);
+                const codeSection = document.getElementById('code-section');
+                if (codeSection && window.innerWidth < 768) {
+                    codeSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+
+        window.addEventListener('hashchange', handleHash);
+
         window.onload = function() {
             renderModuleButtons();
-            updateCodeView();
-            switchTab('home');
             
-            // Start clock
+            // PRELOAD DEFAULT CODE IMMEDIATELY
+            const defaultData = codes['rc'];
+            document.getElementById('code-title').innerText = defaultData.title;
+            document.getElementById('code-desc').innerText = defaultData.desc;
+            document.getElementById('code-content').textContent = defaultData.esp32;
+            
+            handleHash();
             setInterval(updateClock, 1000);
             updateClock();
         };
@@ -1155,14 +1252,22 @@ void loop() {
             document.getElementById('code-section').classList.add('hidden');
             document.getElementById('privacy-section').classList.add('hidden');
             
-            document.getElementById(tabId + '-section').classList.remove('hidden');
+            const targetId = (tabId === 'firmware' || tabId === 'code') ? 'code' : tabId;
+            const targetSection = document.getElementById(targetId + '-section');
+            
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
 
-            // Nav Styling
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active', 'text-white');
                 btn.classList.add('text-slate-400');
             });
-            const activeBtn = document.getElementById('nav-' + tabId);
+            
+            let btnId = 'nav-' + tabId;
+            if (tabId === 'code') btnId = 'nav-firmware';
+            
+            const activeBtn = document.getElementById(btnId);
             if (activeBtn) {
                 activeBtn.classList.add('active', 'text-white');
                 activeBtn.classList.remove('text-slate-400');
@@ -1207,18 +1312,13 @@ void loop() {
 
         function updateCodeView() {
             const data = codes[currentModule];
-            
-            // Fade effect
             const codeBlock = document.getElementById('code-content');
-            codeBlock.style.opacity = '0';
             
-            setTimeout(() => {
-                document.getElementById('code-title').innerText = data.title;
-                document.getElementById('code-desc').innerText = data.desc;
-                const codeText = currentPlatform === 'esp32' ? data.esp32 : data.arduino;
-                codeBlock.textContent = codeText;
-                codeBlock.style.opacity = '1';
-            }, 150);
+            // INSTANT UPDATE (No setTimeout delay)
+            document.getElementById('code-title').innerText = data.title;
+            document.getElementById('code-desc').innerText = data.desc;
+            const codeText = currentPlatform === 'esp32' ? data.esp32 : data.arduino;
+            codeBlock.textContent = codeText;
         }
 
         function copyCode() {
@@ -1234,3 +1334,5 @@ void loop() {
     </script>
 </body>
 </html>
+
+
