@@ -712,12 +712,13 @@
         // --- DATA STORE ---
         const modules = [
             { id: 'rc', label: 'RC Car', icon: 'fa-gamepad' },
-            { id: 'rgb', label: 'Smart Light', icon: 'fa-lightbulb' },
-            { id: 'switch', label: 'Automation', icon: 'fa-house-signal' },
-            { id: 'sensors', label: 'Sensors', icon: 'fa-gauge-high' },
-            { id: 'terminal', label: 'Terminal', icon: 'fa-terminal' },
+            { id: 'rgb', label: 'RGB LED', icon: 'fa-lightbulb' },
+            { id: 'switch', label: 'Switch', icon: 'fa-house-signal' },
+            { id: 'sensors', label: 'GyroScope ', icon: 'fa-gauge-high' },
+            { id: 'terminal', label: 'Terminal/Voice cmd', icon: 'fa-terminal' },
             { id: 'keypad', label: 'Keypad', icon: 'fa-border-all' },
             { id: 'gps', label: 'GPS / GSM', icon: 'fa-map-pin' },
+            { id: 'proximity', label: 'Proximity', icon: 'fa-rss' },
         ];
 
         const codes = {
@@ -1172,6 +1173,87 @@ void loop() {
   if (BTSerial.available()) Serial.write(BTSerial.read());
   if (Serial.available()) BTSerial.write(Serial.read());
 }`
+            },
+            proximity: {
+                title: "PROXIMITY_ALERT.ino",
+                desc: "Triggers LED alert (GPIO 2/13) when the phone detects an object.",
+                esp32: `// ESP32 PROXIMITY ALERT
+#include "BluetoothSerial.h"
+
+BluetoothSerial SerialBT;
+// Built-in LED is usually on GPIO 2 for ESP32
+const int LED_PIN = 2; 
+
+void setup() {
+  Serial.begin(115200);
+  
+  // DEVICE NAME: Must match what you connect to in the App
+  SerialBT.begin("SmartSensor_ESP32"); 
+  
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW); // Start OFF
+
+  Serial.println("------------------------------------");
+  Serial.println("ESP32 Proximity Receiver Ready");
+  Serial.println("Waiting for App to connect...");
+  Serial.println("------------------------------------");
+}
+
+void loop() {
+  if (SerialBT.available()) {
+    // Read the incoming character from the App
+    char incoming = SerialBT.read();
+    
+    // Debugging: Show what we received in Serial Monitor
+    // Serial.print("Received: ");
+    // Serial.println(incoming);
+
+    // --- LOGIC MAPPING ---
+    // '1' = Object Detected (Alert) -> LED ON
+    // '0' = System Normal (Clear) -> LED OFF
+    
+    if (incoming == '1') {
+      digitalWrite(LED_PIN, HIGH); 
+      Serial.println("⚠️ OBJECT DETECTED!");
+    } 
+    else if (incoming == '0') {
+      digitalWrite(LED_PIN, LOW); 
+      Serial.println("✅ Area Clear");
+    }
+  }
+  delay(20); // Small delay for stability
+}`,
+                arduino: `// ARDUINO PROXIMITY ALERT
+#include <SoftwareSerial.h>
+
+// RX, TX pins on Arduino
+SoftwareSerial BTSerial(10, 11); 
+const int LED_PIN = 13; // Built-in LED on Arduino Uno
+
+void setup() {
+  Serial.begin(9600);
+  BTSerial.begin(9600); // Default speed for HC-05
+  
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  Serial.println("Arduino Proximity Receiver Ready.");
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    char incoming = BTSerial.read();
+    
+    if (incoming == '1') {
+      digitalWrite(LED_PIN, HIGH);
+      Serial.println("⚠️ OBJECT DETECTED!");
+    } 
+    else if (incoming == '0') {
+      digitalWrite(LED_PIN, LOW);
+      Serial.println("✅ Area Clear");
+    }
+  }
+}`
             }
         };
 
@@ -1203,7 +1285,8 @@ void loop() {
                 'sensors': 'sensors',
                 'terminal': 'terminal',
                 'keypad': 'keypad',
-                'gps_gsm': 'gps'
+                'gps_gsm': 'gps',
+                'proximity': 'proximity'
             };
 
             if (['home', 'connections', 'firmware', 'privacy'].includes(hash)) {
@@ -1334,5 +1417,3 @@ void loop() {
     </script>
 </body>
 </html>
-
-
