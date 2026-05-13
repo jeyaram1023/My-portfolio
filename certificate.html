@@ -4,11 +4,19 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <title>Certificates | B. Jeyaram Reddy</title>
+    
+    <!-- Preconnect to Google to speed up CSV fetching -->
+    <link rel="preconnect" href="https://docs.google.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-    <!-- Confetti Library -->
+    
+    <!-- Confetti & PapaParse Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -27,7 +35,8 @@
                         'scan': 'scan 2.5s linear infinite',
                         'modal-pop': 'modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                         'spin-slow': 'spin 15s linear infinite',
-                        'reverse-spin': 'reverseSpin 20s linear infinite',
+                        'reverse-spin': 'reverseSpin 1.5s linear infinite',
+                        'spin-fast': 'spin 0.8s linear infinite',
                     },
                     keyframes: {
                         scan: {
@@ -66,44 +75,55 @@
             background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000000 100%);
         }
 
+        /* --- Custom Loader Styles --- */
+        #loader {
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        .hexagon-core {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+        .glitch-text {
+            position: relative;
+        }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505;
+        }
+        .glitch-text::before {
+            left: 2px; text-shadow: -1px 0 red; animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px; text-shadow: -1px 0 blue; animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-1 { 0% { clip: rect(20px, 9999px, 15px, 0); } 100% { clip: rect(80px, 9999px, 5px, 0); } }
+        @keyframes glitch-anim-2 { 0% { clip: rect(50px, 9999px, 30px, 0); } 100% { clip: rect(10px, 9999px, 80px, 0); } }
+
+        .loading-dots::after {
+            content: ''; animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots { 0%, 20% { content: ''; } 40% { content: '.'; } 60% { content: '..'; } 80%, 100% { content: '...'; } }
+
         /* Cyber Moon Styles */
         .moon-container {
-            position: fixed;
-            top: 5%;
-            right: 5%;
-            z-index: -1;
-            pointer-events: none;
-            transition: transform 0.1s ease-out; /* For parallax smoothness */
+            position: fixed; top: 5%; right: 5%; z-index: -1; pointer-events: none;
+            transition: transform 0.1s ease-out;
         }
 
         .cyber-moon {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 120px; height: 120px; border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0 10%, #475569 60%, #0f172a 100%);
-            box-shadow: 
-                0 0 30px rgba(255, 255, 255, 0.1),
-                0 0 60px rgba(0, 243, 255, 0.2),
-                inset -10px -10px 20px rgba(0, 0, 0, 0.8);
-            position: relative;
-            animation: moonPulse 8s infinite alternate;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1), 0 0 60px rgba(0, 243, 255, 0.2), inset -10px -10px 20px rgba(0, 0, 0, 0.8);
+            position: relative; animation: moonPulse 8s infinite alternate;
         }
 
         .moon-crater {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 50%;
+            position: absolute; background: rgba(0, 0, 0, 0.15); border-radius: 50%;
             box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .orbital-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            border: 1px dashed rgba(0, 243, 255, 0.15);
-            pointer-events: none;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            border-radius: 50%; border: 1px dashed rgba(0, 243, 255, 0.15); pointer-events: none;
         }
 
         @keyframes moonPulse {
@@ -112,96 +132,81 @@
         }
 
         @media (max-width: 768px) {
-            .moon-container {
-                top: 2%;
-                right: -10%;
-                transform: scale(0.6);
-            }
+            .moon-container { top: 2%; right: -10%; transform: scale(0.6); }
         }
 
         /* 3D Card Effect */
-        .cert-card-wrapper {
-            perspective: 1000px;
-        }
+        .cert-card-wrapper { perspective: 1000px; }
         
         .cert-card {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            transform-style: preserve-3d;
+            background: var(--glass); backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); transform-style: preserve-3d;
             transition: transform 0.1s ease-out, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
 
-        .cert-card:hover {
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-            border-color: var(--primary);
-        }
+        .cert-card:hover { box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); border-color: var(--primary); }
 
         .cert-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ''; position: absolute; inset: 0;
             background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
-            z-index: 2;
-            pointer-events: none;
+            z-index: 2; pointer-events: none;
         }
 
-        /* Holographic Shine */
         .holo-shine {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            position: absolute; inset: 0;
             background: linear-gradient(105deg, transparent 40%, rgba(0, 243, 255, 0.1) 45%, rgba(0, 243, 255, 0.3) 50%, transparent 54%);
-            filter: blur(5px);
-            transform: skewX(-20deg) translateX(-150%);
-            transition: transform 0.5s;
-            pointer-events: none;
-            z-index: 3;
+            filter: blur(5px); transform: skewX(-20deg) translateX(-150%);
+            transition: transform 0.5s; pointer-events: none; z-index: 3;
         }
 
         .cert-card:hover .holo-shine {
-            transform: skewX(-20deg) translateX(150%);
-            transition: transform 1s ease-in-out;
+            transform: skewX(-20deg) translateX(150%); transition: transform 1s ease-in-out;
         }
 
-        /* Scanner Line */
         .scanner-bar {
-            position: absolute;
-            width: 100%;
-            height: 10px;
+            position: absolute; width: 100%; height: 10px;
             background: linear-gradient(to right, transparent, var(--primary), transparent);
-            opacity: 0;
-            z-index: 4;
-            pointer-events: none;
+            opacity: 0; z-index: 4; pointer-events: none;
         }
 
-        .cert-card:hover .scanner-bar {
-            animation: scan 1.5s ease-in-out infinite;
-            opacity: 0.7;
-        }
+        .cert-card:hover .scanner-bar { animation: scan 1.5s ease-in-out infinite; opacity: 0.7; }
 
-        /* Filter Button Active State */
         .filter-btn.active {
-            background-color: rgba(0, 243, 255, 0.2);
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary);
-            color: white;
+            background-color: rgba(0, 243, 255, 0.2); border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary); color: white;
         }
 
-        /* Staggered Entry Animation */
         .fade-in-up {
             animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 0; transform: translateY(30px);
         }
 
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-mono">
+
+    <!-- Unique Cyber-Core Loader -->
+    <div id="loader" class="fixed inset-0 z-[9999] bg-[#050505] flex flex-col items-center justify-center">
+        <div class="relative w-40 h-40 flex items-center justify-center mb-8">
+            <!-- Hexagon Core -->
+            <div class="absolute inset-0 bg-cyan-500/20 hexagon-core animate-pulse"></div>
+            <!-- Rotating Precision Rings -->
+            <div class="absolute inset-2 border-t-4 border-l-4 border-cyan-400 rounded-full animate-spin-fast mix-blend-screen opacity-80"></div>
+            <div class="absolute inset-6 border-b-4 border-r-4 border-purple-500 rounded-full animate-reverse-spin mix-blend-screen opacity-80"></div>
+            <div class="absolute inset-10 border-t-4 border-green-400 rounded-full animate-spin mix-blend-screen opacity-80" style="animation-duration: 3s;"></div>
+            <!-- Center Lock/Key Icon -->
+            <i class="fas fa-fingerprint text-4xl text-white animate-pulse drop-shadow-[0_0_10px_#fff]"></i>
+        </div>
+        
+        <div class="text-center relative">
+            <h2 class="font-orbitron text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 tracking-[0.2em] mb-2 glitch-text" data-text="DECRYPTING_VAULT">DECRYPTING_VAULT</h2>
+            <div class="flex items-center justify-center gap-2 font-mono text-xs text-green-400">
+                <span>ESTABLISHING SECURE CONNECTION</span><span class="loading-dots"></span>
+            </div>
+        </div>
+    </div>
 
     <!-- Interactive Background -->
     <canvas id="neural-canvas" class="fixed top-0 left-0 w-full h-full z-[-1]"></canvas>
@@ -213,16 +218,13 @@
 
     <!-- Cyber Moon & Animation -->
     <div class="moon-container" id="moon">
-        <!-- Moon Body -->
         <div class="cyber-moon">
             <div class="moon-crater w-4 h-4 top-[20%] left-[30%]"></div>
             <div class="moon-crater w-8 h-8 top-[50%] left-[60%]"></div>
             <div class="moon-crater w-3 h-3 top-[70%] left-[25%]"></div>
         </div>
-        <!-- Orbital Rings -->
         <div class="orbital-ring w-[160px] h-[160px] animate-spin-slow"></div>
-        <div class="orbital-ring w-[200px] h-[200px] border-dotted opacity-50 animate-reverse-spin"></div>
-        <!-- Satellite/Particle -->
+        <div class="orbital-ring w-[200px] h-[200px] border-dotted opacity-50" style="animation: reverseSpin 20s linear infinite;"></div>
         <div class="orbital-ring w-[240px] h-[240px] animate-spin-slow border-transparent">
             <div class="w-2 h-2 bg-cyan-400 rounded-full absolute top-0 left-1/2 transform -translate-x-1/2 shadow-[0_0_10px_#22d3ee]"></div>
         </div>
@@ -265,165 +267,10 @@
         </div>
     </header>
 
-    <!-- Certificate Grid -->
+    <!-- Certificate Grid (Dynamically Populated) -->
     <main class="container mx-auto px-4 pb-20 flex-grow relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="cert-grid">
-            
-            <!-- Card 1: IoT -->
-            <div class="cert-card-wrapper fade-in-up" style="animation-delay: 0.1s;" data-category="tech">
-                <div class="cert-card rounded-xl p-4 h-full flex flex-col group cursor-pointer">
-                    <div class="holo-shine"></div>
-                    <div class="scanner-bar"></div>
-                    
-                    <div class="relative w-full h-48 mb-4 overflow-hidden rounded-lg bg-black border border-gray-800 group-hover:border-cyan-500/50 transition-colors">
-                        <img src="https://placehold.co/600x400/05101a/22d3ee?text=IoT+System+Design&font=orbitron" alt="IoT Cert" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded border border-cyan-500/50">
-                            <i class="fas fa-microchip text-cyan-400 text-xs"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-white font-orbitron text-lg font-bold group-hover:text-cyan-400 transition-colors">IoT & Embedded Systems</h3>
-                        </div>
-                        <p class="text-gray-400 text-xs font-mono mb-4 leading-relaxed">
-                            Comprehensive certification in developing smart connected devices, sensor integration, and embedded logic programming.
-                        </p>
-                    </div>
-
-                    <div class="border-t border-gray-700/50 pt-4 flex justify-between items-center mt-auto">
-                        <span class="text-[10px] text-cyan-300 font-mono bg-cyan-900/20 px-2 py-1 rounded border border-cyan-500/20">VERIFIED ID: IOT-2024</span>
-                        <button class="expand-btn text-gray-400 hover:text-cyan-400 transition-colors p-2 rounded-full hover:bg-cyan-900/20" title="Maximize">
-                            <i class="fas fa-expand-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 2: Python -->
-            <div class="cert-card-wrapper fade-in-up" style="animation-delay: 0.2s;" data-category="tech">
-                <div class="cert-card rounded-xl p-4 h-full flex flex-col group cursor-pointer">
-                    <div class="holo-shine"></div>
-                    <div class="scanner-bar"></div>
-                    
-                    <div class="relative w-full h-48 mb-4 overflow-hidden rounded-lg bg-black border border-gray-800 group-hover:border-green-500/50 transition-colors">
-                        <img src="https://placehold.co/600x400/051a05/39ff14?text=Python+Programming&font=orbitron" alt="Python Cert" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded border border-green-500/50">
-                            <i class="fab fa-python text-green-400 text-xs"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-white font-orbitron text-lg font-bold group-hover:text-green-400 transition-colors">Python Programming</h3>
-                        </div>
-                        <p class="text-gray-400 text-xs font-mono mb-4 leading-relaxed">
-                            Advanced programming certification focusing on data structures, automation scripts, and algorithm efficiency.
-                        </p>
-                    </div>
-
-                    <div class="border-t border-gray-700/50 pt-4 flex justify-between items-center mt-auto">
-                        <span class="text-[10px] text-green-300 font-mono bg-green-900/20 px-2 py-1 rounded border border-green-500/20">VERIFIED ID: PY-2023</span>
-                        <button class="expand-btn text-gray-400 hover:text-green-400 transition-colors p-2 rounded-full hover:bg-green-900/20" title="Maximize">
-                            <i class="fas fa-expand-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3: RBI Quiz -->
-            <div class="cert-card-wrapper fade-in-up" style="animation-delay: 0.3s;" data-category="achieve">
-                <div class="cert-card rounded-xl p-4 h-full flex flex-col group cursor-pointer">
-                    <div class="holo-shine"></div>
-                    <div class="scanner-bar"></div>
-                    
-                    <div class="relative w-full h-48 mb-4 overflow-hidden rounded-lg bg-black border border-gray-800 group-hover:border-purple-500/50 transition-colors">
-                        <img src="https://placehold.co/600x400/1a051a/bc13fe?text=RBI+State+Quiz&font=orbitron" alt="RBI Cert" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded border border-purple-500/50">
-                            <i class="fas fa-trophy text-purple-400 text-xs"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-white font-orbitron text-lg font-bold group-hover:text-purple-400 transition-colors">RBI State Level Quiz</h3>
-                        </div>
-                        <p class="text-gray-400 text-xs font-mono mb-4 leading-relaxed">
-                            State-level recognition for excellence in financial awareness and economic knowledge competition.
-                        </p>
-                    </div>
-
-                    <div class="border-t border-gray-700/50 pt-4 flex justify-between items-center mt-auto">
-                        <span class="text-[10px] text-purple-300 font-mono bg-purple-900/20 px-2 py-1 rounded border border-purple-500/20">MERIT AWARD</span>
-                        <button class="expand-btn text-gray-400 hover:text-purple-400 transition-colors p-2 rounded-full hover:bg-purple-900/20" title="Maximize">
-                            <i class="fas fa-expand-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 4: QIS Project Expo -->
-            <div class="cert-card-wrapper fade-in-up" style="animation-delay: 0.4s;" data-category="achieve">
-                <div class="cert-card rounded-xl p-4 h-full flex flex-col group cursor-pointer">
-                    <div class="holo-shine"></div>
-                    <div class="scanner-bar"></div>
-                    
-                    <div class="relative w-full h-48 mb-4 overflow-hidden rounded-lg bg-black border border-gray-800 group-hover:border-yellow-500/50 transition-colors">
-                        <img src="https://placehold.co/600x400/292503/facc15?text=Project+Expo&font=orbitron" alt="Expo Cert" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded border border-yellow-500/50">
-                            <i class="fas fa-lightbulb text-yellow-400 text-xs"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-white font-orbitron text-lg font-bold group-hover:text-yellow-400 transition-colors">QIS Project Expo</h3>
-                        </div>
-                        <p class="text-gray-400 text-xs font-mono mb-4 leading-relaxed">
-                            Showcased innovative hardware solutions. Recognized for creativity and practical application in engineering.
-                        </p>
-                    </div>
-
-                    <div class="border-t border-gray-700/50 pt-4 flex justify-between items-center mt-auto">
-                        <span class="text-[10px] text-yellow-300 font-mono bg-yellow-900/20 px-2 py-1 rounded border border-yellow-500/20">EXCELLENCE</span>
-                        <button class="expand-btn text-gray-400 hover:text-yellow-400 transition-colors p-2 rounded-full hover:bg-yellow-900/20" title="Maximize">
-                            <i class="fas fa-expand-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 5: QIS Group Discussion -->
-            <div class="cert-card-wrapper fade-in-up" style="animation-delay: 0.5s;" data-category="soft">
-                <div class="cert-card rounded-xl p-4 h-full flex flex-col group cursor-pointer">
-                    <div class="holo-shine"></div>
-                    <div class="scanner-bar"></div>
-                    
-                    <div class="relative w-full h-48 mb-4 overflow-hidden rounded-lg bg-black border border-gray-800 group-hover:border-blue-500/50 transition-colors">
-                        <img src="https://placehold.co/600x400/031529/3b82f6?text=Group+Dynamics&font=orbitron" alt="GD Cert" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded border border-blue-500/50">
-                            <i class="fas fa-users text-blue-400 text-xs"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-white font-orbitron text-lg font-bold group-hover:text-blue-400 transition-colors">Group Discussion</h3>
-                        </div>
-                        <p class="text-gray-400 text-xs font-mono mb-4 leading-relaxed">
-                            Certified in effective communication, critical thinking, and collaborative problem-solving in group dynamics.
-                        </p>
-                    </div>
-
-                    <div class="border-t border-gray-700/50 pt-4 flex justify-between items-center mt-auto">
-                        <span class="text-[10px] text-blue-300 font-mono bg-blue-900/20 px-2 py-1 rounded border border-blue-500/20">SOFT SKILL</span>
-                        <button class="expand-btn text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-blue-900/20" title="Maximize">
-                            <i class="fas fa-expand-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Cards will be generated here instantly by JavaScript -->
         </div>
     </main>
 
@@ -433,7 +280,7 @@
         </p>
     </footer>
 
-    <!-- Music Toggle Button (Bottom Right) -->
+    <!-- Music Toggle Button -->
     <div class="fixed bottom-6 right-6 z-50">
         <button id="music-btn" class="glass w-12 h-12 rounded-full border border-cyan-500/50 bg-black/60 flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20 hover:scale-110 transition-all shadow-[0_0_15px_rgba(0,243,255,0.3)] animate-bounce-slow">
             <i class="fas fa-music"></i>
@@ -443,7 +290,6 @@
     <!-- Image Modal -->
     <div id="cert-modal" class="fixed inset-0 z-[100] bg-black/90 hidden flex items-center justify-center backdrop-blur-md p-4" onclick="closeModal()">
         <div class="relative max-w-5xl w-full max-h-[95vh] flex flex-col" onclick="event.stopPropagation()">
-            <!-- Modal Decoration -->
             <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg opacity-50 blur-lg animate-pulse"></div>
             
             <div class="relative bg-gray-900 rounded-lg overflow-hidden border border-cyan-500/50 shadow-[0_0_50px_rgba(0,243,255,0.2)] animate-modal-pop flex flex-col max-h-full">
@@ -472,167 +318,205 @@
     </div>
 
     <script>
-        // --- Confetti on Load ---
-        window.addEventListener('load', () => {
-            // "Star Shower" Effect
-            var defaults = {
-                spread: 360,
-                ticks: 50,
-                gravity: 0,
-                decay: 0.94,
-                startVelocity: 30,
-                shapes: ['star'],
-                colors: ['#22d3ee', '#bc13fe', '#39ff14', '#ffffff']
-            };
+        // ==========================================
+        // CONFIG & DATA
+        // ==========================================
+        // Paste your published Google Sheets CSV URL here
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQDMuMVhiYPlgC0Rm5JOy-1_ZTD7djXzncBSFZ10rl_t92hWxjAzCUeKLJl2tOcd9wuDtzMKLqVQI1K/pub?output=csv"; 
 
-            function shoot() {
-                confetti({
-                    ...defaults,
-                    particleCount: 40,
-                    scalar: 1.2,
-                    shapes: ['star']
-                });
+        // Fallback Data
+        let certificatesRaw = {
+            'cert1': {
+                title: "IoT & Embedded Systems", category: "tech", icon: "fas fa-microchip", color: "cyan", vip: true,
+                img: "https://placehold.co/600x400/05101a/22d3ee?text=IoT+System+Design&font=orbitron",
+                desc: "Comprehensive certification in developing smart connected devices, sensor integration, and embedded logic programming.", tagText: "VERIFIED ID: IOT-2024"
+            },
+            'cert2': {
+                title: "Python Programming", category: "tech", icon: "fab fa-python", color: "green", vip: false,
+                img: "https://placehold.co/600x400/051a05/39ff14?text=Python+Programming&font=orbitron",
+                desc: "Advanced programming certification focusing on data structures, automation scripts, and algorithm efficiency.", tagText: "VERIFIED ID: PY-2023"
+            },
+            'cert3': {
+                title: "RBI State Level Quiz", category: "achieve", icon: "fas fa-trophy", color: "purple", vip: true,
+                img: "https://placehold.co/600x400/1a051a/bc13fe?text=RBI+State+Quiz&font=orbitron",
+                desc: "State-level recognition for excellence in financial awareness and economic knowledge competition.", tagText: "MERIT AWARD"
+            },
+            'cert4': {
+                title: "QIS Project Expo", category: "achieve", icon: "fas fa-lightbulb", color: "yellow", vip: false,
+                img: "https://placehold.co/600x400/292503/facc15?text=Project+Expo&font=orbitron",
+                desc: "Showcased innovative hardware solutions. Recognized for creativity and practical application in engineering.", tagText: "EXCELLENCE"
+            },
+            'cert5': {
+                title: "Group Discussion", category: "soft", icon: "fas fa-users", color: "blue", vip: false,
+                img: "https://placehold.co/600x400/031529/3b82f6?text=Group+Dynamics&font=orbitron",
+                desc: "Certified in effective communication, critical thinking, and collaborative problem-solving in group dynamics.", tagText: "SOFT SKILL"
+            }
+        };
 
-                confetti({
-                    ...defaults,
-                    particleCount: 10,
-                    scalar: 0.75,
-                    shapes: ['circle']
-                });
+        // Fisher-Yates Shuffle Algorithm to Randomize the Grid
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ==========================================
+        // LIGHTNING-FAST FETCH & RENDER LOGIC
+        // ==========================================
+        function loadDatabase() {
+            if (!SHEET_CSV_URL || SHEET_CSV_URL.trim() === "") {
+                processAndRender(certificatesRaw);
+                hideLoader();
+                return;
             }
 
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    const fetchedCerts = {};
+                    results.data.forEach(row => {
+                        if (row.id && row.title) {
+                            fetchedCerts[row.id] = {
+                                title: row.title,
+                                category: row.category,
+                                icon: row.icon || 'fas fa-certificate',
+                                img: row.image_url,
+                                desc: row.description,
+                                tagText: row.tag_text,
+                                color: row.color || 'cyan',
+                                vip: (row.vip && row.vip.trim().toLowerCase() === 'yes')
+                            };
+                        }
+                    });
+                    
+                    processAndRender(Object.keys(fetchedCerts).length > 0 ? fetchedCerts : certificatesRaw);
+                    hideLoader(); // Hide loader the absolute instant data is parsed
+                },
+                error: function(error) {
+                    console.error("Failed to fetch Google Sheet CSV:", error);
+                    processAndRender(certificatesRaw); 
+                    hideLoader();
+                }
+            });
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                fireConfettiSequence();
+            }, 300); // Only wait for the CSS fade-out transition
+        }
+
+        function processAndRender(dataObj) {
+            const grid = document.getElementById('cert-grid');
+            grid.innerHTML = ''; 
+
+            let shuffledCerts = shuffleArray(Object.entries(dataObj));
+            let delay = 0.05;
+
+            shuffledCerts.forEach(([id, cert]) => {
+                const vipBadge = cert.vip 
+                    ? `<div class="absolute top-2 left-2 bg-black/80 backdrop-blur-md border border-yellow-500/50 text-yellow-400 text-[10px] font-orbitron px-2 py-1 rounded shadow-[0_0_15px_rgba(250,204,21,0.5)] z-20"><i class="fas fa-star animate-pulse mr-1"></i> VIP</div>` 
+                    : '';
+
+                const cardHTML = `
+                    <div class="cert-card-wrapper cert-item fade-in-up" style="animation-delay: ${delay}s;" data-category="${cert.category}">
+                        <div class="cert-card rounded-xl p-4 h-full flex flex-col group cursor-pointer" onclick="openModal(event, '${cert.img}')">
+                            <div class="holo-shine"></div>
+                            <div class="scanner-bar"></div>
+                            
+                            <div class="relative w-full h-48 mb-4 overflow-hidden rounded-lg bg-black border border-gray-800 group-hover:border-${cert.color}-500/50 transition-colors">
+                                ${vipBadge}
+                                <img src="${cert.img}" alt="${cert.title}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" onerror="this.src='https://placehold.co/600x400/05101a/22d3ee?text=Error&font=orbitron'">
+                                <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-1 rounded border border-${cert.color}-500/50 z-20">
+                                    <i class="${cert.icon} text-${cert.color}-400 text-xs"></i>
+                                </div>
+                            </div>
+
+                            <div class="flex-grow">
+                                <h3 class="text-white font-orbitron text-lg font-bold group-hover:text-${cert.color}-400 transition-colors mb-2">${cert.title}</h3>
+                                <p class="text-gray-400 text-xs font-mono mb-4 leading-relaxed">${cert.desc}</p>
+                            </div>
+
+                            <div class="border-t border-gray-700/50 pt-4 flex justify-between items-center mt-auto">
+                                <span class="text-[10px] text-${cert.color}-300 font-mono bg-${cert.color}-900/20 px-2 py-1 rounded border border-${cert.color}-500/20 uppercase">${cert.tagText}</span>
+                                <button class="expand-btn text-gray-400 hover:text-${cert.color}-400 transition-colors p-2 rounded-full hover:bg-${cert.color}-900/20" title="Maximize" onclick="openModal(event, '${cert.img}')">
+                                    <i class="fas fa-expand-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+                delay += 0.05; // Faster stagger animation
+            });
+
+            initTiltEffect();
+        }
+
+        window.addEventListener('load', loadDatabase);
+
+        // ==========================================
+        // UI & ANIMATIONS
+        // ==========================================
+
+        function initTiltEffect() {
+            const cards = document.querySelectorAll('.cert-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -10; 
+                    const rotateY = ((x - centerX) / centerX) * 10;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+                });
+            });
+        }
+
+        function fireConfettiSequence() {
+            var defaults = { spread: 360, ticks: 50, gravity: 0, decay: 0.94, startVelocity: 30, colors: ['#22d3ee', '#bc13fe', '#39ff14', '#ffffff'] };
+            function shoot() {
+                // useWorker: false prevents Canvas errors in restricted iframe environments
+                confetti({ ...defaults, particleCount: 40, scalar: 1.2, shapes: ['star'], useWorker: false });
+                confetti({ ...defaults, particleCount: 10, scalar: 0.75, shapes: ['circle'], useWorker: false });
+            }
             setTimeout(shoot, 0);
             setTimeout(shoot, 100);
             setTimeout(shoot, 200);
-        });
-
-        // --- Audio Control ---
-        const audio = document.getElementById('bg-music');
-        const musicBtn = document.getElementById('music-btn');
-        let isPlaying = false;
-
-        // Helper to update icon
-        function updateMusicIcon() {
-            const icon = musicBtn.querySelector('i');
-            if (isPlaying) {
-                icon.className = 'fas fa-pause';
-                musicBtn.classList.add('animate-pulse');
-                musicBtn.classList.add('border-cyan-400'); // Visual feedback
-            } else {
-                icon.className = 'fas fa-music';
-                musicBtn.classList.remove('animate-pulse');
-                musicBtn.classList.remove('border-cyan-400');
-            }
         }
-
-        // Robust Play Function
-        function safePlay() {
-            if (isPlaying) return; // Prevent multiple calls
-            
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isPlaying = true;
-                    updateMusicIcon();
-                }).catch(error => {
-                    console.log("Playback failed (likely browser policy):", error);
-                    isPlaying = false;
-                    updateMusicIcon();
-                });
-            }
-        }
-
-        // Robust Pause Function
-        function safePause() {
-            if (!isPlaying) return;
-            isPlaying = false;
-            updateMusicIcon();
-            audio.pause();
-        }
-
-        // Toggle Logic
-        musicBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent window listener from firing
-            if (isPlaying) {
-                safePause();
-            } else {
-                safePlay();
-            }
-        });
-
-        // Autoplay Strategy
-        window.addEventListener('load', () => {
-            // Try immediately on load
-            safePlay();
-        });
-
-        // Fallback: Try on any interaction
-        function handleInteraction() {
-            if (!isPlaying) {
-                safePlay();
-            }
-            // Once played, we can likely stop listening for these specific "start" triggers
-            // helping performance, though safePlay has a guard clause.
-             if (isPlaying) {
-                ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(event => {
-                    window.removeEventListener(event, handleInteraction);
-                });
-            }
-        }
-
-        ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(event => {
-            window.addEventListener(event, handleInteraction, { once: true }); 
-            // once: true might be too aggressive if the first attempt fails, 
-            // but safePlay handles the promise. Better to use standard listener and remove inside.
-             window.addEventListener(event, handleInteraction);
-        });
-
-        // --- 3D Tilt Effect ---
-        const cards = document.querySelectorAll('.cert-card');
-
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                // Rotation values
-                const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg rotation
-                const rotateY = ((x - centerX) / centerX) * 10;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            });
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-            });
-        });
 
         // --- Filtering Logic ---
         const filterBtns = document.querySelectorAll('.filter-btn');
-        const certItems = document.querySelectorAll('.cert-card-wrapper');
-
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Remove active class from all
                 filterBtns.forEach(b => b.classList.remove('active'));
-                // Add to clicked
                 btn.classList.add('active');
 
                 const filterValue = btn.getAttribute('data-filter');
+                const certItems = document.querySelectorAll('.cert-item');
 
                 certItems.forEach(item => {
                     const category = item.getAttribute('data-category');
-                    
                     if (filterValue === 'all' || filterValue === category) {
                         item.style.display = 'block';
-                        // Re-trigger animation
                         item.style.animation = 'none';
-                        item.offsetHeight; /* trigger reflow */
-                        item.style.animation = 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                        item.offsetHeight; 
+                        item.style.animation = 'fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
                     } else {
                         item.style.display = 'none';
                     }
@@ -640,21 +524,17 @@
             });
         });
 
-        // --- Interactive Neural Network Background & Moon Parallax ---
+        // --- Interactive Neural Network Background ---
         const canvas = document.getElementById('neural-canvas');
         const ctx = canvas.getContext('2d');
         const moon = document.getElementById('moon');
-        
         let width, height, particles = [];
         let mouse = { x: null, y: null, radius: 150 };
 
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-            
-            // Moon Parallax Effect
+            mouse.x = e.clientX; mouse.y = e.clientY;
             if (moon) {
-                const moveX = (e.clientX - window.innerWidth / 2) * -0.02; // Move opposite to mouse
+                const moveX = (e.clientX - window.innerWidth / 2) * -0.02; 
                 const moveY = (e.clientY - window.innerHeight / 2) * -0.02;
                 moon.style.transform = `translate(${moveX}px, ${moveY}px)`;
             }
@@ -667,36 +547,28 @@
 
         class Particle {
             constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 1;
-                this.vy = (Math.random() - 0.5) * 1;
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1; this.vy = (Math.random() - 0.5) * 1;
                 this.size = Math.random() * 2 + 1;
-                this.color = Math.random() > 0.5 ? '#22d3ee' : '#bc13fe'; // Cyan or Purple for Certs page
+                this.color = Math.random() > 0.5 ? '#22d3ee' : '#bc13fe'; 
             }
             update() {
                 if (mouse.x != null) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
+                    let dx = mouse.x - this.x; let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
+                        const forceDirectionX = dx / distance; const forceDirectionY = dy / distance;
                         const force = (mouse.radius - distance) / mouse.radius;
-                        this.x += forceDirectionX * force * 2;
-                        this.y += forceDirectionY * force * 2;
+                        this.x += forceDirectionX * force * 2; this.y += forceDirectionY * force * 2;
                     }
                 }
-                this.x += this.vx;
-                this.y += this.vy;
+                this.x += this.vx; this.y += this.vy;
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
             }
             draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color; ctx.fill();
             }
         }
 
@@ -710,19 +582,16 @@
             ctx.clearRect(0, 0, width, height);
             particles.forEach(p => { p.update(); p.draw(); });
             
-            // Draw connections
             ctx.lineWidth = 0.5;
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
+                    const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y;
                     const distance = Math.sqrt(dx*dx + dy*dy);
                     if (distance < 120) {
                         ctx.beginPath();
                         const opacity = 1 - (distance / 120);
-                        ctx.strokeStyle = `rgba(188, 19, 254, ${opacity * 0.3})`; // Purple connections
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(188, 19, 254, ${opacity * 0.3})`;
+                        ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
                         ctx.stroke();
                     }
                 }
@@ -733,32 +602,73 @@
         window.addEventListener('resize', () => { resize(); initParticles(); });
         resize(); initParticles(); animate();
 
+        // --- Audio Control ---
+        const audio = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-btn');
+        let isPlaying = false;
+
+        function updateMusicIcon() {
+            const icon = musicBtn.querySelector('i');
+            if (isPlaying) {
+                icon.className = 'fas fa-pause';
+                musicBtn.classList.add('animate-pulse', 'border-cyan-400'); 
+            } else {
+                icon.className = 'fas fa-music';
+                musicBtn.classList.remove('animate-pulse', 'border-cyan-400');
+            }
+        }
+
+        function safePlay() {
+            if (isPlaying) return; 
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => { isPlaying = true; updateMusicIcon(); })
+                .catch(error => { console.log("Playback failed:", error); isPlaying = false; updateMusicIcon(); });
+            }
+        }
+
+        function safePause() {
+            if (!isPlaying) return;
+            isPlaying = false; updateMusicIcon(); audio.pause();
+        }
+
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            if (isPlaying) safePause(); else safePlay();
+        });
+
+        function handleInteraction() {
+            if (!isPlaying) safePlay();
+            if (isPlaying) {
+                ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(event => {
+                    window.removeEventListener(event, handleInteraction);
+                });
+            }
+        }
+
+        ['click', 'keydown', 'touchstart', 'scroll', 'mousemove'].forEach(event => {
+            window.addEventListener(event, handleInteraction);
+        });
+
         // --- Modal Logic ---
         const modal = document.getElementById('cert-modal');
         const modalImg = document.getElementById('modal-img');
 
-        document.querySelectorAll('.expand-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card tilt issue
-                // Find the image inside the specific card
-                const card = btn.closest('.cert-card');
-                const imgSource = card.querySelector('img').src;
-                
-                modalImg.src = imgSource;
-                modal.classList.remove('hidden');
-                // Re-trigger animation
-                const modalContent = modal.querySelector('div.relative');
-                modalContent.style.animation = 'none';
-                modalContent.offsetHeight; /* trigger reflow */
-                modalContent.style.animation = 'modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
-            });
-        });
+        function openModal(e, imgSrc) {
+            e.stopPropagation(); 
+            modalImg.src = imgSrc;
+            modal.classList.remove('hidden');
+            
+            const modalContent = modal.querySelector('div.relative');
+            modalContent.style.animation = 'none';
+            modalContent.offsetHeight; 
+            modalContent.style.animation = 'modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+        }
 
         function closeModal() {
             modal.classList.add('hidden');
         }
 
-        // Close on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
