@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Drive Bot | AI Eye Control</title>
+    <title>Vision Drive Bot | Tri-Modal AI Control</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,6 +44,8 @@
             /* 🎨 APP COLORS */
             --primary: #00f3ff;   /* Bright Cyan/Blue */
             --accent: #bc13fe;    /* Purple/Pink Accent */
+            --success: #10b981;   /* Emerald Green */
+            --warning: #f59e0b;   /* Amber */
             --bg-deep: #030712;
         }
 
@@ -130,7 +132,7 @@
                 <div class="flex items-center gap-3">
                     <div class="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl bg-slate-900/50 border border-white/10 overflow-hidden group flex-shrink-0">
                         <!-- App Icon Image -->
-                        <img src="https://uploads.onecompiler.io/42q5e2pr5/44bbang88/1000182335.png" alt="App Icon" class="w-full h-full object-cover logo-glow" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <img src="https://i.ibb.co/d0qZ6s8n/fcfd8d2479c140fbafa7ee498dbf1ddf.gif" alt="App Icon" class="w-full h-full object-cover logo-glow" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                         <!-- Fallback Icon if image missing -->
                         <div class="hidden w-full h-full items-center justify-center text-[var(--primary)] text-2xl">
                             <i class="fas fa-robot"></i>
@@ -142,7 +144,7 @@
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#problem" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">Mission</a>
-                    <a href="#controls" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">Controls</a>
+                    <a href="#modes" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">AI Modes</a>
                     <a href="#hardware" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-sm transition-all hover:scale-105">Hardware</a>
                     
                     <!-- Top Play Store Button -->
@@ -170,8 +172,8 @@
                 <a href="#problem" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
                     <i class="fas fa-bullseye w-6 text-[var(--primary)]"></i> Mission
                 </a>
-                <a href="#controls" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
-                    <i class="fas fa-gamepad w-6 text-[var(--primary)]"></i> Controls
+                <a href="#modes" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
+                    <i class="fas fa-gamepad w-6 text-[var(--primary)]"></i> AI Modes
                 </a>
                 <a href="#hardware" onclick="toggleMobileMenu()" class="text-gray-300 hover:text-[var(--primary)] font-bold uppercase tracking-widest text-base flex items-center gap-3">
                     <i class="fas fa-microchip w-6 text-[var(--primary)]"></i> Hardware
@@ -197,16 +199,16 @@
             <div class="relative z-10 order-2 lg:order-1 text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded border border-[var(--primary)]/30 bg-[var(--primary)]/10 text-[var(--primary)] text-xs md:text-sm font-bold tracking-widest mb-4 md:mb-6 font-display">
                     <span class="w-2 h-2 rounded-full bg-[var(--primary)] animate-pulse"></span>
-                    SYSTEM ONLINE V2025.1
+                    TRI-MODAL SYSTEM V2025.2
                 </div>
                 
-                <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4 md:mb-6">
-                    MIND <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] text-glow">OVER</span><br>
-                    MACHINE
+                <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 md:mb-6">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] text-glow">FACE, RETINA &</span><br>
+                    HAND GESTURES
                 </h1>
                 
                 <p class="text-base md:text-xl text-slate-400 mb-6 md:mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed lg:border-l-2 lg:border-[var(--primary)] lg:pl-6">
-                    The bridge between human gaze and robotic motion. Control hardware using nothing but eye movements and AI.
+                    The ultimate AI interface. Control robots and hardware effortlessly using your head pose, precision eye gaze, or complex hand gestures.
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -216,8 +218,8 @@
                             INITIALIZE CODE <i class="fas fa-terminal text-xs"></i>
                         </span>
                     </a>
-                    <a href="#problem" class="px-6 py-3 md:px-8 md:py-4 text-slate-300 hover:text-white font-display font-bold tracking-wider flex items-center justify-center gap-2 transition-colors border border-transparent hover:border-slate-700 text-sm md:text-base">
-                        LEARN MORE <i class="fas fa-arrow-down text-[var(--primary)]"></i>
+                    <a href="#modes" class="px-6 py-3 md:px-8 md:py-4 text-slate-300 hover:text-white font-display font-bold tracking-wider flex items-center justify-center gap-2 transition-colors border border-transparent hover:border-slate-700 text-sm md:text-base">
+                        EXPLORE MODES <i class="fas fa-arrow-down text-[var(--primary)]"></i>
                     </a>
                 </div>
             </div>
@@ -232,26 +234,52 @@
                     <div class="bg-black/80 rounded-xl p-6 md:p-8 aspect-square flex flex-col items-center justify-center relative">
                         <div class="scanner-line"></div>
                         
-                        <!-- Eye Visualization -->
-                        <div class="relative w-20 h-20 md:w-32 md:h-32 mb-6 md:mb-8">
-                            <div class="absolute inset-0 border-4 border-[var(--primary)] rounded-full opacity-20"></div>
-                            <div class="absolute inset-0 border-t-4 border-[var(--primary)] rounded-full animate-spin"></div>
-                            <div class="absolute inset-4 bg-[var(--primary)] rounded-full opacity-20 animate-pulse"></div>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <i class="fas fa-eye text-2xl md:text-4xl text-white"></i>
-                            </div>
+                        <!-- Company Logo / App Icon -->
+                        <div class="relative w-24 h-24 md:w-36 md:h-36 mb-6 md:mb-8 flex items-center justify-center rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(0,243,255,0.3)] border border-white/10">
+                            <img src="https://uploads.onecompiler.io/42q5e2pr5/44bbang88/1000182335.png" alt="Company Logo" class="w-full h-full object-cover">
                         </div>
                         
                         <div class="space-y-2 w-full">
                             <div class="flex justify-between text-xs font-mono text-[var(--primary)]">
-                                <span>TRACKING</span>
+                                <span>3D TRACKING</span>
                                 <span>ACTIVE</span>
                             </div>
                             <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-[var(--primary)] w-3/4 animate-pulse"></div>
+                                <div class="h-full bg-[var(--primary)] w-full animate-pulse"></div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Intro Video Section -->
+    <section id="video-intro" class="py-12 md:py-20 relative z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 text-center">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2">SYSTEM <span class="text-[var(--primary)]">OVERVIEW</span></h2>
+                <div class="h-1 w-20 bg-[var(--primary)] mx-auto"></div>
+            </div>
+            
+            <div class="glass-panel p-2 md:p-4 rounded-2xl md:rounded-3xl shadow-[0_0_50px_rgba(0,243,255,0.1)] relative overflow-hidden group">
+                <!-- Decorative corner accents -->
+                <div class="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-[var(--primary)] rounded-tl-3xl opacity-50 pointer-events-none z-20"></div>
+                <div class="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-[var(--primary)] rounded-br-3xl opacity-50 pointer-events-none z-20"></div>
+
+                <div class="aspect-video w-full rounded-xl md:rounded-2xl overflow-hidden bg-black relative flex items-center justify-center border border-white/5">
+                    
+                    <!-- HTML5 Video Player -->
+                    <video 
+                        class="absolute inset-0 w-full h-full object-cover z-10" 
+                        controls 
+                        preload="metadata"
+                        poster=https://i.ibb.co/MDyhj8Qp/image.png"
+                    >
+                        <source src="https://github.com/user-attachments/assets/c6ce295d-98e6-47ce-8bbc-47faec24f696" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    
                 </div>
             </div>
         </div>
@@ -280,7 +308,7 @@
                             <p class="text-slate-300 leading-relaxed text-base md:text-lg">
                                 Traditional robot interfaces—joysticks, keyboards, and touchscreens—require <span class="text-white font-bold">manual dexterity</span>. 
                                 This creates an insurmountable wall for individuals with physical disabilities, paralysis, or upper-limb amputations. 
-                                Even in industrial settings, operators often lack a "third hand" for control.
+                                Furthermore, in industrial or sterile environments, operators often lack a "third hand" for control.
                             </p>
                         </div>
                     </div>
@@ -307,20 +335,20 @@
                     <div class="md:col-span-7 md:order-1">
                         <div class="glass-panel p-6 md:p-8 rounded-xl border-l-4 border-l-[var(--primary)] hover:-translate-x-2 transition-transform duration-300">
                             <p class="text-slate-300 leading-relaxed text-base md:text-lg mb-6">
-                                I developed a <span class="text-white font-bold">Hands-Free Control System</span> utilizing computer vision directly on a smartphone.
+                                I upgraded the application into a comprehensive <span class="text-white font-bold">Multi-Modal Control System</span>, turning any standard smartphone into a versatile robotics controller.
                             </p>
                             <ul class="space-y-4 font-mono text-sm text-slate-400">
                                 <li class="flex items-start gap-3 bg-black/20 p-3 rounded border border-white/5">
-                                    <i class="fas fa-code text-[var(--primary)] mt-1"></i>
-                                    <span>Integrated <strong class="text-white">Android ML Kit</strong> for real-time iris tracking without cloud latency.</span>
+                                    <i class="fas fa-brain text-[var(--primary)] mt-1"></i>
+                                    <span>Integrated massive <strong class="text-white">ML Kit Updates</strong> to process Face Pose, 21-point Hand Landmarks, and Iris Tracking simultaneously.</span>
                                 </li>
                                 <li class="flex items-start gap-3 bg-black/20 p-3 rounded border border-white/5">
                                     <i class="fas fa-signal text-[var(--primary)] mt-1"></i>
-                                    <span>Built a custom Bluetooth bridge to communicate with <strong class="text-white">Arduino & ESP32</strong> microcontrollers.</span>
+                                    <span>Enhanced the Bluetooth bridge for seamless, low-latency transmission to <strong class="text-white">Arduino & ESP32</strong>.</span>
                                 </li>
                                 <li class="flex items-start gap-3 bg-black/20 p-3 rounded border border-white/5">
                                     <i class="fas fa-shield-alt text-[var(--primary)] mt-1"></i>
-                                    <span>Implemented a <strong class="text-white">"Double-Blink" Safety Protocol</strong> to pause/resume the robot instantly.</span>
+                                    <span>Added <strong class="text-white">Double-Blink Emergency Locks</strong> and gesture-based safety resets.</span>
                                 </li>
                             </ul>
                         </div>
@@ -331,89 +359,112 @@
         </div>
     </section>
 
-    <!-- Controls Dashboard -->
-    <section id="controls" class="py-16 md:py-20">
+    <!-- NEW: MODALITIES DASHBOARD -->
+    <section id="modes" class="py-16 md:py-24 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-10 md:mb-16 text-center md:text-left">
-                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2">COMMAND <span class="text-[var(--primary)]">INTERFACE</span></h2>
-                <div class="h-1 w-20 bg-[var(--primary)] mx-auto md:mx-0"></div>
+            <div class="mb-12 md:mb-20 text-center">
+                <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-4">TRI-MODAL <span class="text-[var(--primary)]">INTERFACE</span></h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Three entirely distinct ways to control your hardware, built right into one app. Choose the mode that fits your specific project or accessibility needs.</p>
+                <div class="h-1 w-24 bg-[var(--primary)] mx-auto mt-6"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                <!-- Control Cards -->
-                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
-                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
-                        <i class="fas fa-arrow-left text-3xl md:text-4xl"></i>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- 1. FACE CONTROL -->
+                <div class="glass-panel rounded-2xl p-8 relative overflow-hidden group border-t-4 border-t-[var(--success)] hover:-translate-y-2 transition-all duration-300">
+                    <!-- Background Icon -->
+                    <i class="fas fa-user-astronaut absolute -right-6 -bottom-6 text-9xl text-white opacity-[0.03] group-hover:opacity-10 group-hover:scale-110 transition-all duration-500"></i>
+                    
+                    <div class="w-16 h-16 rounded-xl bg-[var(--success)]/10 border border-[var(--success)]/30 flex items-center justify-center text-[var(--success)] text-3xl mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                        <i class="fas fa-head-side-mask"></i>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">LEFT GAZING</h3>
-                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Iris deviation > 15° Left</p>
-                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
-                            OUTPUT: "LEFT"
-                        </div>
+                    
+                    <h3 class="font-display text-2xl font-bold text-white mb-3">FACE CONTROL</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">Tracks the 3D orientation (Pitch, Yaw, Roll) of your head. Turn your head left/right to steer, and nod up/down to move forward/backward.</p>
+                    
+                    <div class="mb-6 border-l-2 border-[var(--success)] pl-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-[var(--success)] mb-2">Ideal Uses</h4>
+                        <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                            <li>- Coarse Navigation</li>
+                            <li>- Hands-free vehicle driving</li>
+                            <li>- Gross motor accessibility</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-black/40 rounded-lg p-4 border border-white/5 relative">
+                        <div class="absolute -top-3 left-4 bg-[var(--bg-deep)] px-2 text-[0.65rem] font-bold tracking-widest text-slate-400 border border-white/10 rounded">EXAMPLE PROJECT</div>
+                        <p class="text-white font-bold text-sm mb-1"><i class="fas fa-wheelchair text-[var(--success)] mr-2"></i>Smart Wheelchair Navigator</p>
+                        <p class="text-slate-400 text-xs leading-relaxed">Steer a motorized chassis by simply pointing your nose in the desired direction. Perfect for users with paraplegia.</p>
                     </div>
                 </div>
 
-                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
-                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
-                        <i class="fas fa-arrow-right text-3xl md:text-4xl"></i>
+                <!-- 2. RETINA CONTROL -->
+                <div class="glass-panel rounded-2xl p-8 relative overflow-hidden group border-t-4 border-t-[var(--primary)] hover:-translate-y-2 transition-all duration-300 shadow-[0_0_30px_rgba(0,243,255,0.05)]">
+                    <!-- Background Icon -->
+                    <i class="fas fa-eye absolute -right-6 -bottom-6 text-9xl text-white opacity-[0.03] group-hover:opacity-10 group-hover:scale-110 transition-all duration-500"></i>
+                    
+                    <div class="w-16 h-16 rounded-xl bg-[var(--primary)]/10 border border-[var(--primary)]/30 flex items-center justify-center text-[var(--primary)] text-3xl mb-6 shadow-[0_0_15px_rgba(0,243,255,0.2)]">
+                        <i class="fas fa-eye-crosshairs"></i>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">RIGHT GAZING</h3>
-                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Iris deviation > 15° Right</p>
-                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
-                            OUTPUT: "RIGHT"
-                        </div>
+                    
+                    <h3 class="font-display text-2xl font-bold text-white mb-3">RETINA CONTROL</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">High-precision iris tracking and blink detection. Look directly at specific zones on the screen to trigger granular directional outputs.</p>
+                    
+                    <div class="mb-6 border-l-2 border-[var(--primary)] pl-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-[var(--primary)] mb-2">Ideal Uses</h4>
+                        <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                            <li>- Zero-exertion operation</li>
+                            <li>- ALS/Quadriplegia assistance</li>
+                            <li>- Silent/Stealth triggering</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-black/40 rounded-lg p-4 border border-white/5 relative">
+                        <div class="absolute -top-3 left-4 bg-[var(--bg-deep)] px-2 text-[0.65rem] font-bold tracking-widest text-slate-400 border border-white/10 rounded">EXAMPLE PROJECT</div>
+                        <p class="text-white font-bold text-sm mb-1"><i class="fas fa-crosshairs text-[var(--primary)] mr-2"></i>Gaze-Directed Gimbal</p>
+                        <p class="text-slate-400 text-xs leading-relaxed">Aim a camera gimbal or laser pointer exactly where you look. Use a rapid double-blink to trigger an action or snap a photo.</p>
                     </div>
                 </div>
 
-                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
-                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
-                        <i class="fas fa-arrow-up text-3xl md:text-4xl"></i>
+                <!-- 3. HAND CONTROL -->
+                <div class="glass-panel rounded-2xl p-8 relative overflow-hidden group border-t-4 border-t-[var(--warning)] hover:-translate-y-2 transition-all duration-300">
+                    <!-- Background Icon -->
+                    <i class="fas fa-hand-paper absolute -right-6 -bottom-6 text-9xl text-white opacity-[0.03] group-hover:opacity-10 group-hover:scale-110 transition-all duration-500"></i>
+                    
+                    <div class="w-16 h-16 rounded-xl bg-[var(--warning)]/10 border border-[var(--warning)]/30 flex items-center justify-center text-[var(--warning)] text-3xl mb-6 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                        <i class="fas fa-hand-sparkles"></i>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">UPWARD GAZING</h3>
-                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Eyelid Lift / Look Up</p>
-                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
-                            CMD: "DOWN"
-                        </div>
+                    
+                    <h3 class="font-display text-2xl font-bold text-white mb-3">HAND CONTROL</h3>
+                    <p class="text-slate-400 text-sm mb-6 leading-relaxed">Detects 21 3D hand landmarks in real-time. Translates complex gestures (Pinch, Fist, Open Palm, Swipes) into robotic commands.</p>
+                    
+                    <div class="mb-6 border-l-2 border-[var(--warning)] pl-4">
+                        <h4 class="text-xs font-bold uppercase tracking-widest text-[var(--warning)] mb-2">Ideal Uses</h4>
+                        <ul class="text-sm text-slate-300 space-y-1 font-mono">
+                            <li>- Complex robotic manipulation</li>
+                            <li>- Industrial remote operation</li>
+                            <li>- Drone piloting</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-black/40 rounded-lg p-4 border border-white/5 relative">
+                        <div class="absolute -top-3 left-4 bg-[var(--bg-deep)] px-2 text-[0.65rem] font-bold tracking-widest text-slate-400 border border-white/10 rounded">EXAMPLE PROJECT</div>
+                        <p class="text-white font-bold text-sm mb-1"><i class="fas fa-robot text-[var(--warning)] mr-2"></i>Mimicry Robotic Arm</p>
+                        <p class="text-slate-400 text-xs leading-relaxed">Build a 5-axis robotic arm that mimics your hand. Close your fist to grab an object, and open your palm to release it.</p>
                     </div>
                 </div>
 
-                <div class="glass-panel p-6 rounded-xl group relative overflow-hidden flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
-                    <div class="md:absolute top-0 right-0 md:p-4 text-[var(--primary)] md:opacity-10 group-hover:opacity-100 transition-opacity">
-                        <i class="fas fa-arrow-down text-3xl md:text-4xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-display text-lg md:text-xl text-white mb-1 md:mb-2">DOWN GAZING</h3>
-                        <p class="text-slate-400 text-sm mb-0 md:mb-4">Look Down</p>
-                        <div class="hidden md:inline-block font-mono text-xs text-[var(--primary)] border border-[var(--primary)]/30 p-2 rounded">
-                            CMD: "UP"
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pause Mode Banner -->
-            <div class="mt-8 glass-panel border border-[var(--accent)]/50 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-                <div class="w-12 h-12 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[var(--accent)] animate-pulse flex-shrink-0">
-                    <i class="fas fa-lock text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-white font-display text-lg">EMERGENCY STOP PROTOCOL</h3>
-                    <p class="text-sm text-slate-300">Blink rapidly (2x) to engage/disengage safety lock.</p>
-                </div>
             </div>
         </div>
     </section>
 
     <!-- Hardware / Code Section -->
-    <section id="hardware" class="py-16 md:py-20 bg-black/20">
+    <section id="hardware" class="py-16 md:py-20 bg-black/40 border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-12">
                 <div class="w-full md:w-auto text-center md:text-left mb-6 md:mb-0">
                     <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-2">FIRMWARE <span class="text-[var(--primary)]">UPLOAD</span></h2>
-                    <p class="text-slate-400 text-sm md:text-base">Select microcontroller architecture</p>
+                    <p class="text-slate-400 text-sm md:text-base">Universal code for Face, Retina, & Hand Control data streams.</p>
                 </div>
                 
                 <!-- Custom Tabs -->
@@ -467,6 +518,12 @@
                                 <span class="text-emerald-400">IN3</span> <i class="fas fa-arrow-right text-gray-600"></i> <span class="text-white">GPIO 14</span>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Code Notes -->
+                    <div class="mt-6 bg-slate-900/50 p-4 rounded-lg border border-[var(--warning)]/30">
+                        <h4 class="text-[var(--warning)] text-xs font-bold uppercase mb-2"><i class="fas fa-info-circle mr-1"></i> Multi-Modal Note</h4>
+                        <p class="text-slate-400 text-xs">This code works for ALL modes. The Android App handles the AI processing (Face/Eyes/Hands) and translates it into standard text commands ("UP", "GRAB", etc.) sent via Bluetooth.</p>
                     </div>
                 </div>
 
@@ -526,7 +583,19 @@ void loop() {
     } 
     <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RIGHT") >= 0) { 
         turnRight(); command = ""; 
-    } 
+    }
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("GRAB") >= 0) { 
+        <span class="text-[#8b949e]">// Hand Gesture: Fist</span>
+        grabObject(); command = ""; 
+    }
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RELEASE") >= 0) { 
+        <span class="text-[#8b949e]">// Hand Gesture: Open Palm</span>
+        releaseObject(); command = ""; 
+    }
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RETINA_CLICK") >= 0) { 
+        <span class="text-[#8b949e]">// Retina Control: Double Blink</span>
+        triggerRetinaAction(); command = ""; 
+    }
     <span class="text-[#d2a8ff]">else if</span> (command.indexOf("STOP") >= 0) { 
         stopRobot(); command = ""; 
     }
@@ -554,6 +623,18 @@ void stopRobot() {
   digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
 }
+void grabObject() {
+  <span class="text-[#8b949e]">// Add servo logic here for robotic arm</span>
+  Serial.println("Grabbing...");
+}
+void releaseObject() {
+  <span class="text-[#8b949e]">// Add servo logic here for robotic arm</span>
+  Serial.println("Releasing...");
+}
+void triggerRetinaAction() {
+  <span class="text-[#8b949e]">// Add relay/trigger logic here</span>
+  Serial.println("Retina Action Triggered!");
+}
 </pre>
 
 <pre id="code-esp32" class="font-mono text-xs md:text-sm leading-6 text-slate-300 hidden">
@@ -571,8 +652,8 @@ String command = "";
 void setup() {
   Serial.begin(115200);
   
-  <span class="text-[#8b949e]">// Advertise as ESP32_Eye_Robot</span>
-  SerialBT.begin("ESP32_Eye_Robot"); 
+  <span class="text-[#8b949e]">// Advertise as ESP32 Multi-Modal Robot</span>
+  SerialBT.begin("ESP32_AI_Robot"); 
   
   pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
@@ -594,7 +675,19 @@ void loop() {
     } 
     <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RIGHT") >= 0) { 
         turnRight(); command = ""; 
-    } 
+    }
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("GRAB") >= 0) { 
+        <span class="text-[#8b949e]">// Hand Gesture: Fist</span>
+        grabObject(); command = ""; 
+    }
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RELEASE") >= 0) { 
+        <span class="text-[#8b949e]">// Hand Gesture: Open Palm</span>
+        releaseObject(); command = ""; 
+    }
+    <span class="text-[#d2a8ff]">else if</span> (command.indexOf("RETINA_CLICK") >= 0) { 
+        <span class="text-[#8b949e]">// Retina Control: Double Blink</span>
+        triggerRetinaAction(); command = ""; 
+    }
     <span class="text-[#d2a8ff]">else if</span> (command.indexOf("STOP") >= 0) { 
         stopRobot(); command = ""; 
     }
@@ -620,6 +713,18 @@ void turnRight() {
 void stopRobot() {
   digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+}
+void grabObject() {
+  <span class="text-[#8b949e]">// Add servo logic here for robotic arm</span>
+  Serial.println("Grabbing...");
+}
+void releaseObject() {
+  <span class="text-[#8b949e]">// Add servo logic here for robotic arm</span>
+  Serial.println("Releasing...");
+}
+void triggerRetinaAction() {
+  <span class="text-[#8b949e]">// Add relay/trigger logic here</span>
+  Serial.println("Retina Action Triggered!");
 }
 </pre>
                         </div>
@@ -721,5 +826,3 @@ void stopRobot() {
     </script>
 </body>
 </html>
-
-
