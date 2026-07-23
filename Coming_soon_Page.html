@@ -3,183 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coming Soon - Under Construction</title>
-    <!-- Import Tailwind CSS for rapid styling -->
+    <title>Coming Soon - Content Unavailable</title>
+    <!-- Import Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Import Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Import Phosphor Icons for the navigation buttons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Import Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* Base styles */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Slate 900 */
-            color: #f8fafc; /* Slate 50 */
-            overflow-x: hidden;
+            background-color: #050505; /* Deep black for sad theme */
+            color: #ffffff;
+            margin: 0;
+            overflow: hidden; /* Prevent scrolling to keep the canvas fixed */
         }
 
-        /* Custom animation for the floating images */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
-        .animate-float-slow {
-            animation: float 6s ease-in-out infinite;
+        /* Continuous Glowing Pulse for Buttons */
+        @keyframes intense-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
         
-        .animate-float-medium {
-            animation: float 4s ease-in-out infinite;
+        @keyframes intense-pulse-gray {
+            0% { box-shadow: 0 0 0 0 rgba(148, 163, 184, 0.5); }
+            70% { box-shadow: 0 0 0 20px rgba(148, 163, 184, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(148, 163, 184, 0); }
         }
 
-        /* Glitch effect for the main title */
-        .glitch-text {
-            position: relative;
-            color: white;
-            font-weight: 800;
+        .btn-glow-blue {
+            animation: intense-pulse 2s infinite;
         }
-        .glitch-text::before,
-        .glitch-text::after {
+        
+        .btn-glow-gray {
+            animation: intense-pulse-gray 2.5s infinite;
+        }
+
+        /* Floating Images Animation */
+        @keyframes float-heavy {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .float-img-1 { animation: float-heavy 7s ease-in-out infinite; }
+        .float-img-2 { animation: float-heavy 9s ease-in-out infinite reverse; }
+        .float-img-3 { animation: float-heavy 11s ease-in-out infinite 1s; }
+
+        /* Glitch Text Effect */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+        .glitch::before, .glitch::after {
             content: attr(data-text);
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.8;
+            background: rgba(15, 23, 42, 0);
         }
-        .glitch-text::before {
+        .glitch::before {
             left: 2px;
-            text-shadow: -2px 0 #ef4444; /* Red 500 */
-            clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-anim 3s infinite linear alternate-reverse;
+            text-shadow: -2px 0 red;
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
         }
-        .glitch-text::after {
+        .glitch::after {
             left: -2px;
-            text-shadow: -2px 0 #3b82f6; /* Blue 500 */
-            clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+            text-shadow: -2px 0 blue;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
         }
-
-        @keyframes glitch-anim {
-            0% { clip: rect(4px, 9999px, 86px, 0); }
-            20% { clip: rect(61px, 9999px, 20px, 0); }
-            40% { clip: rect(85px, 9999px, 66px, 0); }
-            60% { clip: rect(31px, 9999px, 4px, 0); }
-            80% { clip: rect(100px, 9999px, 73px, 0); }
-            100% { clip: rect(51px, 9999px, 12px, 0); }
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(20px, 9999px, 85px, 0); }
+            50% { clip: rect(60px, 9999px, 10px, 0); }
+            100% { clip: rect(10px, 9999px, 90px, 0); }
         }
-
-        /* Ambient background glow */
-        .ambient-glow {
-            position: absolute;
-            width: 60vw;
-            height: 60vw;
-            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(15,23,42,0) 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            pointer-events: none;
-        }
-        
-        /* Image masking for a softer look */
-        .image-mask {
-            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(15px, 9999px, 90px, 0); }
+            50% { clip: rect(75px, 9999px, 20px, 0); }
+            100% { clip: rect(5px, 9999px, 60px, 0); }
         }
     </style>
 </head>
+<body class="w-screen h-screen relative flex items-center justify-center">
 
-<body class="min-h-screen flex flex-col items-center justify-center relative px-6 py-12">
-    
-    <!-- Background ambient effect -->
-    <div class="ambient-glow"></div>
+    <!-- Canvas for sad falling rain/tears effect -->
+    <canvas id="rainCanvas" class="absolute inset-0 z-0 opacity-60"></canvas>
 
-    <div class="max-w-5xl w-full flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
+    <!-- Floating Sad/Empty Images -->
+    <img src="https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+         alt="Empty Bench" 
+         class="absolute top-12 left-12 md:top-24 md:left-24 w-40 md:w-56 rounded-2xl grayscale opacity-30 float-img-1 z-10 border border-white/10 shadow-2xl">
+         
+    <img src="https://images.unsplash.com/photo-1447015237013-0e80b2786ddc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+         alt="Foggy Road" 
+         class="absolute bottom-12 right-12 md:bottom-24 md:right-24 w-48 md:w-64 rounded-2xl grayscale opacity-30 float-img-2 z-10 border border-white/10 shadow-2xl">
+
+    <img src="https://images.unsplash.com/photo-1502282464115-37330a132924?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+         alt="Broken Clock" 
+         class="absolute top-1/4 right-10 md:top-1/3 md:right-32 w-32 md:w-48 rounded-full grayscale opacity-20 float-img-3 z-10 border border-white/10 shadow-2xl">
+
+    <!-- Main Content Panel -->
+    <div class="glass-panel relative z-20 w-11/12 max-w-4xl p-8 md:p-16 rounded-[2.5rem] flex flex-col items-center text-center">
         
-        <div class="flex-1 text-center lg:text-left">
-            <span class="inline-block py-1 px-3 rounded-full bg-slate-800 text-slate-300 text-sm font-semibold mb-6 tracking-wide uppercase border border-slate-700 shadow-sm">
-                Work in Progress
-            </span>
-            
-            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 glitch-text tracking-tight" data-text="Coming Soon.">
-                Coming Soon.
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-400 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                We're currently building something extraordinary for this space. It's empty right now, but the future looks bright. Check back later!
-            </p>
-            
-            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                
-                <!-- Back Button (Javascript history.back) -->
-                <button onclick="goBack()" class="group relative inline-flex items-center justify-center px-6 py-3 font-semibold text-white transition-all duration-300 ease-in-out bg-slate-800 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 border border-slate-600 shadow-lg hover:shadow-xl w-full sm:w-auto">
-                    <i class="ph ph-arrow-u-up-left text-xl mr-2 group-hover:-translate-x-1 transition-transform"></i>
-                    <span>Go Back</span>
-                </button>
-
-                <!-- Home Button -->
-                <a href="/" class="group relative inline-flex items-center justify-center px-6 py-3 font-semibold text-slate-900 transition-all duration-300 ease-in-out bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] w-full sm:w-auto">
-                    <i class="ph ph-house text-xl mr-2 group-hover:scale-110 transition-transform"></i>
-                    <span>Return Home</span>
-                </a>
-                
-            </div>
+        <div class="mb-4 inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 font-semibold text-sm uppercase tracking-widest">
+            <i class="ph ph-warning-circle mr-2 text-lg"></i> Bad News
         </div>
 
-        <div class="flex-1 relative w-full h-[400px] md:h-[500px] flex items-center justify-center">
+        <h1 class="text-5xl md:text-7xl font-black mb-6 text-white tracking-tighter glitch" data-text="Coming Soon.">
+            Coming Soon.
+        </h1>
+        
+        <p class="text-lg md:text-2xl text-slate-400 mb-12 max-w-2xl leading-relaxed font-light">
+            We are deeply sorry, but the page you are looking for is currently empty. We are working on this space, but for now, there is nothing here but the void.
+        </p>
+
+        <!-- Massive Buttons Container -->
+        <div class="flex flex-col md:flex-row items-center justify-center w-full gap-6 md:gap-10">
             
-            <!-- Central Main Image representing construction/emptiness -->
-            <div class="absolute z-20 animate-float-slow image-mask">
-                <img src="https://images.unsplash.com/photo-1518349619113-03114f06ac3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                     alt="Empty road representing future path" 
-                     class="w-64 md:w-80 rounded-2xl shadow-2xl border-4 border-slate-800 object-cover opacity-80"
-                     onerror="this.src='https://placehold.co/400x500/1e293b/94a3b8?text=Building...'">
-            </div>
+            <!-- Go Back Button (Fixed fallback to index.html) -->
+            <button onclick="goBack()" class="btn-glow-gray group relative w-full md:w-auto flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-white px-8 md:px-12 py-5 md:py-6 rounded-2xl text-xl md:text-2xl font-bold transition-all duration-300 border border-slate-600 z-30 overflow-hidden">
+                <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i class="ph ph-arrow-u-up-left text-3xl group-hover:-translate-x-2 transition-transform"></i>
+                <span>One Step Back</span>
+            </button>
 
-            <!-- Decorative Element 1 (Top Left) -->
-            <div class="absolute top-10 left-0 md:left-10 z-10 animate-float-medium" style="animation-delay: 1s;">
-                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-slate-800 opacity-60 shadow-lg blur-[2px]">
-                    <img src="https://images.unsplash.com/photo-1541888086925-0c1330cc74f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
-                         alt="Construction details" 
-                         class="w-full h-full object-cover grayscale"
-                         onerror="this.src='https://placehold.co/200x200/0f172a/475569?text=Tools'">
-                </div>
-            </div>
-
-            <!-- Decorative Element 2 (Bottom Right) -->
-            <div class="absolute bottom-10 right-0 md:right-10 z-30 animate-float-medium" style="animation-delay: 2s;">
-                <div class="w-40 h-24 md:w-48 md:h-32 rounded-xl overflow-hidden border-4 border-slate-700 opacity-70 shadow-[0_0_20px_rgba(59,130,246,0.3)] backdrop-blur-sm relative group">
-                    <img src="https://images.unsplash.com/photo-1506744626753-1fa28f6e5229?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
-                         alt="Abstract sad/calm landscape" 
-                         class="w-full h-full object-cover sepia-[.3] group-hover:sepia-0 transition-all duration-500"
-                         onerror="this.src='https://placehold.co/300x200/334155/94a3b8?text=Patience'">
-                    <div class="absolute inset-0 bg-slate-900/40 mix-blend-multiply"></div>
-                </div>
-            </div>
+            <!-- Home Button (Fixed to index.html for GitHub Pages) -->
+            <a href="index.html" class="btn-glow-blue group relative w-full md:w-auto flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-500 text-white px-8 md:px-12 py-5 md:py-6 rounded-2xl text-xl md:text-2xl font-bold transition-all duration-300 shadow-[0_0_40px_rgba(37,99,235,0.4)] z-30 overflow-hidden border border-blue-400">
+                <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i class="ph ph-house text-3xl group-hover:scale-110 transition-transform"></i>
+                <span>Start Home Page</span>
+            </a>
             
-            <!-- Abstract shapes -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-slate-700/50 rounded-full border-dashed animate-[spin_60s_linear_infinite] z-0"></div>
-
         </div>
     </div>
 
     <script>
-        // Function to handle the "Go Back" action
+        // ROUTING FIX FOR GITHUB PAGES
         function goBack() {
-            // Check if there is history to go back to
             if (window.history.length > 1) {
+                // If they have a previous page in their tab history, go back
                 window.history.back();
             } else {
-                // Fallback: If no history, redirect to the home page
-                // This happens if the user opened this page directly in a new tab
-                window.location.href = '/'; 
+                // If they opened this link directly, fallback to index.html (works on GH pages)
+                window.location.href = 'index.html'; 
             }
         }
+
+        // CANVAS ANIMATION: Sad Falling Tears / Digital Rain
+        const canvas = document.getElementById('rainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let drops = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Initialize drops
+        const numDrops = 100;
+        for (let i = 0; i < numDrops; i++) {
+            drops.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                speed: Math.random() * 2 + 1,
+                length: Math.random() * 20 + 10,
+                opacity: Math.random() * 0.5 + 0.1
+            });
+        }
+
+        function draw() {
+            // Clear canvas with a slight trail effect
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw falling tears
+            for (let i = 0; i < drops.length; i++) {
+                let p = drops[i];
+                ctx.beginPath();
+                // Gradient for tear drop
+                let grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.length);
+                grad.addColorStop(0, `rgba(100, 116, 139, 0)`); // Slate 500 transparent
+                grad.addColorStop(1, `rgba(148, 163, 184, ${p.opacity})`); // Slate 400
+
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 2;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x, p.y + p.length);
+                ctx.stroke();
+
+                // Move drop
+                p.y += p.speed;
+
+                // Reset drop to top if it goes off screen
+                if (p.y > height) {
+                    p.y = -20;
+                    p.x = Math.random() * width;
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+
+        // Start animation
+        window.onload = function() {
+            draw();
+        };
     </script>
 </body>
 </html>
