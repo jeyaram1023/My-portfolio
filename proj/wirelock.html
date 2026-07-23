@@ -41,9 +41,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; background: var(--bg); }
 
-/* Custom Key Cursor applied globally */
 body, a, button, input[type=range], .layer-tab, .sim-btn {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='7.5' cy='15.5' r='5.5'/%3E%3Cpath d='m21 2-9.6 9.6'/%3E%3Cpath d='m15.5 7.5 3 3L22 7l-3-3'/%3E%3C/svg%3E") 12 12, auto !important;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cdefs%3E%3ClinearGradient id='keyGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300e5ff'%3E%3Canimate attributeName='stop-color' values='%2300e5ff;%2300ff9d;%23b700ff;%2300e5ff' dur='3s' repeatCount='indefinite' /%3E%3C/stop%3E%3Cstop offset='100%25' stop-color='%23b700ff'%3E%3Canimate attributeName='stop-color' values='%23b700ff;%2300e5ff;%2300ff9d;%23b700ff' dur='3s' repeatCount='indefinite' /%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Cg stroke='url(%23keyGrad)'%3E%3Ccircle cx='7.5' cy='15.5' r='5.5'/%3E%3Cpath d='m21 2-9.6 9.6'/%3E%3Cpath d='m15.5 7.5 3 3L22 7l-3-3'/%3E%3C/g%3E%3C/svg%3E") 12 12, auto !important;
 }
 
 body {
@@ -62,7 +61,6 @@ img, canvas { display: block; max-width: 100%; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
 @media(max-width: 640px) { .wrap { padding: 0 20px; } }
 
-/* Unique Background Style with Ambient Glowing Orbs */
 .bg-blobs {
   position: fixed; inset: 0; z-index: -3;
   overflow: hidden; pointer-events: none;
@@ -139,7 +137,6 @@ nav {
 nav.scrolled { border-bottom-color: var(--border); background: rgba(5,8,15,0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .nav-brand { display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 16px; letter-spacing: 0.1em; color: #fff; cursor: pointer; }
 
-/* Enhanced Company Logo Animation and Style */
 @keyframes floatLogo {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
@@ -460,7 +457,8 @@ h1.hero-title {
   border-bottom: 2px solid var(--border); text-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 .use-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; perspective: 1200px; }
-@media(max-width: 960px) { .use-grid { grid-template-columns: 1fr; } }
+@media(max-width: 960px) { .use-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width: 640px) { .use-grid { grid-template-columns: 1fr; } }
 .use-card {
   border: 1px solid var(--border); background: var(--panel); border-radius: var(--radius);
   padding: 24px; transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.5s, border-color 0.5s;
@@ -480,6 +478,45 @@ h1.hero-title {
 }
 .use-card h3 { font-family: var(--font-display); font-size: 16px; margin-bottom: 12px; color: #fff; transform: translateZ(10px); }
 .use-card p { font-size: 14px; color: var(--text-dim); transform: translateZ(5px); }
+
+.ekey-banner {
+  margin-top: 60px;
+  padding: 60px 40px;
+  background: #000;
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 229, 255, 0.1);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.ekey-banner:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 229, 255, 0.2);
+}
+.ekey-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.15), transparent);
+  animation: bannerSweep 4s infinite linear;
+}
+@keyframes bannerSweep {
+  100% { left: 100%; }
+}
+.ekey-banner h2 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 38px);
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--c-aes), var(--c-ascon), var(--c-provision));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
 
 .footer-cta {
   padding: 80px 0 60px;
@@ -605,7 +642,6 @@ footer {
         <div class="vuln-item tilt-card"><div class="tilt-inner"><div class="k">RFID CLONING [MITIGATED]</div><div class="v">Static UIDs are wrapped in AES-256-CBC and permuted dynamically.</div></div></div>
       </div>
     </div>
-    
     <div style="text-align: center; margin-top: 50px;">
       <a href="https://jeyaram1023.github.io/My-portfolio/proj/ev-key-security-lit-review.html" target="_blank" class="btn-paper" style="font-size: 14px; padding: 14px 28px; margin-bottom: 0;">Learn more about the problem statement ↗</a>
     </div>
@@ -617,7 +653,6 @@ footer {
     <div class="eyebrow" style="--dot:var(--c-aes)">03 · Hardware Topology</div>
     <h2 class="section-title">Asymmetric Node Pairing</h2>
     <p class="section-lede">The entire cryptographic handshake executes across four physical I²C pins.</p>
-
     <div class="arch-diagram">
       <div class="node master tilt-card">
         <div class="tilt-inner">
@@ -631,13 +666,11 @@ footer {
           </ul>
         </div>
       </div>
-
       <div class="bus">
         <div class="pin-row"><span class="pin vcc">VCC</span><span class="pin gnd">GND</span></div>
         <div class="line"></div>
         <div class="pin-row"><span class="pin sda">SDA</span><span class="pin scl">SCL</span></div>
       </div>
-
       <div class="node token tilt-card">
         <div class="tilt-inner">
           <span class="tag">KEY NODE</span>
@@ -792,7 +825,7 @@ footer {
       <div class="use-card tilt-card">
         <div class="tilt-inner">
           <div class="use-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=600&auto=format&fit=crop" alt="EV Ignition Placeholder">
+            <img src="https://i.ibb.co/gL7fNKPv/Copilot-20260723-235253.png" alt="EV Ignition">
             <div class="use-image-overlay"></div>
           </div>
           <h3>EV Ignition Immobilization</h3>
@@ -802,7 +835,7 @@ footer {
       <div class="use-card tilt-card">
         <div class="tilt-inner">
           <div class="use-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&auto=format&fit=crop" alt="Server Rack Placeholder">
+            <img src="https://i.ibb.co/mFqhPxRw/Copilot-20260723-235557.png" alt="Server Rack">
             <div class="use-image-overlay"></div>
           </div>
           <h3>Server Rack Security</h3>
@@ -812,18 +845,56 @@ footer {
       <div class="use-card tilt-card">
         <div class="tilt-inner">
           <div class="use-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop" alt="Industrial Access Placeholder">
+            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop" alt="Industrial Access">
             <div class="use-image-overlay"></div>
           </div>
           <h3>Non-Networked Access</h3>
           <p>Secure physical access control for restricted facilities, hazmat lockers, and off-grid remote sites.</p>
         </div>
       </div>
+      
+      <!-- New Added Applications based on User Request -->
+      <div class="use-card tilt-card">
+        <div class="tilt-inner">
+          <div class="use-image-wrapper">
+            <img src="https://i.ibb.co/6R994pJQ/Copilot-20260723-234735.png" alt="Military Purpose">
+            <div class="use-image-overlay"></div>
+          </div>
+          <h3>Military & Defense</h3>
+          <p>Jam-proof, untraceable authentication for tactical vehicles and secure field communications hardware.</p>
+        </div>
+      </div>
+      <div class="use-card tilt-card">
+        <div class="tilt-inner">
+          <div class="use-image-wrapper">
+            <img src="https://i.ibb.co/WpH2969y/Copilot-20260724-000502.png" alt="Electrical Doors">
+            <div class="use-image-overlay"></div>
+          </div>
+          <h3>Electrical Smart Doors</h3>
+          <p>Upgrades standard building electronic locks with physical-only, uncloneable cryptographic keys.</p>
+        </div>
+      </div>
+      <div class="use-card tilt-card">
+        <div class="tilt-inner">
+          <div class="use-image-wrapper">
+            <img src="https://i.ibb.co/JwnKN5RL/Copilot-20260724-000159.png" alt="Bank Locks">
+            <div class="use-image-overlay"></div>
+          </div>
+          <h3>Bank Locks & Vaults</h3>
+          <p>Ultimate air-gapped hardware security designed for safe deposit boxes and restricted financial storage.</p>
+        </div>
+      </div>
     </div>
+    
+    <!-- E-KEY Banner Addition -->
+    <div class="ekey-banner reveal">
+      <h2>REPLACE THE PHYSICAL KEY INTO E-KEY</h2>
+      <p>The form factor of the past, powered by the cryptography of the future.</p>
+    </div>
+
   </div>
 </section>
 
-<!-- Updated Social and Portfolio Links -->
 <section id="links" class="footer-cta">
   <div class="wrap reveal">
     <a href="https://jeyaram1023.github.io/My-portfolio/proj/ev-key-security-lit-review.html" target="_blank" class="btn-paper">Read the Full Research Paper ↗</a>
@@ -840,7 +911,6 @@ footer {
   <div class="wrap" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
     <span style="flex: 1 1 300px; text-align: left;">WIRELOCK / ZERO-RF CRYPTOGRAPHIC AUTHENTICATION</span>
     <span style="flex: 0 0 auto; display: flex; justify-content: center; align-items: center;">
-      <!-- Glowing Hexagon Key Icon in footer -->
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--c-aes)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px var(--c-aes));"><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/><circle cx="7.5" cy="15.5" r="5.5"/></svg>
     </span>
     <span style="flex: 1 1 300px; text-align: right;">ASCON-128 · AES-256-CBC · DYNAMIC PERMUTATION</span>
