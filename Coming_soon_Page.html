@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - Under Construction</title>
+    <!-- Import Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Import Phosphor Icons for the navigation buttons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc; /* Slate 50 */
+            overflow-x: hidden;
+        }
+
+        /* Custom animation for the floating images */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .animate-float-slow {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-medium {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Glitch effect for the main title */
+        .glitch-text {
+            position: relative;
+            color: white;
+            font-weight: 800;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ef4444; /* Red 500 */
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #3b82f6; /* Blue 500 */
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(4px, 9999px, 86px, 0); }
+            20% { clip: rect(61px, 9999px, 20px, 0); }
+            40% { clip: rect(85px, 9999px, 66px, 0); }
+            60% { clip: rect(31px, 9999px, 4px, 0); }
+            80% { clip: rect(100px, 9999px, 73px, 0); }
+            100% { clip: rect(51px, 9999px, 12px, 0); }
+        }
+
+        /* Ambient background glow */
+        .ambient-glow {
+            position: absolute;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(15,23,42,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Image masking for a softer look */
+        .image-mask {
+            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center relative px-6 py-12">
+    
+    <!-- Background ambient effect -->
+    <div class="ambient-glow"></div>
+
+    <div class="max-w-5xl w-full flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
+        
+        <div class="flex-1 text-center lg:text-left">
+            <span class="inline-block py-1 px-3 rounded-full bg-slate-800 text-slate-300 text-sm font-semibold mb-6 tracking-wide uppercase border border-slate-700 shadow-sm">
+                Work in Progress
+            </span>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 glitch-text tracking-tight" data-text="Coming Soon.">
+                Coming Soon.
+            </h1>
+            
+            <p class="text-lg md:text-xl text-slate-400 mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                We're currently building something extraordinary for this space. It's empty right now, but the future looks bright. Check back later!
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                
+                <!-- Back Button (Javascript history.back) -->
+                <button onclick="goBack()" class="group relative inline-flex items-center justify-center px-6 py-3 font-semibold text-white transition-all duration-300 ease-in-out bg-slate-800 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 border border-slate-600 shadow-lg hover:shadow-xl w-full sm:w-auto">
+                    <i class="ph ph-arrow-u-up-left text-xl mr-2 group-hover:-translate-x-1 transition-transform"></i>
+                    <span>Go Back</span>
+                </button>
+
+                <!-- Home Button -->
+                <a href="/" class="group relative inline-flex items-center justify-center px-6 py-3 font-semibold text-slate-900 transition-all duration-300 ease-in-out bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 shadow-[0_0_15px_rgba(59,130,246,0.5)] hover:shadow-[0_0_25px_rgba(59,130,246,0.7)] w-full sm:w-auto">
+                    <i class="ph ph-house text-xl mr-2 group-hover:scale-110 transition-transform"></i>
+                    <span>Return Home</span>
+                </a>
+                
+            </div>
+        </div>
+
+        <div class="flex-1 relative w-full h-[400px] md:h-[500px] flex items-center justify-center">
+            
+            <!-- Central Main Image representing construction/emptiness -->
+            <div class="absolute z-20 animate-float-slow image-mask">
+                <img src="https://images.unsplash.com/photo-1518349619113-03114f06ac3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                     alt="Empty road representing future path" 
+                     class="w-64 md:w-80 rounded-2xl shadow-2xl border-4 border-slate-800 object-cover opacity-80"
+                     onerror="this.src='https://placehold.co/400x500/1e293b/94a3b8?text=Building...'">
+            </div>
+
+            <!-- Decorative Element 1 (Top Left) -->
+            <div class="absolute top-10 left-0 md:left-10 z-10 animate-float-medium" style="animation-delay: 1s;">
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-slate-800 opacity-60 shadow-lg blur-[2px]">
+                    <img src="https://images.unsplash.com/photo-1541888086925-0c1330cc74f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                         alt="Construction details" 
+                         class="w-full h-full object-cover grayscale"
+                         onerror="this.src='https://placehold.co/200x200/0f172a/475569?text=Tools'">
+                </div>
+            </div>
+
+            <!-- Decorative Element 2 (Bottom Right) -->
+            <div class="absolute bottom-10 right-0 md:right-10 z-30 animate-float-medium" style="animation-delay: 2s;">
+                <div class="w-40 h-24 md:w-48 md:h-32 rounded-xl overflow-hidden border-4 border-slate-700 opacity-70 shadow-[0_0_20px_rgba(59,130,246,0.3)] backdrop-blur-sm relative group">
+                    <img src="https://images.unsplash.com/photo-1506744626753-1fa28f6e5229?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" 
+                         alt="Abstract sad/calm landscape" 
+                         class="w-full h-full object-cover sepia-[.3] group-hover:sepia-0 transition-all duration-500"
+                         onerror="this.src='https://placehold.co/300x200/334155/94a3b8?text=Patience'">
+                    <div class="absolute inset-0 bg-slate-900/40 mix-blend-multiply"></div>
+                </div>
+            </div>
+            
+            <!-- Abstract shapes -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-slate-700/50 rounded-full border-dashed animate-[spin_60s_linear_infinite] z-0"></div>
+
+        </div>
+    </div>
+
+    <script>
+        // Function to handle the "Go Back" action
+        function goBack() {
+            // Check if there is history to go back to
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback: If no history, redirect to the home page
+                // This happens if the user opened this page directly in a new tab
+                window.location.href = '/'; 
+            }
+        }
+    </script>
+</body>
+</html>
