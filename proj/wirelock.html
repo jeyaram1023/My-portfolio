@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WireLock — Zero-RF Cryptographic Authentication</title>
+<!-- Added Favicon -->
+<link rel="icon" type="image/png" href="https://i.ibb.co/KBwtZ0v/Screenshot-2026-0104-020409.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;0,800;1,400&family=Syncopate:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:          #05080f;
+  --bg-raised:   #090d16;
+  --panel:       #0d131f;
+  --panel-2:     #121a29;
+  --panel-3:     #172236;
+  --border:      #21304a;
+  --border-glow: #2a4066;
+  --border-soft: #162032;
+  
+  --text:        #f0f4f8;
+  --text-dim:    #94a3b8;
+  --text-faint:  #475569;
+
+  --c-ascon:     #00ff9d;   
+  --c-aes:       #00e5ff;   
+  --c-perm:      #ffb800;   
+  --c-tear:      #ff0055;   
+  --c-provision: #b700ff;   
+
+  --font-display: 'Syncopate', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  --radius: 8px;
+  --maxw: 1240px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+
+/* Custom Key Cursor applied globally */
+body, a, button, input[type=range], .layer-tab, .sim-btn {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='%2300e5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='7.5' cy='15.5' r='5.5'/%3E%3Cpath d='m21 2-9.6 9.6'/%3E%3Cpath d='m15.5 7.5 3 3L22 7l-3-3'/%3E%3C/svg%3E") 12 12, auto !important;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+::selection { background: var(--c-aes); color: #000; }
+
+a { color: inherit; text-decoration: none; }
+img, canvas { display: block; max-width: 100%; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
+@media(max-width: 640px) { .wrap { padding: 0 20px; } }
+
+/* Unique Background Style with Ambient Glowing Orbs */
+.bg-blobs {
+  position: fixed; inset: 0; z-index: -3;
+  overflow: hidden; pointer-events: none;
+}
+.blob {
+  position: absolute; border-radius: 50%;
+  filter: blur(120px); opacity: 0.3;
+  animation: floatBlob 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+.blob-1 { width: 60vw; height: 60vw; background: var(--c-aes); top: -20vw; left: -20vw; }
+.blob-2 { width: 50vw; height: 50vw; background: var(--c-provision); bottom: -20vw; right: -20vw; animation-duration: 25s; animation-direction: alternate-reverse; }
+.blob-3 { width: 40vw; height: 40vw; background: var(--c-ascon); top: 30vh; left: 30vw; animation-duration: 30s; opacity: 0.15; }
+
+@keyframes floatBlob {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(8vw, 10vw) scale(1.1); }
+}
+
+.grid-bg {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -2;
+  pointer-events: none;
+  transform: perspective(500px) rotateX(60deg) scale(2.5) translateY(-20%);
+  transform-origin: top center;
+  mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
+  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
+}
+
+#cursor-glow {
+  position: fixed; top: 0; left: 0; width: 350px; height: 350px;
+  border-radius: 50%; pointer-events: none; z-index: 9999;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.3) 0%, rgba(0, 229, 255, 0.05) 40%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.eyebrow {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--text-faint);
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.eyebrow::before {
+  content: ""; width: 8px; height: 8px;
+  background: var(--dot, var(--c-aes));
+  box-shadow: 0 0 12px var(--dot, var(--c-aes));
+  border-radius: 2px;
+}
+h2.section-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(24px, 4vw, 36px); letter-spacing: 0;
+  margin-bottom: 20px; text-transform: uppercase;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+.section-lede {
+  color: var(--text-dim); max-width: 680px; font-size: 18px; margin-bottom: 50px;
+}
+section { padding: 140px 0; position: relative; z-index: 10; }
+@media(max-width: 640px) { section { padding: 80px 0; } }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 40px; font-family: var(--font-mono); font-size: 13px;
+  backdrop-filter: blur(12px); background: rgba(5,8,15,0.4);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: all 0.4s ease;
+}
+nav.scrolled { border-bottom-color: var(--border); background: rgba(5,8,15,0.85); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.nav-brand { display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 16px; letter-spacing: 0.1em; color: #fff; cursor: pointer; }
+
+/* Enhanced Company Logo Animation and Style */
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.nav-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+  animation: floatLogo 3s ease-in-out infinite;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease, border-color 0.5s ease;
+}
+.nav-brand:hover .nav-logo {
+  transform: scale(1.15) rotate(15deg);
+  border-color: var(--c-aes);
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.8), inset 0 0 10px rgba(0, 229, 255, 0.5);
+  animation-play-state: paused;
+}
+.nav-brand:hover {
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+.nav-links { display: flex; gap: 32px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.nav-links a { transition: color 0.3s, text-shadow 0.3s; position: relative; }
+.nav-links a:hover { color: var(--c-aes); text-shadow: 0 0 10px rgba(0,229,255,0.5); }
+@media(max-width: 860px) { .nav-links { display: none; } }
+
+.reveal {
+  opacity: 0; transform: translateY(50px) rotateX(15deg) scale(0.95);
+  transform-origin: center bottom;
+  transition: opacity 1s cubic-bezier(0.2,0.8,0.2,1), transform 1s cubic-bezier(0.2,0.8,0.2,1);
+  will-change: transform, opacity;
+}
+.reveal.in { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s ease, border-color 0.4s ease;
+  will-change: transform;
+}
+.tilt-card:hover { 
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8), 0 0 20px -5px var(--hover-color, rgba(0,229,255,0.2)); 
+  border-color: var(--hover-color, var(--border-glow));
+  z-index: 2;
+}
+.tilt-inner { transform: translateZ(30px); }
+
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; overflow: hidden; padding-top: 80px;
+}
+#hero-canvas, #rain-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#hero-canvas { z-index: 1; }
+#rain-canvas { z-index: 2; opacity: 0.35; mix-blend-mode: screen; pointer-events: none; }
+.hero-vignette {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 20%, var(--bg) 90%);
+}
+.hero-content { position: relative; z-index: 4; padding: 0 24px; transform-style: preserve-3d; }
+.hero-kicker {
+  font-family: var(--font-mono); font-size: 14px; color: var(--c-ascon);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 30px;
+  text-shadow: 0 0 10px rgba(0,255,157,0.4); transform: translateZ(20px);
+}
+.hero-kicker::before { content: "$ "; color: var(--text-dim); }
+h1.hero-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(48px, 10vw, 130px); line-height: 1;
+  letter-spacing: -0.02em; margin-bottom: 20px;
+  background: linear-gradient(180deg, #fff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 10px 30px rgba(0,229,255,0.2));
+  transform: translateZ(50px);
+}
+.hero-title .cursor {
+  display: inline-block; width: 0.6ch; background: var(--c-ascon);
+  animation: blink 1s steps(1) infinite; color: transparent;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.hero-sub {
+  font-family: var(--font-body); font-size: clamp(16px, 2vw, 20px);
+  color: var(--text-dim); max-width: 600px; margin: 0 auto 40px;
+  transform: translateZ(30px); text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+.hero-sub b { color: #fff; }
+.hero-cmd {
+  font-family: var(--font-mono); font-size: 14px; color: var(--text-dim);
+  display: inline-flex; gap: 12px; align-items: center;
+  border: 1px solid var(--border); padding: 14px 24px; border-radius: 4px;
+  background: rgba(13,19,31,0.6); backdrop-filter: blur(10px);
+  transform: translateZ(40px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.5);
+}
+.hero-cmd b { color: var(--c-aes); text-shadow: 0 0 8px rgba(0,229,255,0.5); }
+.hero-scroll {
+  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 4;
+  font-family: var(--font-mono); font-size: 12px; color: var(--text-faint);
+  letter-spacing: 0.2em; display: flex; flex-direction: column; align-items: center; gap: 12px;
+  animation: bob 2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,10px); } }
+.hero-scroll i { width: 1px; height: 30px; background: linear-gradient(var(--text-faint), transparent); }
+
+.sim-shell {
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px;
+  border: 1px solid var(--border); background: var(--panel);
+  border-radius: var(--radius); padding: 32px;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 20px 50px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
+}
+.sim-shell::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--c-aes), var(--c-ascon), var(--c-perm));
+}
+@media(max-width: 960px) { .sim-shell { grid-template-columns: 1fr; } }
+.sim-stage {
+  position: relative; background: #000; border: 1px solid var(--border-soft);
+  border-radius: var(--radius); aspect-ratio: 16/10; overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0,229,255,0.05);
+}
+#sim-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.sim-controls { display: flex; flex-direction: column; justify-content: center; }
+.sim-step-label {
+  font-family: var(--font-mono); font-size: 14px; color: var(--c-perm);
+  letter-spacing: 0.1em; margin-bottom: 16px;
+  text-shadow: 0 0 10px rgba(255,184,0,0.4);
+}
+.sim-progress { height: 4px; background: var(--panel-2); border-radius: 2px; margin-bottom: 24px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
+.sim-progress-bar { height: 100%; width: 16.66%; background: var(--c-perm); transition: width 0.5s cubic-bezier(0.2,0.8,0.2,1); box-shadow: 0 0 10px var(--c-perm); }
+.sim-caption { color: var(--text); font-size: 16px; line-height: 1.7; margin-bottom: 30px; min-height: 110px; }
+.sim-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+.sim-badge {
+  font-family: var(--font-mono); font-size: 11px; padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text-faint); background: var(--panel-2);
+  transition: all 0.3s ease; letter-spacing: 0.05em;
+}
+.sim-badge.active {
+  color: #000; background: var(--c-perm); border-color: var(--c-perm);
+  box-shadow: 0 0 15px rgba(255,184,0,0.6); font-weight: 700;
+}
+.sim-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: auto; }
+.sim-btn {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 12px 20px; border-radius: 4px;
+  background: var(--panel-3); border: 1px solid var(--border);
+  color: var(--text); cursor: pointer;
+  transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.sim-btn:hover { border-color: var(--c-aes); background: var(--border-glow); box-shadow: 0 0 15px rgba(0,229,255,0.2); transform: translateY(-2px); }
+.sim-btn.primary { background: var(--c-aes); border-color: var(--c-aes); color: #000; box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+.sim-btn.primary:hover { filter: brightness(1.2); box-shadow: 0 0 30px rgba(0,229,255,0.6); }
+
+.problem-grid, .arch-diagram {
+  display: grid; gap: 32px; align-items: stretch;
+}
+.problem-grid { grid-template-columns: 1fr 1fr; }
+.arch-diagram { grid-template-columns: 1fr auto 1fr; align-items: center; }
+@media(max-width: 900px) { .problem-grid, .arch-diagram { grid-template-columns: 1fr; } }
+
+.problem-text p { color: var(--text-dim); margin-bottom: 20px; font-size: 17px; }
+.problem-text b { color: #fff; font-weight: 600; }
+.vuln-list { display: flex; flex-direction: column; gap: 16px; perspective: 1000px; }
+.vuln-item {
+  border: 1px solid var(--border); background: var(--panel); padding: 20px 24px;
+  border-radius: var(--radius); border-left: 3px solid var(--c-tear);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3);
+  --hover-color: rgba(255,0,85,0.3);
+}
+.vuln-item .k { font-family: var(--font-mono); font-size: 13px; color: var(--c-tear); letter-spacing: 0.1em; margin-bottom: 8px; font-weight: 700; }
+.vuln-item .v { font-size: 15px; color: var(--text-dim); }
+
+.node {
+  border: 1px solid var(--border); background: var(--panel);
+  border-radius: var(--radius); padding: 32px; position: relative;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.6), 0 20px 40px rgba(0,0,0,0.4);
+  --hover-color: rgba(0,229,255,0.2);
+}
+.node .tag {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.15em;
+  padding: 6px 10px; border-radius: 4px; display: inline-block; margin-bottom: 20px; font-weight: 700;
+}
+.node.master .tag { background: rgba(0,229,255,0.1); color: var(--c-aes); border: 1px solid rgba(0,229,255,0.3); }
+.node.token .tag { background: rgba(183,0,255,0.1); color: var(--c-provision); border: 1px solid rgba(183,0,255,0.3); }
+.node h3 { font-family: var(--font-display); font-size: 24px; margin-bottom: 8px; text-transform: uppercase; }
+.node .mcu { font-family: var(--font-mono); font-size: 14px; color: var(--text-dim); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-soft); }
+.node ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.node li { font-size: 15px; color: var(--text); padding-left: 20px; position: relative; }
+.node li::before { content: "▹"; position: absolute; left: 0; color: var(--c-perm); font-family: var(--font-mono); }
+
+.bus { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.bus .line { width: 100px; height: 3px; background: var(--border); position: relative; overflow: hidden; border-radius: 2px; }
+.bus .line::after {
+  content: ""; position: absolute; top: 0; left: -50%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--c-aes), var(--c-ascon), transparent);
+  animation: busFlow 1.5s linear infinite; box-shadow: 0 0 10px var(--c-aes);
+}
+@keyframes busFlow { 0% { left: -50%; } 100% { left: 100%; } }
+.pin-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pin {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px;
+  border: 1px solid var(--border); background: var(--panel-2); color: var(--text-dim);
+}
+.pin.vcc { border-color: rgba(255,184,0,0.4); color: var(--c-perm); box-shadow: 0 0 10px rgba(255,184,0,0.1); }
+.pin.sda { border-color: rgba(0,255,157,0.4); color: var(--c-ascon); box-shadow: 0 0 10px rgba(0,255,157,0.1); }
+.pin.scl { border-color: rgba(0,229,255,0.4); color: var(--c-aes); box-shadow: 0 0 10px rgba(0,229,255,0.1); }
+@media(max-width: 900px) { .bus { flex-direction: row; } .bus .line { width: 3px; height: 60px; } .bus .line::after { left: 0; top: -50%; width: 100%; height: 50%; background: linear-gradient(180deg, transparent, var(--c-aes), var(--c-ascon), transparent); animation-name: busFlowV; } @keyframes busFlowV { 0% { top: -50%; } 100% { top: 100%; } } }
+
+.layer-tabs { display: flex; gap: 4px; margin-bottom: 0; flex-wrap: wrap; perspective: 800px; }
+.layer-tab {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600; padding: 16px 20px;
+  background: var(--panel-2); border: 1px solid var(--border); border-bottom: none;
+  color: var(--text-faint); cursor: pointer; display: flex; align-items: center; gap: 10px;
+  border-radius: 6px 6px 0 0; transition: all 0.3s; transform-origin: bottom;
+  transform: rotateX(10deg); box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
+}
+.layer-tab .n { opacity: 0.5; font-size: 11px; }
+.layer-tab .sw { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 5px currentColor; }
+.layer-tab:hover { color: var(--text); transform: rotateX(5deg) translateY(-2px); background: var(--panel-3); }
+.layer-tab.active {
+  color: #fff; transform: rotateX(0) translateY(0); background: var(--panel);
+  border-top: 2px solid var(--tab-color); border-bottom: 1px solid var(--panel);
+  box-shadow: 0 -10px 20px rgba(0,0,0,0.3); z-index: 2; position: relative;
+}
+.layer-panels {
+  border: 1px solid var(--border); background: var(--panel); border-radius: 0 6px 6px 6px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.3);
+  position: relative; top: -1px; transform-style: preserve-3d;
+}
+.layer-panel { display: none; padding: 40px; }
+.layer-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; animation: popIn 0.5s cubic-bezier(0.2,0.8,0.2,1); }
+@keyframes popIn { from { opacity: 0; transform: translateZ(-20px) rotateX(-2deg); } to { opacity: 1; transform: translateZ(0) rotateX(0); } }
+@media(max-width: 800px) { .layer-panel.active { grid-template-columns: 1fr; } .layer-panel { padding: 24px; } }
+
+.layer-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 16px; text-transform: uppercase; }
+.layer-body p { color: var(--text-dim); font-size: 16px; margin-bottom: 16px; }
+.layer-body code { font-family: var(--font-mono); font-size: 14px; padding: 2px 6px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 4px; color: var(--c-perm); }
+.layer-visual {
+  border: 1px solid var(--border-glow); background: #000; border-radius: var(--radius);
+  padding: 30px; display: flex; align-items: center; justify-content: center;
+  min-height: 220px; font-family: var(--font-mono);
+  box-shadow: inset 0 0 40px rgba(0,229,255,0.05); position: relative; overflow: hidden;
+}
+.layer-visual::before { content:''; position:absolute; inset:0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.03) 2px, rgba(0,229,255,0.03) 4px); pointer-events:none; }
+
+.mono-line { font-size: 14px; color: var(--text-dim); line-height: 2; width: 100%; position: relative; z-index: 2; }
+.mono-line .c { color: var(--c-aes); text-shadow: 0 0 8px rgba(0,229,255,0.4); }
+.mono-line .a { color: var(--c-perm); text-shadow: 0 0 8px rgba(255,184,0,0.4); }
+.mono-line .v { color: var(--c-provision); text-shadow: 0 0 8px rgba(183,0,255,0.4); }
+.mono-line .p { color: var(--c-tear); text-shadow: 0 0 8px rgba(255,0,85,0.4); }
+
+.hand-flow { display: flex; align-items: center; gap: 16px; width: 100%; justify-content: center; position: relative; z-index: 2; }
+.hand-node { font-size: 12px; text-align: center; color: var(--text); }
+.hand-node .box { border: 1px solid var(--c-ascon); color: var(--c-ascon); padding: 10px 16px; border-radius: 4px; margin-bottom: 8px; background: rgba(0,255,157,0.1); box-shadow: 0 0 15px rgba(0,255,157,0.2); font-weight: 700; }
+.hand-arrow { color: var(--text-faint); font-size: 20px; }
+
+.lut-panel {
+  border: 1px solid var(--border); background: var(--panel); border-radius: var(--radius);
+  padding: 40px; box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 20px 50px rgba(0,0,0,0.5);
+  --hover-color: rgba(255,184,0,0.2);
+  position: relative;
+}
+@media(max-width: 640px) { .lut-panel { padding: 24px; } }
+
+.lut-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+@media(max-width: 1000px) { .lut-layout { grid-template-columns: 1fr; } }
+
+.lut-3d-stage {
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(255,184,0,0.05);
+}
+#lut-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.lut-controls {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin-bottom: 40px;
+  font-family: var(--font-mono); font-size: 14px; color: var(--text);
+  background: var(--panel-2); padding: 20px; border-radius: 6px; border: 1px solid var(--border);
+}
+.lut-controls input[type=range] { flex: 1; min-width: 200px; accent-color: var(--c-perm); cursor: ew-resize; }
+.lut-controls .val { color: #000; background: var(--c-perm); padding: 6px 12px; border-radius: 4px; font-weight: 700; min-width: 160px; text-align: center; box-shadow: 0 0 15px rgba(255,184,0,0.4); }
+.lut-stage { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; perspective: 1000px; }
+.lut-col { display: flex; flex-direction: column; gap: 16px; align-items: center; }
+.lut-col .lab { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); letter-spacing: 0.1em; font-weight: 700; text-align: center; }
+.block {
+  width: 50px; height: 50px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 14px; font-weight: 700; border-radius: 6px;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, border-color 0.3s;
+  background: var(--panel-2); transform-style: preserve-3d;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 0 10px rgba(0,0,0,0.5);
+}
+.block:hover { transform: translateZ(20px) translateY(-5px) scale(1.1); }
+.b0 { color: #ff8a8a; border-color: rgba(255,138,138,0.4); } 
+.b1 { color: var(--c-perm); border-color: rgba(255,184,0,0.4); }
+.b2 { color: var(--c-ascon); border-color: rgba(0,255,157,0.4); } 
+.b3 { color: var(--c-aes); border-color: rgba(0,229,255,0.4); }
+.b4 { color: var(--c-provision); border-color: rgba(183,0,255,0.4); }
+.lut-arrow-col { color: var(--c-perm); font-size: 24px; text-shadow: 0 0 10px rgba(255,184,0,0.5); animation: pulseArrow 1.5s infinite alternate; }
+@keyframes pulseArrow { from { opacity: 0.5; transform: scale(0.9); } to { opacity: 1; transform: scale(1.1); } }
+.lut-note { margin-top: 40px; font-size: 15px; color: var(--text-dim); border-top: 1px solid var(--border-soft); padding-top: 20px; text-align: center; }
+
+.apps-subhead {
+  font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.2em; font-weight: 700;
+  color: #fff; margin-bottom: 24px; padding-bottom: 12px;
+  border-bottom: 2px solid var(--border); text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+.use-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; perspective: 1200px; }
+@media(max-width: 960px) { .use-grid { grid-template-columns: 1fr; } }
+.use-card {
+  border: 1px solid var(--border); background: var(--panel); border-radius: var(--radius);
+  padding: 24px; transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.5s, border-color 0.5s;
+  transform-style: preserve-3d; --hover-color: rgba(0,229,255,0.3);
+}
+.use-card:hover { transform: translateY(-10px) translateZ(20px) rotateX(4deg); z-index: 2; }
+.use-image-wrapper {
+  position: relative; width: 100%; aspect-ratio: 16/9; margin-bottom: 20px;
+  border-radius: 4px; overflow: hidden; border: 1px solid var(--border-soft);
+  transform: translateZ(20px); box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  background: var(--panel-2);
+}
+.use-image-wrapper img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: opacity 0.4s, transform 0.4s; }
+.use-card:hover .use-image-wrapper img { opacity: 1; transform: scale(1.05); }
+.use-image-overlay {
+  position: absolute; inset: 0; background: linear-gradient(to top, var(--panel) 0%, transparent 60%); pointer-events: none;
+}
+.use-card h3 { font-family: var(--font-display); font-size: 16px; margin-bottom: 12px; color: #fff; transform: translateZ(10px); }
+.use-card p { font-size: 14px; color: var(--text-dim); transform: translateZ(5px); }
+
+.footer-cta {
+  padding: 80px 0 60px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(to bottom, var(--bg), #020408);
+}
+.btn-paper {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 40px;
+  font-family: var(--font-mono); font-size: 16px; font-weight: 800; text-transform: uppercase;
+  color: #000; background: var(--c-aes); padding: 18px 40px; border-radius: 6px;
+  box-shadow: 0 0 20px rgba(0,229,255,0.4), inset 0 0 10px rgba(255,255,255,0.5); 
+  transition: all 0.3s;
+}
+.btn-paper:hover { box-shadow: 0 0 40px rgba(0,229,255,0.8); transform: translateY(-4px) scale(1.02); }
+
+.social-links {
+  display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+}
+.btn-social {
+  font-family: var(--font-mono); font-size: 14px; font-weight: 600; text-transform: uppercase;
+  color: var(--text); border: 1px solid var(--border); padding: 12px 24px; border-radius: 4px;
+  background: var(--panel); transition: all 0.3s;
+}
+.btn-social:hover {
+  background: var(--panel-2); border-color: var(--c-perm); color: var(--c-perm);
+  box-shadow: 0 0 15px rgba(255,184,0,0.3); transform: translateY(-2px);
+}
+
+footer {
+  border-top: 1px solid var(--border); padding: 40px 0; background: #000;
+  font-family: var(--font-mono); font-size: 13px; color: var(--text-faint);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+}
+</style>
+</head>
+<body>
+<div class="bg-blobs">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+<div class="grid-bg"></div>
+<div id="cursor-glow"></div>
+
+<nav id="nav">
+  <div class="nav-brand">
+    <img src="https://i.ibb.co/KBwtZ0v/Screenshot-2026-0104-020409.png" alt="Company Logo" class="nav-logo">
+    WIRELOCK
+  </div>
+  <div class="nav-links">
+    <a href="#simulate">Simulator</a>
+    <a href="#problem">Problem</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#layers">Protocol</a>
+    <a href="#apps">Applications</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <canvas id="rain-canvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-content">
+    <div class="hero-kicker">auth --mode=wired --rf=disabled</div>
+    <h1 class="hero-title" id="hero-title">WIRELOCK<span class="cursor">_</span></h1>
+    <p class="hero-sub">A zero-RF authentication architecture bridging dual-microcontrollers via physical I²C. <b>Eradicate relay attacks, signal amplification, and cloning instantly.</b></p>
+    <div class="hero-cmd">$ handshake --execute --layers=5 &nbsp;→&nbsp; <b>VERIFIED</b></div>
+  </div>
+  <div class="hero-scroll"><i></i>SCROLL</div>
+</header>
+
+<section id="simulate">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="--dot:var(--c-perm)">01 · 3D Protocol Simulator</div>
+    <h2 class="section-title">Observe the physical handshake.</h2>
+    <p class="section-lede">Step through exactly what travels across VCC / GND / SDA / SCL during a real insertion. The entire cryptographic payload is verified instantly over a wired channel.</p>
+
+    <div class="sim-shell tilt-card">
+      <div class="sim-stage">
+        <canvas id="sim-canvas"></canvas>
+      </div>
+
+      <div class="sim-controls">
+        <div class="sim-step-label">STEP <span id="simStepNum">1</span>/6 &nbsp;—&nbsp; <span id="simStepName">INSERTION</span></div>
+        <div class="sim-progress"><div class="sim-progress-bar" id="simProgressBar"></div></div>
+        <p class="sim-caption" id="simCaption">The KEY makes physical contact with the socket. The Master supplies 3.3V over VCC/GND — the KEY carries no battery of its own.</p>
+
+        <div class="sim-badges" id="simBadges">
+          <span class="sim-badge" data-badge="NONCE">NONCE</span>
+          <span class="sim-badge" data-badge="MAC">MAC</span>
+          <span class="sim-badge" data-badge="AES KEY">AES KEY</span>
+          <span class="sim-badge" data-badge="IV">IV</span>
+          <span class="sim-badge" data-badge="PERM">PERM ORDER</span>
+          <span class="sim-badge" data-badge="RELAY">RELAY FIRE</span>
+        </div>
+
+        <div class="sim-buttons">
+          <button id="simPrev" class="sim-btn">◂ PREV</button>
+          <button id="simPlay" class="sim-btn primary">▶ AUTO PLAY</button>
+          <button id="simNext" class="sim-btn">NEXT ▸</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="--dot:var(--c-tear)">02 · Threat Model</div>
+    <h2 class="section-title">Wireless exposure is a structural flaw.</h2>
+    <div class="problem-grid">
+      <div class="problem-text tilt-card">
+        <div class="tilt-inner">
+          <p>Nearly every proposed improvement in access-control secures a <b>wireless</b> channel rather than removing it. The attack surface is the radio link itself.</p>
+          <p>A relay attack doesn't need to break AES. It only needs two radios bridging the distance between a key on a kitchen counter and a vehicle parked on the street.</p>
+          <p><b>WireLock's premise is structural:</b> if the KEY physically cannot transmit over the air, there is no signal left to relay, replay, amplify, or clone.</p>
+        </div>
+      </div>
+      <div class="vuln-list">
+        <div class="vuln-item tilt-card"><div class="tilt-inner"><div class="k">RELAY ATTACKS [MITIGATED]</div><div class="v">Zero antennas mean amplifiers cannot bridge physical distance to the KEY.</div></div></div>
+        <div class="vuln-item tilt-card"><div class="tilt-inner"><div class="k">REPLAY ATTACKS [MITIGATED]</div><div class="v">Captured payloads are invalidated by a strict rolling 16-byte TRNG nonce.</div></div></div>
+        <div class="vuln-item tilt-card"><div class="tilt-inner"><div class="k">RFID CLONING [MITIGATED]</div><div class="v">Static UIDs are wrapped in AES-256-CBC and permuted dynamically.</div></div></div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 50px;">
+      <a href="https://jeyaram1023.github.io/My-portfolio/proj/ev-key-security-lit-review.html" target="_blank" class="btn-paper" style="font-size: 14px; padding: 14px 28px; margin-bottom: 0;">Learn more about the problem statement ↗</a>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="--dot:var(--c-aes)">03 · Hardware Topology</div>
+    <h2 class="section-title">Asymmetric Node Pairing</h2>
+    <p class="section-lede">The entire cryptographic handshake executes across four physical I²C pins.</p>
+
+    <div class="arch-diagram">
+      <div class="node master tilt-card">
+        <div class="tilt-inner">
+          <span class="tag">MASTER NODE</span>
+          <h3>ESP32-S3</h3>
+          <div class="mcu">Main controller · Actuator Manager</div>
+          <ul>
+            <li>Executes AES & ASCON verification</li>
+            <li>Generates TRNG challenges</li>
+            <li>Triggers ignition/solenoid relay</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="bus">
+        <div class="pin-row"><span class="pin vcc">VCC</span><span class="pin gnd">GND</span></div>
+        <div class="line"></div>
+        <div class="pin-row"><span class="pin sda">SDA</span><span class="pin scl">SCL</span></div>
+      </div>
+
+      <div class="node token tilt-card">
+        <div class="tilt-inner">
+          <span class="tag">KEY NODE</span>
+          <h3>CH32V003 KEY</h3>
+          <div class="mcu">RISC-V · 2KB SRAM · Battery-Free</div>
+          <ul>
+            <li>Parasitically powered on insertion</li>
+            <li>Stores UID + rolling session state</li>
+            <li>Zero internal RF hardware</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="layers">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="--dot:var(--c-ascon)">04 · Cryptographic Stack</div>
+    <h2 class="section-title">Five layers of security.</h2>
+    <p class="section-lede">Every insertion runs the full stack sequentially — providing hardware proof-of-presence, ephemeral challenges, encryption, and mutation.</p>
+
+    <div class="layer-tabs" id="layer-tabs" role="tablist">
+      <button class="layer-tab active" data-tab="1" style="--tab-color:var(--c-provision)"><span class="n">01</span><span class="sw" style="background:var(--c-provision)"></span>Provisioning</button>
+      <button class="layer-tab" data-tab="2" style="--tab-color:var(--c-ascon)"><span class="n">02</span><span class="sw" style="background:var(--c-ascon)"></span>ASCON Handshake</button>
+      <button class="layer-tab" data-tab="3" style="--tab-color:var(--c-aes)"><span class="n">03</span><span class="sw" style="background:var(--c-aes)"></span>AES-256-CBC</button>
+      <button class="layer-tab" data-tab="4" style="--tab-color:var(--c-perm)"><span class="n">04</span><span class="sw" style="background:var(--c-perm)"></span>Dynamic Permutation</button>
+      <button class="layer-tab" data-tab="5" style="--tab-color:var(--c-tear)"><span class="n">05</span><span class="sw" style="background:var(--c-tear)"></span>Tearing Recovery</button>
+    </div>
+
+    <div class="layer-panels tilt-card">
+      <div class="layer-panel active" data-panel="1">
+        <div class="layer-body">
+          <div class="layer-title" style="color:var(--c-provision); text-shadow:0 0 10px rgba(183,0,255,0.4)">Zero-Trust Provisioning</div>
+          <p>Before pairing, the Master polls the KEY's EEPROM. A new AES-256 key is only written if every byte strictly reads <code>0xFF</code> — proof of a physical factory reset.</p>
+          <p>The AES key crosses the wire exactly once during setup, and never again.</p>
+        </div>
+        <div class="layer-visual">
+          <div class="mono-line">
+            > poll(EEPROM)<br>
+            > read: <span class="v">0xFF 0xFF 0xFF 0xFF …</span><br>
+            > state: <span class="v">FACTORY-RESET CONFIRMED</span><br>
+            > write(AES_256_KEY) → KEY
+          </div>
+        </div>
+      </div>
+      <div class="layer-panel" data-panel="2">
+        <div class="layer-body">
+          <div class="layer-title" style="color:var(--c-ascon); text-shadow:0 0 10px rgba(0,255,157,0.4)">ASCON-128 Ephemeral Handshake</div>
+          <p>On insertion, the Master issues a 16-byte TRNG nonce. Both sides compute a 16-byte MAC using the lightweight <code>ASCON-128</code> AEAD algorithm.</p>
+        </div>
+        <div class="layer-visual">
+          <div class="hand-flow">
+            <div class="hand-node"><div class="box">MASTER</div>nonce (16B)</div><div class="hand-arrow">→</div>
+            <div class="hand-node"><div class="box">KEY</div>MAC(UID, nonce)</div><div class="hand-arrow">→</div>
+            <div class="hand-node"><div class="box">MASTER</div>verify</div>
+          </div>
+        </div>
+      </div>
+      <div class="layer-panel" data-panel="3">
+        <div class="layer-body">
+          <div class="layer-title" style="color:var(--c-aes); text-shadow:0 0 10px rgba(0,229,255,0.4)">AES-256-CBC Encryption</div>
+          <p>The Master reads a 16-byte IV and a 20-byte encrypted payload. Every session gets a brand-new cryptographically random IV.</p>
+        </div>
+        <div class="layer-visual">
+          <div class="mono-line">
+            > IV = TRNG(16B) &nbsp;<span class="c">// fresh session</span><br>
+            > payload = UID ‖ C_n &nbsp;(20B)<br>
+            > ct = <span class="c">AES256_CBC_encrypt</span>(payload, IV)
+          </div>
+        </div>
+      </div>
+      <div class="layer-panel" data-panel="4">
+        <div class="layer-body">
+          <div class="layer-title" style="color:var(--c-perm); text-shadow:0 0 10px rgba(255,184,0,0.4)">Dynamic Permutation</div>
+          <p>The ciphertext is split into five blocks. The transmit sequence is derived from the session counter: <code>I_seq = C_n mod 120</code>.</p>
+        </div>
+        <div class="layer-visual">
+          <div class="mono-line">
+            > blocks = [b0 b1 b2 b3 b4]<br>
+            > I_seq = C_n mod 120<br>
+            > order = LUT[I_seq]<br>
+            > tx: <span class="a">b3 → b0 → b1 → b4 → b2</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer-panel" data-panel="5">
+        <div class="layer-body">
+          <div class="layer-title" style="color:var(--c-tear); text-shadow:0 0 10px rgba(255,0,85,0.4)">Tearing Mitigation</div>
+          <p>If power is lost mid-write, WireLock detects the previous state `n-1` on next boot and silently rolls forward, preventing locked out KEYs.</p>
+        </div>
+        <div class="layer-visual">
+          <div class="mono-line">
+            > expected: C_n<br>
+            > received: C_n₋₁ &nbsp;<span class="p">// power loss</span><br>
+            > window check: <span class="p">PASS (n−1)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="lut">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="--dot:var(--c-perm)">05 · Live Permutation Matrix</div>
+    <h2 class="section-title">120 Block Orderings.</h2>
+    <p class="section-lede">The auto-playing sequence demonstrates how the transmit order shifts in real-time based on the rolling state, obfuscating ciphertext layout without altering core cryptography.</p>
+
+    <div class="lut-panel tilt-card">
+      <div class="tilt-inner">
+        <div class="lut-layout">
+          <div class="lut-3d-stage">
+            <canvas id="lut-canvas"></canvas>
+          </div>
+
+          <div>
+            <div class="lut-controls">
+              <span>SESSION COUNTER C_n</span>
+              <input type="range" id="lutSlider" min="0" max="239" value="14" step="1">
+              <span class="val" id="lutVal">14 &nbsp;·&nbsp; I_seq = 14</span>
+            </div>
+            <div class="lut-stage">
+              <div class="lut-col">
+                <div class="lab">CIPHERTEXT BLOCKS</div>
+                <div style="display:flex; gap:12px; flex-wrap: wrap; justify-content: center;">
+                  <div class="block b0">b0</div><div class="block b1">b1</div><div class="block b2">b2</div><div class="block b3">b3</div><div class="block b4">b4</div>
+                </div>
+              </div>
+              <div class="lut-arrow-col">⤑</div>
+              <div class="lut-col">
+                <div class="lab">TRANSMIT SEQUENCE</div>
+                <div style="display:flex; gap:12px; flex-wrap: wrap; justify-content: center;" id="lutOutput"></div>
+              </div>
+            </div>
+            <div class="lut-note">120 permutations recomputed securely on both nodes based on the rolling state.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="apps">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="--dot:var(--c-ascon)">06 · Global Applications</div>
+    <h2 class="section-title">Decoupled Architecture.</h2>
+    <p class="section-lede">WireLock’s hardware drops in anywhere a wireless key currently creates risk, paired with a complete software ecosystem.</p>
+
+    <div class="apps-subhead">HARDWARE DEPLOYMENTS</div>
+    <div class="use-grid">
+      <div class="use-card tilt-card">
+        <div class="tilt-inner">
+          <div class="use-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=600&auto=format&fit=crop" alt="EV Ignition Placeholder">
+            <div class="use-image-overlay"></div>
+          </div>
+          <h3>EV Ignition Immobilization</h3>
+          <p>Replaces vulnerable wireless keyfobs with a physical, non-relayable handshake at the ignition point.</p>
+        </div>
+      </div>
+      <div class="use-card tilt-card">
+        <div class="tilt-inner">
+          <div class="use-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&auto=format&fit=crop" alt="Server Rack Placeholder">
+            <div class="use-image-overlay"></div>
+          </div>
+          <h3>Server Rack Security</h3>
+          <p>Battery-free smart keys for high-voltage racks and data centers, operating completely offline.</p>
+        </div>
+      </div>
+      <div class="use-card tilt-card">
+        <div class="tilt-inner">
+          <div class="use-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop" alt="Industrial Access Placeholder">
+            <div class="use-image-overlay"></div>
+          </div>
+          <h3>Non-Networked Access</h3>
+          <p>Secure physical access control for restricted facilities, hazmat lockers, and off-grid remote sites.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Updated Social and Portfolio Links -->
+<section id="links" class="footer-cta">
+  <div class="wrap reveal">
+    <a href="https://jeyaram1023.github.io/My-portfolio/proj/ev-key-security-lit-review.html" target="_blank" class="btn-paper">Read the Full Research Paper ↗</a>
+    <div class="social-links">
+      <a href="https://www.linkedin.com/in/jeyaram-ece-reddy" target="_blank" class="btn-social">LinkedIn</a>
+      <a href="https://github.com/jeyaram1023" target="_blank" class="btn-social">GitHub</a>
+      <a href="https://jeyaram1023.github.io/My-portfolio" target="_blank" class="btn-social">Portfolio</a>
+      <a href="mailto:jeyaram.reddy.ece@gmail.com" class="btn-social">Email</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <span style="flex: 1 1 300px; text-align: left;">WIRELOCK / ZERO-RF CRYPTOGRAPHIC AUTHENTICATION</span>
+    <span style="flex: 0 0 auto; display: flex; justify-content: center; align-items: center;">
+      <!-- Glowing Hexagon Key Icon in footer -->
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--c-aes)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px var(--c-aes));"><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/><circle cx="7.5" cy="15.5" r="5.5"/></svg>
+    </span>
+    <span style="flex: 1 1 300px; text-align: right;">ASCON-128 · AES-256-CBC · DYNAMIC PERMUTATION</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const navEl = document.getElementById('nav');
+window.addEventListener('scroll', () => { navEl.classList.toggle('scrolled', window.scrollY > 40); });
+
+(function(){
+  const glow = document.getElementById('cursor-glow');
+  if(!glow) return;
+  window.addEventListener('mousemove', (e) => {
+    glow.style.opacity = '1'; glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
+})();
+
+(function(){
+  const cards = document.querySelectorAll('.tilt-card');
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(1000px) rotateX(${-py * 10}deg) rotateY(${px * 10}deg) translateZ(10px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+    });
+  });
+})();
+
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.15 });
+revealEls.forEach(el => io.observe(el));
+
+(function(){
+  const el = document.getElementById('hero-title');
+  const finalText = "WIRELOCK";
+  const glyphs = "01#█▓▒░<>";
+  let frame = 0; const totalFrames = 30;
+  function render(){
+    let out = "";
+    for(let i=0; i<finalText.length; i++){
+      const revealFrame = i * 2;
+      if(frame >= revealFrame + 10) out += finalText[i];
+      else if(frame >= revealFrame) out += glyphs[Math.floor(Math.random()*glyphs.length)];
+      else out += " ";
+    }
+    el.innerHTML = out + '<span class="cursor">_</span>';
+    frame++;
+    if(frame <= totalFrames + finalText.length*2) requestAnimationFrame(()=>setTimeout(render, 40));
+  }
+  render();
+})();
+
+(function(){
+  const canvas = document.getElementById('rain-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, cols, drops;
+  const chars = "01ASCONAESUID0xFF".split("");
+  const colors = ["#00ff9d", "#00e5ff", "#ffb800"];
+  function resize(){
+    w = canvas.width = canvas.offsetWidth; h = canvas.height = canvas.offsetHeight;
+    cols = Math.floor(w/20); drops = new Array(cols).fill(0).map(()=>Math.random()*-h/20);
+  }
+  window.addEventListener('resize', resize); resize();
+  function draw(){
+    ctx.fillStyle = "rgba(5,8,15,0.1)"; ctx.fillRect(0,0,w,h);
+    ctx.font = "14px 'JetBrains Mono', monospace";
+    for(let i=0; i<cols; i++){
+      ctx.fillStyle = colors[i % colors.length]; ctx.globalAlpha = 0.4;
+      ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*20, drops[i]*20);
+      if(drops[i]*20 > h && Math.random() > 0.98) drops[i] = 0;
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+function createRealisticKey() {
+  const group = new THREE.Group();
+  
+  const headGeo = new THREE.BoxGeometry(1.6, 0.4, 1.2);
+  const headMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9, metalness: 0.3 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.set(-1.2, 0, 0);
+  
+  const gripGeo = new THREE.BoxGeometry(0.1, 0.42, 0.8);
+  const gripMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 1 });
+  for(let i=0; i<3; i++) {
+    const grip = new THREE.Mesh(gripGeo, gripMat);
+    grip.position.set(-1.0 - (i*0.3), 0, 0);
+    group.add(grip);
+  }
+  group.add(head);
+
+  const shaftGeo = new THREE.BoxGeometry(1.8, 0.15, 0.8);
+  const shaftMat = new THREE.MeshStandardMaterial({ color: 0x778899, roughness: 0.2, metalness: 0.9 });
+  const shaft = new THREE.Mesh(shaftGeo, shaftMat);
+  shaft.position.set(0.5, 0, 0);
+  group.add(shaft);
+
+  for(let i=0; i<4; i++) {
+    const contact = new THREE.Mesh(
+      new THREE.BoxGeometry(0.25, 0.17, 0.12),
+      new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2, metalness: 1 })
+    );
+    contact.position.set(0.2 + (i*0.35), 0, 0.35); 
+    group.add(contact);
+  }
+
+  const hole = new THREE.Mesh(
+    new THREE.TorusGeometry(0.2, 0.08, 16, 32),
+    new THREE.MeshStandardMaterial({ color: 0x444444, metalness: 0.8 })
+  );
+  hole.position.set(-2.2, 0, 0);
+  hole.rotation.x = Math.PI/2;
+  group.add(hole);
+  
+  return group;
+}
+
+function createRealisticHolder() {
+  const group = new THREE.Group();
+  
+  const bezelGeo = new THREE.BoxGeometry(0.6, 1.8, 2.2);
+  const bezelMat = new THREE.MeshStandardMaterial({ color: 0x1a1a24, roughness: 0.6, metalness: 0.5 });
+  const bezel = new THREE.Mesh(bezelGeo, bezelMat);
+  group.add(bezel);
+  
+  const slotGeo = new THREE.BoxGeometry(0.65, 0.25, 1.0);
+  const slotMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1 });
+  const slot = new THREE.Mesh(slotGeo, slotMat);
+  slot.position.set(-0.05, 0, 0);
+  group.add(slot);
+  
+  const ledGeo = new THREE.BoxGeometry(0.62, 0.4, 1.2);
+  const ledMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0x00e5ff, emissiveIntensity: 0.5, transparent: true, opacity: 0.8 });
+  const led = new THREE.Mesh(ledGeo, ledMat);
+  led.name = "ledRing";
+  group.add(led);
+  
+  return group;
+}
+
+function create3DCheckmark() {
+  const group = new THREE.Group();
+  const shape = new THREE.Shape();
+  shape.moveTo(-0.25, 0.0);
+  shape.lineTo(-0.1, -0.25);
+  shape.lineTo(0.35, 0.3);
+  shape.lineTo(0.25, 0.4);
+  shape.lineTo(-0.1, -0.1);
+  shape.lineTo(-0.18, 0.08);
+  shape.closePath();
+
+  const extrudeSettings = { depth: 0.08, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.02, bevelThickness: 0.02 };
+  const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x00ff9d, emissive: 0x00ff9d, emissiveIntensity: 3.0, roughness: 0.1, metalness: 0.9
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  group.add(mesh);
+  return group;
+}
+
+(function(){
+  if(typeof THREE === 'undefined') return;
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 3, 10);
+  camera.lookAt(0,0,0);
+
+  function resize(){
+    const wdt = canvas.offsetWidth, hgt = canvas.offsetHeight;
+    renderer.setSize(wdt, hgt, false); camera.aspect = wdt/hgt; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+
+  scene.add(new THREE.AmbientLight(0x2a4066, 3.5));
+  const spot1 = new THREE.SpotLight(0x00e5ff, 8, 30, 0.5, 0.5, 1); spot1.position.set(5, 5, 5); scene.add(spot1);
+  const spot2 = new THREE.SpotLight(0x00ff9d, 6, 30, 0.5, 0.5, 1); spot2.position.set(-5, 5, -5); scene.add(spot2);
+
+  const rig = new THREE.Group(); scene.add(rig);
+
+  const gridHelper = new THREE.GridHelper(20, 40, 0x00e5ff, 0x162032);
+  gridHelper.position.y = -3; gridHelper.material.opacity = 0.2; gridHelper.material.transparent = true;
+  rig.add(gridHelper);
+
+  const holder = createRealisticHolder();
+  holder.position.set(1.5, -0.5, 0); 
+  holder.rotation.y = -0.4;
+  rig.add(holder);
+
+  const key = createRealisticKey();
+  key.position.set(-2.5, 1.2, 0.5); 
+  key.rotation.set(0.3, 0.5, 0.1);
+  rig.add(key);
+
+  let t = 0; let mX = 0, mY = 0;
+  window.addEventListener('mousemove', (e) => { mX = (e.clientX/window.innerWidth - 0.5); mY = (e.clientY/window.innerHeight - 0.5); });
+
+  function animate(){
+    t += 0.035; 
+    key.position.y = 1.2 + Math.sin(t)*0.1;
+    key.rotation.y = 0.5 + Math.sin(t*0.5)*0.1;
+    holder.position.y = -0.5 + Math.sin(t+2)*0.05;
+    gridHelper.rotation.y = t * 0.05;
+
+    const cycle = (t % 8);
+    let insZ = 0;
+    if(cycle > 5 && cycle < 7){
+      const p = (cycle - 5) / 2;
+      insZ = Math.sin(p * Math.PI) * -1.8; 
+      spot1.intensity = 8 + Math.sin(p * Math.PI)*5; 
+    } else { spot1.intensity = 8; }
+    
+    key.position.x = -2.5 - insZ * 1.5;
+    key.position.z = 0.5 + insZ * 0.3;
+    key.rotation.z = insZ * 0.1;
+
+    rig.rotation.y += ((mX * 0.3) - rig.rotation.y) * 0.05;
+    rig.rotation.x += ((mY * 0.3) - rig.rotation.x) * 0.05;
+
+    renderer.render(scene, camera); requestAnimationFrame(animate);
+  }
+  resize(); animate();
+})();
+
+(function(){
+  const tabs = document.querySelectorAll('.layer-tab');
+  const panels = document.querySelectorAll('.layer-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector('.layer-panel[data-panel="'+tab.dataset.tab+'"]').classList.add('active');
+    });
+  });
+})();
+
+(function(){
+  if(typeof THREE === 'undefined') return;
+  const canvas = document.getElementById('sim-canvas');
+  if(!canvas) return;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setClearColor(0x020305, 1);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 16/10, 0.1, 100);
+  camera.position.set(0, 6, 9);
+  camera.lookAt(0, 0, 0);
+
+  function resizeSim(){
+    const p = canvas.parentElement;
+    renderer.setSize(p.clientWidth, p.clientHeight, false);
+    camera.aspect = p.clientWidth / p.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resizeSim); resizeSim();
+
+  scene.add(new THREE.AmbientLight(0x2a4066, 3.0));
+  const pLight1 = new THREE.PointLight(0x00e5ff, 6, 20); pLight1.position.set(4, 4, 4); scene.add(pLight1);
+  const pLight2 = new THREE.PointLight(0x00ff9d, 4, 20); pLight2.position.set(-4, 3, -4); scene.add(pLight2);
+  const relayGlow = new THREE.PointLight(0x00ff9d, 0, 15); relayGlow.position.set(3, 1, 0); scene.add(relayGlow);
+
+  const gridMat = new THREE.LineBasicMaterial({ color: 0x21304a, transparent: true, opacity: 0.5 });
+  const grid = new THREE.GridHelper(12, 24, 0x21304a, 0x21304a); grid.position.y = -0.5; scene.add(grid);
+
+  const keyNode = createRealisticKey();
+  keyNode.position.set(-2.5, 0, 0); 
+  scene.add(keyNode);
+
+  const masterNode = createRealisticHolder();
+  masterNode.position.set(2.5, 0, 0); 
+  scene.add(masterNode);
+
+  const ledRing = masterNode.getObjectByName("ledRing");
+
+  const checkmark = create3DCheckmark();
+  checkmark.position.set(3.4, 0.2, 0.2);
+  checkmark.scale.set(1.5, 1.5, 1.5);
+  checkmark.visible = false;
+  scene.add(checkmark);
+
+  const wireZs = [-0.6, -0.2, 0.2, 0.6];
+  const wireColors = [0xffb800, 0x94a3b8, 0x00ff9d, 0x00e5ff];
+  const wireStartX = -1.2, wireEndX = 2.2;
+  const wires = [];
+  wireZs.forEach((z, i) => {
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(wireStartX, -0.1, z), new THREE.Vector3(wireEndX, -0.1, z)]);
+    const mat = new THREE.LineBasicMaterial({ color: wireColors[i], linewidth: 2, transparent: true, opacity: 0.4 });
+    const line = new THREE.Line(geo, mat); scene.add(line); wires.push(line);
+  });
+
+  const pulseGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.6, 16);
+  pulseGeo.rotateZ(Math.PI/2);
+  const pulseMat = new THREE.MeshStandardMaterial({ color: 0x00ff9d, emissive: 0x00ff9d, emissiveIntensity: 2, transparent: true, opacity: 0 });
+  const pulse = new THREE.Mesh(pulseGeo, pulseMat);
+  pulse.position.set(wireStartX, -0.1, wireZs[2]); scene.add(pulse);
+
+  const blockColors = [0xff8a8a, 0xffb800, 0x00ff9d, 0x00e5ff, 0xb700ff];
+  const blockGrp = new THREE.Group();
+  const blocks3D = [];
+  for(let i=0; i<5; i++){
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshStandardMaterial({ color: blockColors[i], emissive: blockColors[i], emissiveIntensity: 0.4 }));
+    m.position.set(-1.2 + i*0.6, 1.5, 0); blockGrp.add(m); blocks3D.push(m);
+  }
+  blockGrp.visible = false; scene.add(blockGrp);
+  const demoOrder = [3,0,1,4,2];
+
+  let currentStep = 0, playing = false, playTimer = null, pulseAnim = null;
+  const numEl = document.getElementById('simStepNum'), nameEl = document.getElementById('simStepName');
+  const capEl = document.getElementById('simCaption'), progEl = document.getElementById('simProgressBar');
+  const badgeEls = document.querySelectorAll('.sim-badge'), playBtn = document.getElementById('simPlay');
+
+  const STEPS = [
+    { name:'INSERTION', pulse:'none', badges:[], cap:'The KEY docks. The Master supplies 3.3V over VCC/GND. KEY boots instantly.' },
+    { name:'TRNG CHALLENGE', pulse:'toToken', badges:['NONCE'], cap:'Master sends a 16-byte TRNG challenge over SDA/SCL (ASCON Handshake initiated).' },
+    { name:'MAC VERIFICATION', pulse:'toMaster', badges:['NONCE','MAC'], cap:'KEY computes and returns MAC(UID, Nonce). Master verifies signature locally.' },
+    { name:'AES DECRYPTION', pulse:'toMaster', badges:['MAC','AES KEY','IV'], aesGlow:true, cap:'Master fetches IV + Ciphertext, decrypting with securely provisioned AES-256 key.' },
+    { name:'DYNAMIC PERMUTATION', pulse:'toToken', badges:['AES KEY','PERM'], showBlocks:true, cap:'Payload is un-shuffled using LUT index derived from the session counter.' },
+    { name:'ACTUATE / MUTATE', pulse:'toToken', badges:['PERM','RELAY'], flash:true, cap:'Payload validated. Relay triggers. New state is encrypted, reshuffled, and written back.' }
+  ];
+
+  let t = 0;
+  function animSim(){
+    t += 0.02;
+    keyNode.position.y = Math.sin(t*2)*0.03;
+    masterNode.position.y = Math.sin(t*1.5+1)*0.02;
+    blocks3D.forEach((m,i)=>{ m.rotation.x = t; m.rotation.y = t*0.5; });
+    relayGlow.intensity = Math.max(0, relayGlow.intensity - 0.2);
+
+    let keyTargetX = -2.5; 
+    if (currentStep > 0) {
+      keyTargetX = -0.5; 
+    }
+    keyNode.position.x += (keyTargetX - keyNode.position.x) * 0.1;
+
+    if(ledRing) {
+      ledRing.material.emissiveIntensity = 0.5 + Math.sin(t*3)*0.2;
+    }
+
+    if(STEPS[currentStep] && STEPS[currentStep].flash) {
+      checkmark.visible = true;
+      checkmark.rotation.y = Math.sin(t*2)*0.2; 
+      const blink = Math.sin(t*10) > 0;
+      checkmark.children[0].material.emissiveIntensity = blink ? 3.0 : 0.4;
+    } else {
+      checkmark.visible = false;
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animSim);
+  }
+  animSim();
+
+  function triggerPulse(dir){
+    if(pulseAnim) cancelAnimationFrame(pulseAnim);
+    if(dir === 'none'){ pulse.material.opacity = 0; wires[2].material.opacity = 0.4; return; }
+    const fx = dir === 'toToken' ? wireEndX : wireStartX, tx = dir === 'toToken' ? wireStartX : wireEndX;
+    pulse.position.set(fx, -0.1, wireZs[2]); pulse.material.opacity = 1;
+    wires[2].material.opacity = 1; 
+    let p = 0;
+    function run(){
+      p += 0.025; pulse.position.x = fx + (tx-fx)*Math.min(p,1);
+      if(p < 1) pulseAnim = requestAnimationFrame(run);
+      else { pulse.material.opacity = 0; wires[2].material.opacity = 0.4; }
+    }
+    run();
+  }
+
+  function applyStep(idx){
+    const s = STEPS[idx];
+    numEl.textContent = idx+1; nameEl.textContent = s.name; capEl.textContent = s.cap;
+    progEl.style.width = ((idx+1)/STEPS.length*100) + '%';
+    badgeEls.forEach(b => b.classList.toggle('active', s.badges.includes(b.dataset.badge)));
+    
+    triggerPulse(s.pulse);
+    blockGrp.visible = !!s.showBlocks;
+    if(s.showBlocks){
+      blocks3D.forEach((m,i)=>{ m.position.x = -1.2 + demoOrder.indexOf(i)*0.6; });
+    }
+    if(ledRing) {
+      ledRing.material.emissive.setHex(s.aesGlow ? 0xffb800 : (s.flash ? 0x00ff9d : 0x00e5ff));
+    }
+    if(s.flash) relayGlow.intensity = 8;
+  }
+
+  function jump(idx){
+    currentStep = Math.max(0, Math.min(STEPS.length-1, idx)); applyStep(currentStep);
+  }
+
+  function stopPlay(){ playing = false; playBtn.textContent = '▶ AUTO PLAY'; clearInterval(playTimer); playBtn.classList.remove('primary'); }
+  
+  function startPlay(){
+    playing = true; playBtn.textContent = '⏸ PAUSE'; playBtn.classList.add('primary');
+    playTimer = setInterval(()=>{ jump(currentStep < STEPS.length-1 ? currentStep+1 : 0); }, 3000);
+  }
+
+  document.getElementById('simPrev').addEventListener('click', ()=>{ stopPlay(); jump(currentStep-1); });
+  document.getElementById('simNext').addEventListener('click', ()=>{ stopPlay(); jump(currentStep < STEPS.length-1 ? currentStep+1 : 0); });
+  
+  playBtn.addEventListener('click', ()=>{
+    if(playing){ stopPlay(); return; }
+    startPlay();
+  });
+  
+  jump(0); 
+  setTimeout(startPlay, 1000); 
+})();
+
+(function(){
+  const canvas = document.getElementById('lut-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 4/3, 0.1, 100);
+  camera.position.set(0, 4, 8);
+  camera.lookAt(0, 0, 0);
+
+  function resizeLUT(){
+    const p = canvas.parentElement;
+    renderer.setSize(p.clientWidth, p.clientHeight, false);
+    camera.aspect = p.clientWidth / p.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resizeLUT); resizeLUT();
+
+  scene.add(new THREE.AmbientLight(0x2a4066, 3.0));
+  const lutLight = new THREE.PointLight(0xffb800, 6, 20);
+  lutLight.position.set(0, 5, 5);
+  scene.add(lutLight);
+
+  const keyNode = createRealisticKey();
+  keyNode.position.set(-1.5, 0, 0);
+  scene.add(keyNode);
+
+  const masterNode = createRealisticHolder();
+  masterNode.position.set(1.5, 0, 0);
+  scene.add(masterNode);
+
+  const busGeo = new THREE.CylinderGeometry(0.05, 0.05, 3, 8);
+  busGeo.rotateZ(Math.PI/2);
+  const busMat = new THREE.MeshBasicMaterial({ color: 0x475569, wireframe: true });
+  const bus = new THREE.Mesh(busGeo, busMat);
+  scene.add(bus);
+
+  const blockColors = [0xff8a8a, 0xffb800, 0x00ff9d, 0x00e5ff, 0xb700ff];
+  const blocks3D = [];
+  for(let i=0; i<5; i++){
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshStandardMaterial({ color: blockColors[i], emissive: blockColors[i], emissiveIntensity: 0.5 }));
+    m.position.set(0, 1, 0);
+    scene.add(m);
+    blocks3D.push(m);
+  }
+
+  function permutations(arr){
+    if(arr.length <= 1) return [arr];
+    const result = [];
+    for(let i=0; i<arr.length; i++){
+      const rest = arr.slice(0,i).concat(arr.slice(i+1));
+      permutations(rest).forEach(p => result.push([arr[i]].concat(p)));
+    }
+    return result;
+  }
+  const LUT = permutations([0,1,2,3,4]);
+  const slider = document.getElementById('lutSlider');
+  const output = document.getElementById('lutOutput');
+  const blockClasses = ['b0','b1','b2','b3','b4'];
+
+  let t = 0;
+  let currentOrder = [0,1,2,3,4];
+
+  function renderLUT(){
+    const idx = parseInt(slider.value, 10) % 120;
+    currentOrder = LUT[idx];
+    document.getElementById('lutVal').textContent = `${slider.value} · I_seq = ${idx}`;
+    
+    output.innerHTML = '';
+    currentOrder.forEach((bIdx, pos) => {
+      const div = document.createElement('div');
+      div.className = `block ${blockClasses[bIdx]}`; div.textContent = `b${bIdx}`;
+      div.style.animation = `popIn 0.3s cubic-bezier(0.2,0.8,0.2,1) ${pos*0.05}s forwards`;
+      div.style.opacity = '0'; 
+      output.appendChild(div);
+    });
+  }
+
+  function animLUT(){
+    t += 0.02;
+    keyNode.rotation.x = Math.sin(t)*0.1;
+    masterNode.rotation.x = Math.cos(t)*0.1;
+
+    blocks3D.forEach((m, i) => {
+      const targetSlot = currentOrder.indexOf(i);
+      const targetX = -1.5 + (targetSlot * 0.75); 
+      const targetY = 0.8 + Math.sin(t * 2 + i) * 0.2;
+
+      m.position.x += (targetX - m.position.x) * 0.1;
+      m.position.y += (targetY - m.position.y) * 0.1;
+      m.rotation.x += 0.05;
+      m.rotation.y += 0.05;
+    });
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animLUT);
+  }
+
+  slider.addEventListener('input', renderLUT); 
+  renderLUT();
+  animLUT();
+
+  setInterval(() => {
+    slider.value = Math.floor(Math.random() * 240);
+    renderLUT();
+  }, 1500);
+
+})();
+</script>
+</body>
+</html>
