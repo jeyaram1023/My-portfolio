@@ -8,7 +8,7 @@
      SEO & SEARCH ENGINE INDEXING OPTIMIZATION
      ========================================== -->
 <meta name="description" content="WireLock: A physical hardware authentication architecture designed to eradicate wireless relay attacks instantly. Zero-RF, battery-free, and uncloneable deep-tech security.">
-<meta name="keywords" content="WireLock, Jeyaram B, Jeyaram ECE Reddy, Hardware Security Architect India, Deep Tech Founder, Relay Attack Prevention, EV Key Security, Zero-RF Authentication, Hardware Cryptography, B2B Automotive Security, Dual-Microcontroller, IEEE Research Author, WireLock, Relay Attack Prevention, EV Key Security, Zero-RF Authentication, Hardware Cryptography, Deep Tech, Licensing, B2B Automotive Security, Anti-Theft Car Key, Dual-Microcontroller, Jeyaram B, Patent Pending">
+<meta name="keywords" content="WireLock, Jeyaram B, Jeyaram ECE Reddy, Hardware Security Architect India, Deep Tech Founder, Relay Attack Prevention, EV Key Security, Zero-RF Authentication, Hardware Cryptography, B2B Automotive Security, Dual-Microcontroller, IEEE Research Author, Patent Pending">
 <meta name="author" content="Jeyaram B">
 <meta name="robots" content="index, follow">
 <meta name="googlebot" content="index, follow">
@@ -42,14 +42,12 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;0,800;1,400&family=Syncopate:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Updated Base Colors for better background visibility */
   --bg:          #03050a; 
   --panel:       rgba(10, 14, 23, 0.65);
   --panel-2:     rgba(15, 20, 33, 0.7);
   --panel-3:     rgba(20, 28, 45, 0.8);
   --border:      rgba(0, 229, 255, 0.15);
   --border-glow: rgba(0, 229, 255, 0.4);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
   
   --text:        #f8fafc;
   --text-dim:    #94a3b8;
@@ -82,10 +80,11 @@ body, a, button, input[type=range], .sim-btn {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cdefs%3E%3ClinearGradient id='keyGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300e5ff'%3E%3Canimate attributeName='stop-color' values='%2300e5ff;%2300ff9d;%23b700ff;%2300e5ff' dur='3s' repeatCount='indefinite' /%3E%3C/stop%3E%3Cstop offset='100%25' stop-color='%23b700ff'%3E%3Canimate attributeName='stop-color' values='%23b700ff;%2300e5ff;%2300ff9d;%23b700ff' dur='3s' repeatCount='indefinite' /%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Cg stroke='url(%23keyGrad)'%3E%3Ccircle cx='7.5' cy='15.5' r='5.5'/%3E%3Cpath d='m21 2-9.6 9.6'/%3E%3Cpath d='m15.5 7.5 3 3L22 7l-3-3'/%3E%3C/g%3E%3C/svg%3E") 12 12, auto !important;
 }
 
+/* FIXED: Changed width from 100vw to 100% to prevent horizontal scrolling issues */
 body {
   background: var(--bg); color: var(--text);
   font-family: var(--font-body); font-size: 16px; line-height: 1.6;
-  -webkit-font-smoothing: antialiased; overflow-x: hidden; width: 100vw;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden; width: 100%;
 }
 ::selection { background: var(--c-aes); color: #000; }
 a { color: inherit; text-decoration: none; }
@@ -135,47 +134,35 @@ img, canvas { display: block; max-width: 100%; }
   transition: width 0.4s ease; box-shadow: 0 0 15px var(--c-aes);
 }
 
-/* HIGH-VISIBILITY TEXTURED & GRID BACKGROUNDS */
+/* NEW: UNIQUE SILVER TECH GRID BACKGROUND (Fixed Viewport Glitch) */
 .bg-grid {
   position: fixed; inset: 0; z-index: -5; pointer-events: none;
   background-size: 50px 50px;
   background-image: 
-    linear-gradient(to right, rgba(0, 229, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 229, 255, 0.07) 1px, transparent 1px);
-  mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
+    linear-gradient(to right, rgba(200, 210, 220, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(200, 210, 220, 0.06) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
+
+/* Matte Noise Overlay */
 .noise-overlay {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  position: fixed; inset: 0; z-index: -4; pointer-events: none;
   background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
-  opacity: 0.12; mix-blend-mode: overlay;
+  opacity: 0.1; mix-blend-mode: overlay;
 }
 
-.bg-glow-orb {
-  position: absolute; border-radius: 50%; filter: blur(140px);
-  opacity: 0.25; pointer-events: none; z-index: -2;
-  animation: floatOrb 25s infinite alternate ease-in-out;
-}
-.orb-1 { top: 20%; left: -10%; width: 45vw; height: 45vw; background: var(--c-aes); }
-.orb-2 { top: 60%; right: -15%; width: 55vw; height: 55vw; background: var(--c-provision); animation-delay: -5s; }
-.orb-3 { top: 80%; left: 20%; width: 45vw; height: 45vw; background: var(--c-ascon); animation-delay: -10s; opacity: 0.15; }
-
-@keyframes floatOrb {
-  0% { transform: translateY(0) scale(1) rotate(0deg); }
-  100% { transform: translateY(200px) scale(1.2) rotate(15deg); }
-}
-
-#global-bg-canvas { position: fixed; inset: 0; z-index: -4; width: 100vw; height: 100vh; pointer-events: none; }
-.cyber-vignette { position: fixed; inset: 0; z-index: -3; pointer-events: none; background: radial-gradient(circle at center, transparent 30%, var(--bg) 100%); }
+#global-bg-canvas { position: fixed; inset: 0; z-index: -3; width: 100%; height: 100vh; pointer-events: none; }
+.cyber-vignette { position: fixed; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(circle at center, transparent 30%, var(--bg) 100%); }
 
 #cursor-glow {
   position: fixed; top: 0; left: 0; width: 500px; height: 500px;
   border-radius: 50%; pointer-events: none; z-index: 9998;
-  background: radial-gradient(circle, rgba(0, 229, 255, 0.15) 0%, rgba(183, 0, 255, 0.05) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, rgba(183, 0, 255, 0.04) 40%, transparent 70%);
   transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s;
   mix-blend-mode: screen; opacity: 0;
 }
-body:active #cursor-glow { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0, 255, 157, 0.2) 0%, transparent 70%); }
+body:active #cursor-glow { width: 400px; height: 400px; background: radial-gradient(circle, rgba(0, 255, 157, 0.15) 0%, transparent 70%); }
 @media(max-width: 768px) { #cursor-glow { display: none; } } 
 
 /* ADVANCED GLASSMORPHISM (TILT CARDS) */
@@ -254,7 +241,7 @@ nav {
 }
 @media(max-width: 768px) { nav { padding: 15px 24px; } }
 nav.scrolled { 
-  background: rgba(5,8,15,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  background: rgba(5,8,15,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255,255,255,0.05); padding: 16px 48px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 @media(max-width: 768px) { nav.scrolled { padding: 12px 24px; } }
@@ -590,12 +577,10 @@ footer {
   </div>
 </div>
 
+<!-- FIXED: Full viewport silver tech grid, NO colorful orbs that cause overflow -->
 <div class="bg-grid"></div>
 <div class="noise-overlay"></div>
 
-<div class="bg-glow-orb orb-1"></div>
-<div class="bg-glow-orb orb-2"></div>
-<div class="bg-glow-orb orb-3"></div>
 <canvas id="global-bg-canvas"></canvas>
 <div class="cyber-vignette"></div>
 <div id="cursor-glow"></div>
@@ -643,7 +628,9 @@ footer {
           <span class="bt-sub">APP NO: <span class="bt-val">202641101016</span></span>
         </div>
       </div>
-      <a href="WireLock_PitchDeck.pdf" target="_blank" class="trust-badge" style="--c: var(--c-aes); --c-rgb: 0,229,255; text-decoration: none; cursor: pointer;">
+      
+      <!-- FIXED: Absolute URL for PDF to avoid GitHub Pages path issues -->
+      <a href="https://jeyaram1023.github.io/My-portfolio/img/WireLock_PitchDeck.pdf" target="_blank" class="trust-badge" style="--c: var(--c-aes); --c-rgb: 0,229,255; text-decoration: none; cursor: pointer;">
         <div class="badge-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         </div>
@@ -731,7 +718,8 @@ footer {
     
     <div class="reveal stagger-3" style="text-align: center; margin-top: 60px;">
       <div class="magnetic-wrap">
-        <a href="proj/proj/problem_analysis.html" target="_blank" class="btn-paper" style="font-size: 14px; padding: 16px 32px; background: rgba(255,255,255,0.05); color: #fff; box-shadow: none; border: 1px solid rgba(255,255,255,0.2);">
+        <!-- FIXED: Absolute URL to Problem Analysis page to fix GitHub routing issue -->
+        <a href="https://jeyaram1023.github.io/My-portfolio/proj/problem_analysis.html" target="_blank" class="btn-paper" style="font-size: 14px; padding: 16px 32px; background: rgba(255,255,255,0.05); color: #fff; box-shadow: none; border: 1px solid rgba(255,255,255,0.2);">
           View Full Theft Analysis & Problem Scope ↗
         </a>
       </div>
@@ -947,7 +935,7 @@ footer {
       <a href="mailto:jeyaram.reddy.ece@gmail.com" class="btn-paper mag-btn">Contact for Licensing & Partnerships ↗</a>
     </div>
     <div class="social-links">
-      <div class="social-mag-wrap"><a href="https://jeyaram1023.github.io/My-portfolio" target="_blank" class="btn-social mag-btn">Portfolio</a></div>
+      <div class="social-mag-wrap"><a href="https://jeyaram1023.github.io/My-portfolio" class="btn-social mag-btn">Portfolio</a></div>
       <div class="social-mag-wrap"><a href="mailto:jeyaram.reddy.ece@gmail.com" class="btn-social mag-btn">Email</a></div>
     </div>
   </div>
@@ -1171,7 +1159,7 @@ const io = new IntersectionObserver((entries) => {
   setTimeout(typeCycle, 3800); 
 })();
 
-// WARP SPEED BACKGROUND (THREE.JS)
+// THREE.JS FIXED SIZING
 (function(){
   if(typeof THREE === 'undefined') return;
   const canvas = document.getElementById('global-bg-canvas');
@@ -1179,16 +1167,18 @@ const io = new IntersectionObserver((entries) => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
   
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(60, document.documentElement.clientWidth/window.innerHeight, 0.1, 1000);
   camera.position.set(0, 10, 50); camera.lookAt(0,0,0);
 
   function resizeBG(){
-    const w = window.innerWidth, h = window.innerHeight;
+    // Use document.documentElement.clientWidth to ignore scrollbar width
+    const w = document.documentElement.clientWidth, h = window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
   }
   window.addEventListener('resize', resizeBG); resizeBG();
 
-  const particleCount = window.matchMedia("(max-width: 768px)").matches ? 1500 : 4000;
+  // Draw sparse tech particles for background
+  const particleCount = window.matchMedia("(max-width: 768px)").matches ? 500 : 1500;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
   const colors = new Float32Array(particleCount * 3);
@@ -1204,7 +1194,7 @@ const io = new IntersectionObserver((entries) => {
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-  const material = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+  const material = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
   const particleSystem = new THREE.Points(geometry, material); scene.add(particleSystem);
 
   let mouseX = 0, mouseY = 0;
@@ -1213,7 +1203,7 @@ const io = new IntersectionObserver((entries) => {
 
   if(!window.matchMedia("(max-width: 768px)").matches) {
     window.addEventListener('mousemove', (e) => { 
-      mouseX = (e.clientX - window.innerWidth/2) * 0.05; 
+      mouseX = (e.clientX - document.documentElement.clientWidth/2) * 0.05; 
       mouseY = (e.clientY - window.innerHeight/2) * 0.05; 
     });
   }
@@ -1359,7 +1349,7 @@ function create3DCheckmark() {
   key.position.set(-2.5, 1.2, 0.5); key.rotation.set(0.3, 0.5, 0.1); rig.add(key);
 
   let t = 0; let mX = 0, mY = 0;
-  window.addEventListener('mousemove', (e) => { mX = (e.clientX/window.innerWidth - 0.5); mY = (e.clientY/window.innerHeight - 0.5); });
+  window.addEventListener('mousemove', (e) => { mX = (e.clientX/document.documentElement.clientWidth - 0.5); mY = (e.clientY/window.innerHeight - 0.5); });
 
   function animate(){
     t += 0.035; 
@@ -1543,3 +1533,4 @@ function create3DCheckmark() {
 </script>
 </body>
 </html>
+```eof
