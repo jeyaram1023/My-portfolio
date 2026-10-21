@@ -10,7 +10,7 @@
     <link rel="canonical" href="https://jeyaram1023.github.io/My-portfolio/" />
     
     <meta name="description" content="Portfolio of Jeyaram Reddy - R&D-focused Electronics and Communication Engineer specializing in Embedded Security, Robotics (ROS 2), BMS, and AI/ML. Patent holder for WireLock.">
-    <meta name="keywords" content="Jeyaram Reddy, Jeyaram B, Hardware Security, WireLock, BMS, Battery Management System, ROS 2, Embedded Systems, IoT, R&D Engineer, ECE, AI/ML, Fusion 360, PCB Design, Andhra Pradesh, India, Relay Attack Prevention, EV Key Security, Zero-RF Authentication, Hardware Cryptography, Deep Tech, Licensing, B2B Automotive Security, Anti-Theft Car Key, Dual-Microcontroller, Patent Pending">
+    <meta name="keywords" content="Jeyaram Reddy, b jeyaram,B Jeyaram, Jeyaram B, jeyaram, jeyaram b, Hardware Security, WireLock, BMS, Battery Management System, ROS 2, Embedded Systems, IoT, R&D Engineer, ECE, AI/ML, Fusion 360, PCB Design, Andhra Pradesh, India, Relay Attack Prevention, EV Key Security, Zero-RF Authentication, Hardware Cryptography, Deep Tech, Licensing, B2B Automotive Security, Anti-Theft Car Key, Dual-Microcontroller, Patent Pending, jayaram, best ece student, ece studrnt, ramu, ramu ece, ">
     <meta name="author" content="Jeyaram Reddy">
 
     <!-- Open Graph / Social Media Meta Tags -->
@@ -30,7 +30,7 @@
     <meta name="twitter:description" content="Explore the projects and R&D skills of Jeyaram Reddy, specializing in Hardware Security, WireLock, and Robotics.">
     <meta name="twitter:image" content="https://i.ibb.co/3YpHJNty/IMG-20250715-070952.jpg">
 
-    <title>Jeyaram Reddy | ECE R&D Portfolio</title>
+    <title>Jeyaram Reddy | 3D ECE R&D Portfolio</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -43,6 +43,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+    <!-- 3D Libraries: Three.js & Vanilla-Tilt.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -57,17 +61,21 @@
                         mono: ['Roboto Mono', 'monospace'],
                     },
                     animation: {
-                        'spin-slow': 'spin 12s linear infinite',
+                        'spin-slow': 'spin 16s linear infinite',
+                        'spin-reverse': 'spin-rev 14s linear infinite',
                         'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite',
+                        'float': 'float 5s ease-in-out infinite',
                         'scan': 'scan 3s ease-in-out infinite',
                         'breathe': 'breathe 4s ease-in-out infinite',
-                        'construct': 'construct 0.8s cubic-bezier(0.17, 0.55, 0.55, 1) forwards',
                     },
                     keyframes: {
+                        'spin-rev': {
+                            '0%': { transform: 'rotate(360deg)' },
+                            '100%': { transform: 'rotate(0deg)' },
+                        },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-15px)' },
+                            '50%': { transform: 'translateY(-12px)' },
                         },
                         scan: {
                             '0%': { top: '-5%', opacity: '0' },
@@ -77,7 +85,7 @@
                         },
                         breathe: {
                             '0%, 100%': { boxShadow: '0 0 10px rgba(0, 243, 255, 0.2)', transform: 'scale(1)' },
-                            '50%': { boxShadow: '0 0 25px rgba(0, 243, 255, 0.5)', transform: 'scale(1.01)' },
+                            '50%': { boxShadow: '0 0 25px rgba(0, 243, 255, 0.6)', transform: 'scale(1.02)' },
                         },
                     }
                 }
@@ -89,67 +97,154 @@
         :root {
             --primary: #00f3ff;
             --secondary: #39ff14;
-            --bg-dark: #050505;
-            --glass: rgba(10, 20, 30, 0.75);
-            --glass-border: rgba(0, 243, 255, 0.2);
+            --purple: #bc13fe;
+            --bg-dark: #030508;
+            --glass: rgba(10, 18, 28, 0.78);
+            --glass-border: rgba(0, 243, 255, 0.25);
         }
 
+        /* IMPORTANT: No perspective on body so fixed cursor works across the entire page */
         body {
             background-color: var(--bg-dark);
             color: #e0e0e0;
             overflow-x: hidden;
             scroll-behavior: smooth;
-            background-image: radial-gradient(circle at 50% 50%, #0a1520 0%, #000000 100%);
+            background-image: radial-gradient(circle at 50% 50%, #07121e 0%, #020305 100%);
+        }
+
+        /* =========================================
+           1. ULTRA-SMOOTH SCI-FI CURSOR
+           ========================================= */
+        @media (pointer: fine) {
+            body, a, button, input, textarea, .glass-panel, .char-3d {
+                cursor: none !important;
+            }
+            #cursor-dot {
+                position: fixed;
+                top: 0; left: 0;
+                width: 8px; height: 8px;
+                background-color: var(--secondary);
+                border-radius: 50%;
+                z-index: 999999;
+                pointer-events: none;
+                box-shadow: 0 0 12px var(--secondary), 0 0 24px var(--secondary);
+                will-change: transform;
+            }
+            #cursor-outline {
+                position: fixed;
+                top: 0; left: 0;
+                width: 36px; height: 36px;
+                border: 1.5px solid var(--primary);
+                border-radius: 50%;
+                z-index: 999998;
+                pointer-events: none;
+                box-shadow: 0 0 15px rgba(0, 243, 255, 0.35);
+                transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+                will-change: transform;
+            }
+            #cursor-outline::before, #cursor-outline::after {
+                content: '';
+                position: absolute;
+                background: var(--primary);
+            }
+            #cursor-outline::before { top: 50%; left: -6px; right: -6px; height: 1px; transform: translateY(-50%); opacity: 0.6; }
+            #cursor-outline::after { left: 50%; top: -6px; bottom: -6px; width: 1px; transform: translateX(-50%); opacity: 0.6; }
+            
+            #cursor-outline.cursor-hover {
+                width: 52px;
+                height: 52px;
+                border-color: var(--secondary);
+                background-color: rgba(57, 255, 20, 0.1);
+                box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            }
+        }
+        @media (pointer: coarse) {
+            #cursor-dot, #cursor-outline { display: none !important; }
+        }
+
+        /* =========================================
+           2. HERO 3D KINETIC EXTRUDED LETTERS
+           ========================================= */
+        .hero-stage {
+            perspective: 1200px;
+        }
+        .hero-cockpit {
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+        .char-3d {
+            display: inline-block;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: #ffffff;
+            transform-style: preserve-3d;
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.15s ease, text-shadow 0.15s ease;
+            will-change: transform;
+            text-shadow: 
+                0 1px 0 #00b8c4,
+                0 2px 0 #009ca6,
+                0 3px 0 #007d85,
+                0 4px 0 #005f66,
+                0 5px 0 #004045,
+                0 6px 0 #002629,
+                0 12px 25px rgba(0, 243, 255, 0.45);
+        }
+        .char-3d.sub-name {
+            color: #94a3b8;
+            text-shadow: 
+                0 1px 0 #475569,
+                0 2px 0 #334155,
+                0 3px 0 #1e293b,
+                0 4px 0 #0f172a,
+                0 10px 20px rgba(0, 0, 0, 0.8);
+        }
+        .char-3d.active-pop {
+            color: var(--secondary) !important;
+            text-shadow: 
+                0 1px 0 #28b80e,
+                0 2px 0 #20940b,
+                0 3px 0 #197308,
+                0 4px 0 #114f05,
+                0 5px 0 #0a2e03,
+                0 0 30px rgba(57, 255, 20, 0.9),
+                0 20px 35px rgba(0, 243, 255, 0.6) !important;
+        }
+
+        /* =========================================
+           3. RESTORED PREVIOUS GLASS-PANEL & GRADIENTS
+           ========================================= */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.08);
+        }
+
+        /* 3D Depth Helper Classes */
+        .tilt-card {
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .tilt-content {
+            transform: translateZ(25px);
+        }
+        .tilt-badge {
+            transform: translateZ(35px);
         }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #020202; }
-        ::-webkit-scrollbar-thumb { background: #22d3ee; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #39ff14; }
-
-        /* Glitch Effect */
-        .glitch-wrapper { position: relative; }
-        .glitch { position: relative; color: white; z-index: 1; }
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark);
-        }
-        .glitch::before {
-            left: 2px; text-shadow: -1px 0 var(--secondary);
-            clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
-        }
-        .glitch::after {
-            left: -2px; text-shadow: -1px 0 var(--primary);
-            clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
-        }
-        @keyframes glitch-anim-1 {
-            0% { clip: rect(20px, 9999px, 15px, 0); }
-            100% { clip: rect(90px, 9999px, 5px, 0); }
-        }
-        @keyframes glitch-anim-2 {
-            0% { clip: rect(15px, 9999px, 80px, 0); }
-            100% { clip: rect(60px, 9999px, 40px, 0); }
-        }
-
-        /* Glassmorphism */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .glass-panel:hover {
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
-            border-color: var(--primary);
-            transform: translateY(-5px);
-        }
 
         /* Scanner Animation */
         .scanner-line {
@@ -157,18 +252,17 @@
             background: linear-gradient(to bottom, transparent, var(--primary), transparent);
             opacity: 0.1; pointer-events: none; z-index: 10;
         }
-
         .group:hover .scanner-line { animation: scan 2s ease-in-out infinite; opacity: 0.5; }
 
-        /* Tech Bar */
+        /* Smooth Gradient Tech Bar (Restored from Previous Version) */
         .tech-bar-container {
-            background: rgba(255, 255, 255, 0.05); height: 12px; width: 100%;
+            background: rgba(255, 255, 255, 0.06); height: 12px; width: 100%;
             position: relative; clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%); overflow: hidden;
         }
         .tech-bar-fill {
             height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0%; transition: width 2s cubic-bezier(0.22, 1, 0.36, 1);
-            position: relative; box-shadow: 0 0 15px var(--primary);
+            width: 0%; transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative; box-shadow: 0 0 12px var(--primary);
         }
 
         /* Nav Link */
@@ -179,15 +273,15 @@
         }
         .nav-link:hover::after { width: 100%; }
 
-        /* Scroll Reveal Class */
+        /* Smooth Scroll Reveal */
         .reveal-on-scroll {
-            opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+            opacity: 0; transform: translateY(35px); transition: opacity 0.7s ease-out, transform 0.7s ease-out;
         }
         .reveal-on-scroll.visible { opacity: 1; transform: translateY(0); }
 
         .bg-grid-pattern {
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-image: linear-gradient(to right, rgba(0, 243, 255, 0.04) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 243, 255, 0.04) 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
@@ -196,12 +290,19 @@
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-black">
 
-<!-- Living Neural Network Background -->
-<canvas id="neural-canvas" class="fixed top-0 left-0 w-full h-full z-[-1]"></canvas>
+<!-- Sci-Fi Custom Cursor -->
+<div id="cursor-dot"></div>
+<div id="cursor-outline"></div>
 
-<!-- Navbar -->
+<!-- LAYER 1: 3D Quantum Gyroscope Core Background (Three.js) -->
+<canvas id="webgl-canvas" class="fixed top-0 left-0 w-full h-full z-[-2] pointer-events-none"></canvas>
+
+<!-- LAYER 2: High-Speed 2D Magnetic Neural Particles (More Dots & Faster!) -->
+<canvas id="neural-canvas" class="fixed top-0 left-0 w-full h-full z-[-1] pointer-events-none"></canvas>
+
+<!-- Navbar (Restored Glass-Panel Style) -->
 <nav class="fixed top-0 w-full z-50 transition-all duration-300" id="navbar">
-    <div class="glass-panel mx-2 mt-2 md:mx-6 md:mt-4 rounded-xl px-4 py-3 border-b-2 border-transparent hover:border-cyan-500/30">
+    <div class="glass-panel mx-2 mt-2 md:mx-6 md:mt-4 rounded-xl px-4 py-3 border-b-2 border-transparent hover:border-cyan-500/40">
         <div class="container mx-auto flex justify-between items-center">
             <a class="flex items-center gap-3 group" href="#home">
                 <div class="relative w-10 h-10 md:w-12 md:h-12">
@@ -211,7 +312,7 @@
                 </div>
                 <div class="flex flex-col">
                     <span class="font-orbitron font-bold text-lg md:text-xl text-cyan-400 tracking-wider group-hover:text-green-400 transition-colors">JR<span class="text-xs align-top opacity-70">.EXE</span></span>
-                    <span class="text-[8px] font-mono text-gray-400 tracking-[0.2em] group-hover:text-cyan-300">SYSTEM ONLINE</span>
+                    <span class="text-[8px] font-mono text-gray-400 tracking-[0.2em] group-hover:text-cyan-300">QUANTUM 3D ONLINE</span>
                 </div>
             </a>
 
@@ -220,7 +321,7 @@
                 <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest" href="#home">/HOME</a>
                 <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest" href="#about">/ABOUT</a>
                 <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest" href="#skills">/SKILLS</a>
-                <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest" href="#projects">/PROJECTS</a>
+                <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest text-yellow-400" href="#projects">/PROJECTS</a>
                 <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest text-purple-400" href="#achievements">/ACHVS</a>
                 <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest text-yellow-400" href="#certificates">/CERTS</a>
                 <a class="nav-link font-mono text-[10px] lg:text-xs hover:text-cyan-400 transition-colors tracking-widest" href="#experience">/EXP</a>
@@ -252,35 +353,80 @@
     </div>
 </nav>
 
-<!-- Hero Section -->
-<header id="home" class="min-h-screen flex flex-col justify-center items-center relative px-4 pt-32 overflow-hidden">
-    <div class="text-center z-10 max-w-4xl mx-auto w-full">
-        <div class="mb-6 inline-flex items-center gap-2 px-4 py-1.5 border border-cyan-500/30 rounded-full bg-cyan-900/10 backdrop-blur-sm animate-breathe">
-            <span class="relative flex h-2 w-2">
+<!-- =========================================================================
+     HERO SECTION (Current 3D Kinetic Pop-out Text & HUD Style Kept!)
+     ========================================================================= -->
+<header id="home" class="hero-stage min-h-screen flex flex-col justify-center items-center relative px-4 pt-32 pb-16 overflow-hidden">
+    
+    <!-- 3D Rotating Holographic HUD Rings Behind Text -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+        <div class="w-[300px] h-[300px] md:w-[560px] md:h-[560px] rounded-full border border-cyan-500/20 border-dashed animate-spin-slow"></div>
+        <div class="absolute w-[240px] h-[240px] md:w-[440px] md:h-[440px] rounded-full border-2 border-green-500/15 border-dotted animate-spin-reverse"></div>
+        <div class="absolute w-[340px] h-[340px] md:w-[660px] md:h-[660px] rounded-full border border-purple-500/10"></div>
+    </div>
+
+    <!-- Floating 3D Telemetry Pods (Desktop) -->
+    <div class="hidden xl:flex flex-col gap-3 absolute left-10 top-1/3 z-20 animate-float pointer-events-none">
+        <div class="glass-panel rounded-lg px-4 py-3 border-l-4 border-cyan-400">
+            <div class="text-[9px] font-mono text-gray-400">SYS_MODULE // 01</div>
+            <div class="text-xs font-orbitron font-bold text-cyan-400 flex items-center gap-2 mt-0.5">
+                <i class="fas fa-shield-halved animate-pulse"></i> ZERO-RF CRYPTO
+            </div>
+        </div>
+        <div class="glass-panel rounded-lg px-4 py-3 border-l-4 border-purple-400 ml-6">
+            <div class="text-[9px] font-mono text-gray-400">PATENT_ID // IN</div>
+            <div class="text-xs font-orbitron font-bold text-purple-400 mt-0.5">202641101016</div>
+        </div>
+    </div>
+
+    <div class="hidden xl:flex flex-col gap-3 absolute right-10 top-1/3 z-20 animate-float pointer-events-none" style="animation-delay: 1.5s;">
+        <div class="glass-panel rounded-lg px-4 py-3 border-r-4 border-green-400 text-right">
+            <div class="text-[9px] font-mono text-gray-400">ROBOTICS_CORE // 02</div>
+            <div class="text-xs font-orbitron font-bold text-green-400 flex items-center justify-end gap-2 mt-0.5">
+                ROS 2 & EDGE AI <i class="fas fa-robot animate-bounce"></i>
+            </div>
+        </div>
+        <div class="glass-panel rounded-lg px-4 py-3 border-r-4 border-yellow-400 mr-6 text-right">
+            <div class="text-[9px] font-mono text-gray-400">HARDWARE // FAB</div>
+            <div class="text-xs font-orbitron font-bold text-yellow-400 mt-0.5">BMS & CUSTOM PCB</div>
+        </div>
+    </div>
+
+    <!-- Center 3D Interactive Cockpit -->
+    <div class="hero-cockpit text-center z-10 max-w-5xl mx-auto w-full" id="hero-cockpit">
+        
+        <!-- Top Status Pill -->
+        <div class="mb-6 inline-flex items-center gap-3 px-5 py-2 border border-cyan-500/50 rounded-full bg-cyan-950/60 backdrop-blur-md animate-breathe shadow-[0_0_25px_rgba(0,243,255,0.3)]" style="transform: translateZ(35px);">
+            <span class="relative flex h-2.5 w-2.5">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
             </span>
-            <span class="text-cyan-300 font-mono text-[10px] md:text-xs tracking-widest">SYSTEM ONLINE // R&D MODE</span>
+            <span class="text-cyan-300 font-mono text-[10px] md:text-xs tracking-[0.25em] font-bold">INTERACTIVE 3D CORE // HOVER TEXT</span>
         </div>
 
-        <h1 class="glitch-wrapper mb-4 md:mb-6">
-            <span class="glitch font-orbitron font-black text-5xl md:text-7xl lg:text-9xl tracking-tighter block" data-text="JEYARAM">JEYARAM</span>
-            <span class="glitch font-orbitron font-bold text-4xl md:text-6xl lg:text-8xl tracking-tighter text-gray-600 block opacity-50" data-text="REDDY">REDDY</span>
-        </h1>
-
-        <div class="h-16 md:h-20 flex justify-center items-center">
-            <p id="typewriter" class="text-cyan-400 font-mono text-sm md:text-xl lg:text-2xl border-r-2 border-green-400 pr-1 animate-pulse max-w-2xl"></p>
+        <!-- 3D KINETIC EXTRUDED NAME (Letters pop out toward mouse!) -->
+        <div class="my-4 md:my-6 select-none" style="transform: translateZ(60px);">
+            <div id="kinetic-title-1" class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight leading-none mb-2 flex justify-center flex-wrap gap-1 md:gap-2" data-text="JEYARAM"></div>
+            <div id="kinetic-title-2" class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-widest leading-none flex justify-center flex-wrap gap-1 md:gap-2" data-text="REDDY"></div>
         </div>
 
-        <!-- Primary Action Buttons -->
-        <div class="flex flex-wrap justify-center gap-6 mt-8 md:mt-10 reveal-on-scroll">
-            <a href="jeyaram_all_resume_ats.pdf" download class="group relative px-8 py-3 font-bold text-white transition-all duration-300 ease-out bg-transparent border border-cyan-400/50 rounded-sm hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+        <!-- 3D Terminal Box for Typewriter -->
+        <div class="h-16 md:h-20 flex justify-center items-center my-4" style="transform: translateZ(45px);">
+            <div class="glass-panel rounded-lg px-6 py-2.5 border border-cyan-500/40 flex items-center gap-3">
+                <span class="text-green-400 font-mono text-sm md:text-xl font-bold">&gt;_</span>
+                <p id="typewriter" class="text-cyan-400 font-mono text-xs sm:text-base md:text-xl lg:text-2xl border-r-2 border-green-400 pr-1 animate-pulse"></p>
+            </div>
+        </div>
+
+        <!-- Primary Action Buttons (Corner bracket style) -->
+        <div class="flex flex-wrap justify-center gap-6 mt-8 reveal-on-scroll" style="transform: translateZ(50px);">
+            <a href="jeyaram_all_resume_ats.pdf" download class="tilt-card group relative px-8 py-3 font-bold text-white transition-all duration-300 ease-out bg-black/60 border border-cyan-400/50 rounded-sm hover:border-cyan-400 hover:shadow-[0_0_25px_rgba(34,211,238,0.5)]">
                 <span class="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400 -mt-1 -ml-1 transition-all duration-300 group-hover:w-full group-hover:h-full"></span>
                 <span class="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-cyan-400 -mb-1 -mr-1 transition-all duration-300 group-hover:w-full group-hover:h-full"></span>
                 <span class="relative font-orbitron tracking-widest text-sm group-hover:text-cyan-300 flex items-center gap-2"><i class="fas fa-download"></i> DOWNLOAD CV</span>
             </a>
 
-            <a href="#projects" class="group relative px-8 py-3 font-bold text-white transition-all duration-300 ease-out bg-transparent border border-green-400/50 rounded-sm hover:border-green-400 hover:shadow-[0_0_20px_rgba(57,255,20,0.4)]">
+            <a href="#projects" class="tilt-card group relative px-8 py-3 font-bold text-white transition-all duration-300 ease-out bg-black/60 border border-green-400/50 rounded-sm hover:border-green-400 hover:shadow-[0_0_25px_rgba(57,255,20,0.5)]">
                 <span class="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-green-400 -mt-1 -mr-1 transition-all duration-300 group-hover:w-full group-hover:h-full"></span>
                 <span class="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-green-400 -mb-1 -ml-1 transition-all duration-300 group-hover:w-full group-hover:h-full"></span>
                 <span class="relative font-orbitron tracking-widest text-sm group-hover:text-green-300 flex items-center gap-2"><i class="fas fa-microchip"></i> VIEW R&D</span>
@@ -288,13 +434,13 @@
         </div>
 
         <!-- Creative Highlight Buttons -->
-        <div class="flex flex-wrap justify-center gap-6 mt-12 reveal-on-scroll" style="transition-delay: 200ms;">
+        <div class="flex flex-wrap justify-center gap-6 mt-10 reveal-on-scroll" style="transform: translateZ(40px);">
             <!-- 3D Holographic Patent Button -->
-            <a href="#achievements" class="group relative inline-flex items-center justify-center p-[2px] rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(188,19,254,0.4)]">
+            <a href="#achievements" class="tilt-card group relative inline-flex items-center justify-center p-[2px] rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_35px_rgba(188,19,254,0.4)]">
                 <div class="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0_300deg,#bc13fe_360deg)] animate-[spin_3s_linear_infinite]"></div>
                 <div class="absolute inset-0 bg-[conic-gradient(from_180deg,transparent_0_300deg,#bc13fe_360deg)] animate-[spin_3s_linear_infinite]"></div>
 
-                <div class="relative flex items-center gap-4 px-6 py-3 bg-black/90 backdrop-blur-xl rounded-[10px] w-full h-full border border-purple-500/20 group-hover:bg-purple-900/40 transition-colors duration-500 overflow-hidden">
+                <div class="relative flex items-center gap-4 px-6 py-3 bg-black/90 rounded-[10px] w-full h-full border border-purple-500/20 group-hover:bg-purple-950/50 transition-colors duration-500 overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-[2px] bg-purple-400/50 shadow-[0_0_10px_#bc13fe] animate-[scan_2s_ease-in-out_infinite]"></div>
                     <div class="relative flex items-center justify-center w-10 h-10 bg-purple-500/10 rounded-lg border border-purple-500/30 group-hover:rotate-12 transition-transform duration-300">
                         <i class="fas fa-shield-alt text-purple-400 text-lg group-hover:animate-pulse"></i>
@@ -312,11 +458,11 @@
             </a>
 
             <!-- 3D Holographic IEEE Button -->
-            <a href="#achievements" class="group relative inline-flex items-center justify-center p-[2px] rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(0,243,255,0.4)]">
+            <a href="#achievements" class="tilt-card group relative inline-flex items-center justify-center p-[2px] rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_35px_rgba(0,243,255,0.4)]">
                 <div class="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0_300deg,#00f3ff_360deg)] animate-[spin_3s_linear_infinite_reverse]"></div>
                 <div class="absolute inset-0 bg-[conic-gradient(from_180deg,transparent_0_300deg,#00f3ff_360deg)] animate-[spin_3s_linear_infinite_reverse]"></div>
 
-                <div class="relative flex items-center gap-4 px-6 py-3 bg-black/90 backdrop-blur-xl rounded-[10px] w-full h-full border border-cyan-400/20 group-hover:bg-cyan-900/40 transition-colors duration-500 overflow-hidden">
+                <div class="relative flex items-center gap-4 px-6 py-3 bg-black/90 rounded-[10px] w-full h-full border border-cyan-400/20 group-hover:bg-cyan-950/50 transition-colors duration-500 overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-[2px] bg-cyan-400/50 shadow-[0_0_10px_#00f3ff] animate-[scan_2s_ease-in-out_infinite]" style="animation-delay: 1s;"></div>
                     <div class="relative flex items-center justify-center w-10 h-10 bg-cyan-500/10 rounded-lg border border-cyan-400/30 group-hover:-rotate-12 transition-transform duration-300">
                         <i class="fas fa-book-open text-cyan-400 text-lg group-hover:animate-pulse"></i>
@@ -335,55 +481,56 @@
         </div>
 
         <!-- Social Icons Floating -->
-        <div class="mt-14 md:mt-20 flex flex-wrap justify-center gap-6 md:gap-10">
+        <div class="mt-12 md:mt-16 flex flex-wrap justify-center gap-6 md:gap-10" style="transform: translateZ(30px);">
             <a href="https://github.com/jeyaram1023" target="_blank" class="flex flex-col items-center gap-2 group animate-float" style="animation-delay: 0s;">
-                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/40 flex items-center justify-center text-gray-400 group-hover:text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-[0_0_15px_var(--primary)] transition-all duration-500 backdrop-blur-sm">
+                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/60 flex items-center justify-center text-gray-400 group-hover:text-cyan-400 group-hover:border-cyan-400 group-hover:shadow-[0_0_15px_var(--primary)] transition-all duration-300">
                     <i class="fab fa-github text-xl"></i>
                 </div>
-                <span class="text-[9px] font-orbitron text-gray-600 group-hover:text-cyan-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">GITHUB</span>
+                <span class="text-[9px] font-orbitron text-gray-500 group-hover:text-cyan-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">GITHUB</span>
             </a>
             <a href="https://linkedin.com/in/jeyaram-ece-reddy" target="_blank" class="flex flex-col items-center gap-2 group animate-float" style="animation-delay: 0.5s;">
-                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/40 flex items-center justify-center text-gray-400 group-hover:text-blue-400 group-hover:border-blue-400 group-hover:shadow-[0_0_15px_#3b82f6] transition-all duration-500 backdrop-blur-sm">
+                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/60 flex items-center justify-center text-gray-400 group-hover:text-blue-400 group-hover:border-blue-400 group-hover:shadow-[0_0_15px_#3b82f6] transition-all duration-300">
                     <i class="fab fa-linkedin-in text-xl"></i>
                 </div>
-                <span class="text-[9px] font-orbitron text-gray-600 group-hover:text-blue-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">LINKEDIN</span>
+                <span class="text-[9px] font-orbitron text-gray-500 group-hover:text-blue-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">LINKEDIN</span>
             </a>
             <a href="mailto:jeyaram.reddy.ece@gmail.com" class="flex flex-col items-center gap-2 group animate-float" style="animation-delay: 1s;">
-                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/40 flex items-center justify-center text-gray-400 group-hover:text-green-400 group-hover:border-green-400 group-hover:shadow-[0_0_15px_var(--secondary)] transition-all duration-500 backdrop-blur-sm">
+                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/60 flex items-center justify-center text-gray-400 group-hover:text-green-400 group-hover:border-green-400 group-hover:shadow-[0_0_15px_var(--secondary)] transition-all duration-300">
                     <i class="fas fa-envelope text-xl"></i>
                 </div>
-                <span class="text-[9px] font-orbitron text-gray-600 group-hover:text-green-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">EMAIL</span>
+                <span class="text-[9px] font-orbitron text-gray-500 group-hover:text-green-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">EMAIL</span>
             </a>
-            <a href="https://jeyaramb.blogspot.com" class="flex flex-col items-center gap-2 group animate-float" style="animation-delay: 1.5s;">
-                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/40 flex items-center justify-center text-gray-400 group-hover:text-orange-400 group-hover:border-orange-400 group-hover:shadow-[0_0_15px_orange] transition-all duration-500 backdrop-blur-sm">
+            <a href="https://jeyaramb.blogspot.com" target="_blank" class="flex flex-col items-center gap-2 group animate-float" style="animation-delay: 1.5s;">
+                <div class="w-12 h-12 rounded-full border border-gray-700 bg-black/60 flex items-center justify-center text-gray-400 group-hover:text-orange-400 group-hover:border-orange-400 group-hover:shadow-[0_0_15px_orange] transition-all duration-300">
                     <i class="fab fa-blogger-b text-xl"></i>
                 </div>
-                <span class="text-[9px] font-orbitron text-gray-600 group-hover:text-orange-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">BLOGGER</span>
+                <span class="text-[9px] font-orbitron text-gray-500 group-hover:text-orange-400 tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">BLOGGER</span>
             </a>
         </div>
     </div>
 </header>
 
+<!-- =========================================================================
+     REST OF THE WEBSITE (Restored Previous Layout & Color Gradients!)
+     ========================================================================= -->
 <main class="container mx-auto px-4 md:px-8 max-w-7xl">
 
     <!-- About Section -->
     <section id="about" class="py-20 md:py-32 relative reveal-on-scroll">
-        <div class="absolute -left-40 top-40 w-80 h-80 bg-cyan-500/10 rounded-full mix-blend-screen filter blur-[100px] animate-pulse"></div>
-
-        <div class="glass-panel p-8 md:p-12 rounded-2xl border-l-4 border-cyan-400 relative overflow-hidden group">
+        <div class="glass-panel tilt-card p-8 md:p-12 rounded-2xl border-l-4 border-cyan-400 relative overflow-hidden group">
             <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-20 transition-opacity duration-700">
                 <i class="fas fa-microchip text-[10rem] transform rotate-12"></i>
             </div>
 
-            <h2 class="text-3xl md:text-5xl font-orbitron font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-green-400">
+            <h2 class="text-3xl md:text-5xl font-orbitron font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-green-400 tilt-content">
                 <span class="text-sm font-mono text-gray-500 block mb-2 tracking-widest">// 01. IDENTITY</span>
                 WHO AM I?
             </h2>
 
             <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="font-mono text-gray-300 space-y-6 leading-relaxed relative z-10">
+                <div class="font-mono text-gray-300 space-y-6 leading-relaxed relative z-10 tilt-content">
                     <p>
-                        I am an <strong class="text-cyan-400 relative inline-block group/text cursor-help">R&D-focused Electronics and Communication Engineer<span class="absolute bottom-0 left-0 w-full h-[1px] bg-cyan-400 transform scale-x-0 group-hover/text:scale-x-100 transition-transform"></span></strong> driven by the challenge of bridging the physical and digital worlds. I don't just write code; I transform complex engineering problems into robust, scalable hardware prototypes.
+                        I am an <strong class="text-cyan-400 relative inline-block group/text">R&D-focused Electronics and Communication Engineer<span class="absolute bottom-0 left-0 w-full h-[1px] bg-cyan-400 transform scale-x-0 group-hover/text:scale-x-100 transition-transform"></span></strong> driven by the challenge of bridging the physical and digital worlds. I don't just write code; I transform complex engineering problems into robust, scalable hardware prototypes.
                     </p>
                     <p>
                         My core expertise lies at the intersection of <strong class="text-green-400">Embedded Security, Battery Management Systems (BMS), and Robotics (ROS 2)</strong>. I thrive in end-to-end R&D environments, taking concepts from 3D design in Fusion 360 and Blender, through custom PCB fabrication, all the way to software and AI integration.
@@ -407,22 +554,23 @@
                         <div>
                             <h3 class="font-orbitron text-xs font-bold mb-4 text-gray-400 border-b border-gray-700 pb-2 inline-block tracking-widest">LANGUAGES</h3>
                             <div class="flex flex-wrap gap-2">
-                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors cursor-default">ENGLISH</span>
-                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors cursor-default">TAMIL</span>
-                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors cursor-default">TELUGU</span>
-                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors cursor-default">HINDI</span>
+                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors">ENGLISH</span>
+                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors">TAMIL</span>
+                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors">TELUGU</span>
+                                <span class="px-3 py-1 bg-gray-800/50 border border-gray-600 rounded-sm text-[10px] text-cyan-300 font-mono hover:bg-cyan-900/30 hover:border-cyan-400 transition-colors">HINDI</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="relative group/image">
-                    <div class="relative z-10 w-full h-80 rounded-lg overflow-hidden border-2 border-gray-700 group-hover/image:border-cyan-400 transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80" alt="Hardware Engineering" class="w-full h-full object-cover filter grayscale group-hover/image:grayscale-0 transition-all duration-700 transform group-hover/image:scale-105">
+                <!-- 3D Interactive Image Frame -->
+                <div class="relative group/image tilt-card">
+                    <div class="relative z-10 w-full h-90 rounded-lg overflow-hidden border-2 border-gray-700 group-hover/image:border-cyan-400 transition-colors duration-500 shadow-[0_0_25px_rgba(0,0,0,0.6)] tilt-content">
+                        <img src="https://i.ibb.co/C5rHsjNC/pic-jeyaram.jpg" alt="Hardware Engineering" class="w-full h-full object-cover filter grayscale group-hover/image:grayscale-0 transition-all duration-700 transform group-hover/image:scale-105">
                         <div class="absolute inset-0 bg-cyan-500 mix-blend-overlay opacity-20"></div>
                         <div class="scanner-line"></div>
-                        <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300"></div>
-                        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyan-400 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-cyan-400 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-cyan-400 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div class="absolute -bottom-4 -right-4 w-full h-full border border-green-400/30 rounded-lg z-0 transition-transform duration-500 group-hover/image:translate-x-2 group-hover/image:translate-y-2"></div>
                 </div>
@@ -439,143 +587,139 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Software / AI -->
-            <div class="glass-panel p-6 rounded-xl border-t-2 border-green-400 hover:transform hover:-translate-y-2 transition-all duration-300 group">
-                <div class="absolute inset-0 bg-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="flex items-center gap-4 mb-6 relative z-10">
+            <div class="glass-panel tilt-card p-6 rounded-xl border-t-2 border-green-400 transition-all duration-300 group">
+                <div class="flex items-center gap-4 mb-6 relative z-10 tilt-content">
                     <div class="w-12 h-12 bg-green-900/30 rounded-lg flex items-center justify-center text-green-400 text-2xl border border-green-500/30 shadow-[0_0_10px_rgba(57,255,20,0.2)]">
                         <i class="fas fa-code-branch"></i>
                     </div>
                     <h3 class="font-orbitron text-xl">SOFTWARE & AI</h3>
                 </div>
-                <div class="space-y-5 relative z-10">
-                    <div class="group/bar">
+                <div class="space-y-5 relative z-10 tilt-content">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>PYTHON & AUTOMATION (n8n)</span>
                             <span class="text-green-400 font-bold">90%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill group-hover:w-[90%] w-0 transition-all duration-1000 ease-out" style="width: 90%"></div>
+                            <div class="tech-bar-fill" style="width: 90%"></div>
                         </div>
                     </div>
-                    <div class="group/bar">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>C/C++ (Embedded)</span>
                             <span class="text-green-400 font-bold">85%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill group-hover:w-[85%] w-0 transition-all duration-1000 ease-out delay-100" style="width: 85%"></div>
+                            <div class="tech-bar-fill" style="width: 85%"></div>
                         </div>
                     </div>
-                    <div class="group/bar">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>GENERATIVE AI & OPENCV</span>
                             <span class="text-green-400 font-bold">80%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill group-hover:w-[80%] w-0 transition-all duration-1000 ease-out delay-200" style="width: 80%"></div>
+                            <div class="tech-bar-fill" style="width: 80%"></div>
                         </div>
                     </div>
-                    <div class="group/bar">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>ROS 2 (Robotics Middleware)</span>
                             <span class="text-green-400 font-bold">75%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill group-hover:w-[75%] w-0 transition-all duration-1000 ease-out delay-300" style="width: 75%"></div>
+                            <div class="tech-bar-fill" style="width: 75%"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Hardware -->
-            <div class="glass-panel p-6 rounded-xl border-t-2 border-cyan-400 hover:transform hover:-translate-y-2 transition-all duration-300 group">
-                <div class="absolute inset-0 bg-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="flex items-center gap-4 mb-6 relative z-10">
+            <div class="glass-panel tilt-card p-6 rounded-xl border-t-2 border-cyan-400 transition-all duration-300 group">
+                <div class="flex items-center gap-4 mb-6 relative z-10 tilt-content">
                     <div class="w-12 h-12 bg-cyan-900/30 rounded-lg flex items-center justify-center text-cyan-400 text-2xl border border-cyan-500/30 shadow-[0_0_10px_rgba(34,211,238,0.2)]">
                         <i class="fas fa-microchip"></i>
                     </div>
                     <h3 class="font-orbitron text-xl">HARDWARE & EMBEDDED</h3>
                 </div>
-                <div class="space-y-5 relative z-10">
-                    <div class="group/bar">
+                <div class="space-y-5 relative z-10 tilt-content">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>MICROCONTROLLERS (ESP32/Pi)</span>
                             <span class="text-cyan-400 font-bold">95%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500 !shadow-cyan-500 group-hover:w-[95%] w-0 transition-all duration-1000 ease-out" style="width: 95%"></div>
+                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500" style="width: 95%"></div>
                         </div>
                     </div>
-                    <div class="group/bar">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>PCB FABRICATION & DESIGN</span>
                             <span class="text-cyan-400 font-bold">90%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500 !shadow-cyan-500 group-hover:w-[90%] w-0 transition-all duration-1000 ease-out delay-100" style="width: 90%"></div>
+                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500" style="width: 90%"></div>
                         </div>
                     </div>
-                    <div class="group/bar">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>HARDWARE CRYPTO (ASCON/AES)</span>
                             <span class="text-cyan-400 font-bold">85%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500 !shadow-cyan-500 group-hover:w-[85%] w-0 transition-all duration-1000 ease-out delay-200" style="width: 85%"></div>
+                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500" style="width: 85%"></div>
                         </div>
                     </div>
-                    <div class="group/bar">
+                    <div>
                         <div class="flex justify-between font-mono text-xs mb-1">
                             <span>BATTERY MGMT SYSTEMS (BMS)</span>
                             <span class="text-cyan-400 font-bold">80%</span>
                         </div>
                         <div class="tech-bar-container">
-                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500 !shadow-cyan-500 group-hover:w-[80%] w-0 transition-all duration-1000 ease-out delay-300" style="width: 80%"></div>
+                            <div class="tech-bar-fill !from-cyan-500 !to-blue-500" style="width: 80%"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Soft Skills -->
-            <div class="glass-panel p-6 rounded-xl border-t-2 border-purple-400 hover:transform hover:-translate-y-2 transition-all duration-300 group">
-                <div class="absolute inset-0 bg-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="flex items-center gap-4 mb-6 relative z-10">
+            <div class="glass-panel tilt-card p-6 rounded-xl border-t-2 border-purple-400 transition-all duration-300 group">
+                <div class="flex items-center gap-4 mb-6 relative z-10 tilt-content">
                     <div class="w-12 h-12 bg-purple-900/30 rounded-lg flex items-center justify-center text-purple-400 text-2xl border border-purple-500/30 shadow-[0_0_10px_rgba(188,19,254,0.2)]">
                         <i class="fas fa-users-cog"></i>
                     </div>
                     <h3 class="font-orbitron text-xl">METHODOLOGIES</h3>
                 </div>
-                <div class="flex flex-wrap gap-2 relative z-10">
-                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors cursor-default">End-to-End R&D</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors cursor-default">Object-Oriented Design</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors cursor-default">Autonomous Path Planning</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors cursor-default">Problem Solving</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors cursor-default">Team Leadership</span>
+                <div class="flex flex-wrap gap-2 relative z-10 tilt-content">
+                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors">End-to-End R&D</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors">Object-Oriented Design</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors">Autonomous Path Planning</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors">Problem Solving</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-purple-500/50 rounded text-purple-300 bg-purple-900/20 hover:bg-purple-500/20 transition-colors">Team Leadership</span>
                 </div>
-                <div class="mt-8 text-center relative z-10">
+                <div class="mt-8 text-center relative z-10 tilt-content">
                     <i class="fas fa-infinity text-4xl text-purple-500/50 group-hover:text-purple-400 transition-colors duration-500 animate-pulse"></i>
                     <p class="font-mono text-xs text-gray-400 mt-2 tracking-widest">ALWAYS EVOLVING</p>
                 </div>
             </div>
 
             <!-- Tools & Design -->
-            <div class="glass-panel p-6 rounded-xl border-t-2 border-orange-400 hover:transform hover:-translate-y-2 transition-all duration-300 group">
-                <div class="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="flex items-center gap-4 mb-6 relative z-10">
+            <div class="glass-panel tilt-card p-6 rounded-xl border-t-2 border-orange-400 transition-all duration-300 group">
+                <div class="flex items-center gap-4 mb-6 relative z-10 tilt-content">
                     <div class="w-12 h-12 bg-orange-900/30 rounded-lg flex items-center justify-center text-orange-400 text-2xl border border-orange-500/30 shadow-[0_0_10px_rgba(251,146,60,0.2)]">
                         <i class="fas fa-cube"></i>
                     </div>
                     <h3 class="font-orbitron text-xl">3D DESIGN & TOOLS</h3>
                 </div>
-                <div class="flex flex-wrap gap-2 relative z-10">
-                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors cursor-default">Fusion 360</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors cursor-default">Blender</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors cursor-default">Git & GitHub</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors cursor-default">n8n Workflows</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors cursor-default">Supabase</span>
-                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors cursor-default">Vertex AI</span>
+                <div class="flex flex-wrap gap-2 relative z-10 tilt-content">
+                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors">Fusion 360</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors">Blender</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors">Git & GitHub</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors">n8n Workflows</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors">Supabase</span>
+                    <span class="px-3 py-1.5 text-xs font-mono border border-orange-500/50 rounded text-orange-300 bg-orange-900/20 hover:bg-orange-500/20 transition-colors">Vertex AI</span>
                 </div>
-                <div class="mt-8 text-center relative z-10">
+                <div class="mt-8 text-center relative z-10 tilt-content">
                     <i class="fas fa-layer-group text-4xl text-orange-500/50 group-hover:text-orange-400 transition-colors duration-500 animate-pulse"></i>
                     <p class="font-mono text-xs text-gray-400 mt-2 tracking-widest">PROTOTYPE TO PROD</p>
                 </div>
@@ -592,21 +736,18 @@
 
         <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <!-- Patent Card -->
-            <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group border border-purple-500/30 hover:border-purple-400 hover:shadow-[0_0_30px_rgba(188,19,254,0.3)] transition-all duration-500 transform hover:-translate-y-2 flex flex-col items-center text-center cursor-default">
-                <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                <div class="w-20 h-20 rounded-full bg-purple-900/30 flex items-center justify-center mb-6 border border-purple-500/50 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(188,19,254,0.2)] relative z-10">
-                    <i class="fas fa-shield-alt text-4xl text-purple-400 group-hover:text-white group-hover:animate-pulse"></i>
+            <div class="glass-panel tilt-card p-8 rounded-2xl relative overflow-hidden group border border-purple-500/30 hover:border-purple-400 hover:shadow-[0_0_30px_rgba(188,19,254,0.3)] transition-all duration-300 flex flex-col items-center text-center">
+                <div class="w-20 h-20 rounded-full bg-purple-900/30 flex items-center justify-center mb-6 border border-purple-500/50 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(188,19,254,0.2)] relative z-10 tilt-badge">
+                    <i class="fas fa-shield-alt text-4xl text-purple-400 group-hover:text-white"></i>
                 </div>
 
-                <!-- Badge -->
-                <span class="absolute top-4 right-4 bg-purple-500/20 border border-purple-500 text-purple-300 text-[10px] font-mono font-bold px-3 py-1 rounded shadow-[0_0_10px_#bc13fe]">INDIAN PATENT</span>
+                <span class="absolute top-4 right-4 bg-purple-500/20 border border-purple-500 text-purple-300 text-[10px] font-mono font-bold px-3 py-1 rounded shadow-[0_0_10px_#bc13fe] tilt-badge">INDIAN PATENT</span>
 
-                <h3 class="font-orbitron text-2xl text-white mb-2 group-hover:text-purple-300 transition-colors relative z-10">WireLock Architecture</h3>
-                <h4 class="text-purple-400 font-mono text-xs mb-4">APP NO: 202641101016</h4>
-                <p class="text-gray-400 font-mono text-sm mb-6 relative z-10 flex-grow">Engineered a $2 Zero-RF automotive security architecture using ASCON/AES physical cryptographic handshakes to eliminate wireless relay theft.</p>
+                <h3 class="font-orbitron text-2xl text-white mb-2 group-hover:text-purple-300 transition-colors relative z-10 tilt-content">WireLock Architecture</h3>
+                <h4 class="text-purple-400 font-mono text-xs mb-4 tilt-content">APP NO: 202641101016</h4>
+                <p class="text-gray-400 font-mono text-sm mb-6 relative z-10 flex-grow tilt-content">Engineered a $2 Zero-RF automotive security architecture using ASCON/AES physical cryptographic handshakes to eliminate wireless relay theft.</p>
 
-                <div class="mt-auto flex flex-col items-center gap-4 relative z-10 w-full">
+                <div class="mt-auto flex flex-col items-center gap-4 relative z-10 w-full tilt-content">
                     <div class="flex gap-2">
                         <span class="text-[10px] bg-purple-900/40 text-purple-300 px-2 py-1 border border-purple-500/30 rounded">Hardware Crypto</span>
                         <span class="text-[10px] bg-purple-900/40 text-purple-300 px-2 py-1 border border-purple-500/30 rounded">Automotive Security</span>
@@ -618,20 +759,17 @@
             </div>
 
             <!-- IEEE Paper Card -->
-            <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group border border-blue-500/30 hover:border-blue-400 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-all duration-500 transform hover:-translate-y-2 flex flex-col items-center text-center cursor-default">
-                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                <div class="w-20 h-20 rounded-full bg-blue-900/30 flex items-center justify-center mb-6 border border-blue-500/50 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] relative z-10">
-                    <i class="fas fa-book text-4xl text-blue-400 group-hover:text-white group-hover:animate-pulse"></i>
+            <div class="glass-panel tilt-card p-8 rounded-2xl relative overflow-hidden group border border-blue-500/30 hover:border-blue-400 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-all duration-300 flex flex-col items-center text-center">
+                <div class="w-20 h-20 rounded-full bg-blue-900/30 flex items-center justify-center mb-6 border border-blue-500/50 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] relative z-10 tilt-badge">
+                    <i class="fas fa-book text-4xl text-blue-400 group-hover:text-white"></i>
                 </div>
 
-                <!-- Badge -->
-                <span class="absolute top-4 right-4 bg-blue-500/20 border border-blue-500 text-blue-300 text-[10px] font-mono font-bold px-3 py-1 rounded shadow-[0_0_10px_#3b82f6]">IEEE</span>
+                <span class="absolute top-4 right-4 bg-blue-500/20 border border-blue-500 text-blue-300 text-[10px] font-mono font-bold px-3 py-1 rounded shadow-[0_0_10px_#3b82f6] tilt-badge">IEEE</span>
 
-                <h3 class="font-orbitron text-2xl text-white mb-4 group-hover:text-blue-300 transition-colors relative z-10">Research Publication</h3>
-                <p class="text-gray-400 font-mono text-sm mb-6 relative z-10 flex-grow">Research paper published in the IEEE database detailing core advancements in biomimetic systems and embedded AI integrations for underwater applications.</p>
+                <h3 class="font-orbitron text-2xl text-white mb-4 group-hover:text-blue-300 transition-colors relative z-10 tilt-content">Research Publication</h3>
+                <p class="text-gray-400 font-mono text-sm mb-6 relative z-10 flex-grow tilt-content">Research paper published in the IEEE database detailing core advancements in biomimetic systems and embedded AI integrations for underwater applications.</p>
 
-                <div class="mt-auto flex flex-col items-center gap-4 relative z-10 w-full">
+                <div class="mt-auto flex flex-col items-center gap-4 relative z-10 w-full tilt-content">
                     <a href="https://jeyaram1023.github.io/My-portfolio/proj/WireLock_PitchDeck_Final.html" target="_blank" class="inline-flex items-center gap-2 text-blue-400 font-bold text-xs tracking-widest px-6 py-2 border border-blue-500/50 rounded-sm hover:bg-blue-500/20 hover:text-blue-300 hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all">
                         VIEW PDF <i class="fas fa-external-link-alt group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -644,21 +782,19 @@
     <section id="projects" class="py-20 reveal-on-scroll">
         <h2 class="text-3xl md:text-5xl font-orbitron font-bold mb-16 text-center">
             <span class="text-sm font-mono text-gray-500 block mb-2 tracking-widest">// 04. CREATIONS</span>
-            <span class="text-white">R&D PROTOTYPES</span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">R&D PROTOTYPES</span>
         </h2>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Project 1 (New Drone Project) -->
-            <div class="glass-panel rounded-xl overflow-hidden group card-3d relative border border-gray-800 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] transition-all duration-300 hover:-translate-y-2">
+            <!-- Project 1 -->
+            <div class="glass-panel tilt-card rounded-xl overflow-hidden group relative border border-gray-800 hover:border-cyan-500/50 transition-all duration-300">
                 <div class="h-48 overflow-hidden relative">
-                    <!-- Placeholder Drone image -->
                     <img src="https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=500&q=80" alt="Drone Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:filter group-hover:brightness-50">
                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <a href="#" class="px-6 py-2 border border-cyan-400 text-cyan-400 font-bold font-orbitron rounded-sm hover:bg-cyan-400 hover:text-black transition-all shadow-[0_0_15px_var(--primary)] transform scale-90 group-hover:scale-100">IN DEVELOPMENT</a>
+                        <a href="#" class="px-6 py-2 border border-cyan-400 text-cyan-400 font-bold font-orbitron rounded-sm hover:bg-cyan-400 hover:text-black transition-all shadow-[0_0_15px_var(--primary)]">IN DEVELOPMENT</a>
                     </div>
                 </div>
-                <div class="p-6 relative">
-                    <div class="absolute top-0 right-0 w-20 h-20 border-t border-r border-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="p-6 relative tilt-content">
                     <h3 class="font-orbitron text-xl text-cyan-400 mb-2 group-hover:text-white transition-colors">SHM Drone Framework</h3>
                     <p class="text-gray-400 text-sm font-mono mb-4 h-20 overflow-hidden line-clamp-4">Currently developing a drone-based structural health monitoring (SHM) system for bridges utilizing ROS 2 and computer vision.</p>
                     <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-800">
@@ -669,16 +805,15 @@
                 </div>
             </div>
 
-            <!-- Project 2 (Aqua Bot) -->
-            <div class="glass-panel rounded-xl overflow-hidden group card-3d relative border border-gray-800 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] transition-all duration-300 hover:-translate-y-2">
+            <!-- Project 2 -->
+            <div class="glass-panel tilt-card rounded-xl overflow-hidden group relative border border-gray-800 hover:border-cyan-500/50 transition-all duration-300">
                 <div class="h-48 overflow-hidden relative">
                     <img src="https://i.ibb.co/yF3BZjNc/aqua-bot-x.jpg" onerror="this.src='https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=500'" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:filter group-hover:brightness-50">
                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <a href="https://github.com/jeyaram1023/Fish-Robot-Aqua-bot-X-/" target="_blank" class="px-6 py-2 border border-cyan-400 text-cyan-400 font-bold font-orbitron rounded-sm hover:bg-cyan-400 hover:text-black transition-all shadow-[0_0_15px_var(--primary)] transform scale-90 group-hover:scale-100">ACCESS CODE</a>
+                        <a href="https://github.com/jeyaram1023/Fish-Robot-Aqua-bot-X-/" target="_blank" class="px-6 py-2 border border-cyan-400 text-cyan-400 font-bold font-orbitron rounded-sm hover:bg-cyan-400 hover:text-black transition-all shadow-[0_0_15px_var(--primary)]">ACCESS CODE</a>
                     </div>
                 </div>
-                <div class="p-6 relative">
-                     <div class="absolute top-0 right-0 w-20 h-20 border-t border-r border-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="p-6 relative tilt-content">
                     <h3 class="font-orbitron text-xl text-cyan-400 mb-2 group-hover:text-white transition-colors">Aqua Bot-X</h3>
                     <p class="text-gray-400 text-sm font-mono mb-4 h-20 overflow-hidden line-clamp-4">Biomimetic fish robot designed for underwater surveillance and water quality monitoring.</p>
                     <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-800">
@@ -688,16 +823,15 @@
                 </div>
             </div>
 
-            <!-- Project 3 (Women Safety / Refocused) -->
-            <div class="glass-panel rounded-xl overflow-hidden group card-3d relative border border-gray-800 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] transition-all duration-300 hover:-translate-y-2">
+            <!-- Project 3 -->
+            <div class="glass-panel tilt-card rounded-xl overflow-hidden group relative border border-gray-800 hover:border-cyan-500/50 transition-all duration-300">
                 <div class="h-48 overflow-hidden relative">
                     <img src="https://i.ibb.co/TMZ443tJ/women-safety-device-banner.jpg" onerror="this.src='https://images.unsplash.com/photo-1555664424-778a69022365?w=500'" alt="Project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:filter group-hover:brightness-50">
                     <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <a href="WOMEN_SAFETY_DEVICE.html" target="_blank" class="px-6 py-2 border border-cyan-400 text-cyan-400 font-bold font-orbitron rounded-sm hover:bg-cyan-400 hover:text-black transition-all shadow-[0_0_15px_var(--primary)] transform scale-90 group-hover:scale-100">ACCESS CODE</a>
+                        <a href="WOMEN_SAFETY_DEVICE.html" target="_blank" class="px-6 py-2 border border-cyan-400 text-cyan-400 font-bold font-orbitron rounded-sm hover:bg-cyan-400 hover:text-black transition-all shadow-[0_0_15px_var(--primary)]">ACCESS CODE</a>
                     </div>
                 </div>
-                <div class="p-6 relative">
-                    <div class="absolute top-0 right-0 w-20 h-20 border-t border-r border-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="p-6 relative tilt-content">
                     <h3 class="font-orbitron text-xl text-cyan-400 mb-2 group-hover:text-white transition-colors">Safety Ecosystem</h3>
                     <p class="text-gray-400 text-sm font-mono mb-4 h-20 overflow-hidden line-clamp-4">Smart safety ecosystem consisting of a wearable watch and smart footwear utilizing embedded GPS/GSM alerts.</p>
                     <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-800">
@@ -710,14 +844,14 @@
             
             <!-- View All Projects Card -->
             <div class="md:col-span-2 lg:col-span-3 flex justify-center mt-4">
-               <a href="project.html" class="px-8 py-3 border border-cyan-500/30 rounded-full text-sm font-orbitron text-cyan-400 hover:bg-cyan-500 hover:text-black transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.5)]">
+               <a href="project.html" class="px-8 py-3 border border-cyan-500/40 bg-black/60 rounded-full text-sm font-orbitron text-cyan-400 hover:bg-cyan-500 hover:text-black transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.5)]">
                    VIEW ALL ARCHIVES <i class="fas fa-arrow-right ml-2"></i>
                </a>
             </div>
         </div>
     </section>
 
-    <!-- NEW: Certificates Section -->
+    <!-- Certificates Section -->
     <section id="certificates" class="py-20 reveal-on-scroll">
         <h2 class="text-3xl md:text-5xl font-orbitron font-bold mb-16 text-center">
             <span class="text-sm font-mono text-gray-500 block mb-2 tracking-widest">// 05. CREDENTIALS</span>
@@ -726,73 +860,67 @@
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             
-            <!-- Certificate 1 -->
-            <div class="glass-panel p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-yellow-400/50 hover:shadow-[0_0_20px_rgba(250,204,21,0.2)] transition-all">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-panel tilt-card p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-yellow-400/50 transition-all">
+                <div class="flex justify-between items-start mb-4 tilt-content">
                     <div class="w-10 h-10 rounded bg-yellow-900/30 flex items-center justify-center text-yellow-400 text-xl border border-yellow-500/30">
                         <i class="fas fa-microchip"></i>
                     </div>
                     <span class="text-[9px] font-mono text-yellow-400 border border-yellow-500/30 px-2 py-1 rounded bg-yellow-900/20">VERIFIED</span>
                 </div>
-                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-yellow-400 transition-colors">IoT & Embedded Systems</h3>
-                <p class="text-gray-400 text-xs font-mono mb-4">Professional certification in IoT device development and embedded C programming.</p>
+                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-yellow-400 transition-colors tilt-content">IoT & Embedded Systems</h3>
+                <p class="text-gray-400 text-xs font-mono mb-4 tilt-content">Professional certification in IoT device development and embedded C programming.</p>
             </div>
 
-            <!-- Certificate 2 -->
-            <div class="glass-panel p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-blue-400/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-panel tilt-card p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-blue-400/50 transition-all">
+                <div class="flex justify-between items-start mb-4 tilt-content">
                     <div class="w-10 h-10 rounded bg-blue-900/30 flex items-center justify-center text-blue-400 text-xl border border-blue-500/30">
                         <i class="fab fa-python"></i>
                     </div>
                     <span class="text-[9px] font-mono text-blue-400 border border-blue-500/30 px-2 py-1 rounded bg-blue-900/20">VERIFIED</span>
                 </div>
-                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-blue-400 transition-colors">Python Programming</h3>
-                <p class="text-gray-400 text-xs font-mono mb-4">Advanced Python with focus on automation, scripting, and data structures.</p>
+                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-blue-400 transition-colors tilt-content">Python Programming</h3>
+                <p class="text-gray-400 text-xs font-mono mb-4 tilt-content">Advanced Python with focus on automation, scripting, and data structures.</p>
             </div>
 
-            <!-- Certificate 3 -->
-            <div class="glass-panel p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-purple-400/50 hover:shadow-[0_0_20px_rgba(188,19,254,0.2)] transition-all">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-panel tilt-card p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-purple-400/50 transition-all">
+                <div class="flex justify-between items-start mb-4 tilt-content">
                     <div class="w-10 h-10 rounded bg-purple-900/30 flex items-center justify-center text-purple-400 text-xl border border-purple-500/30">
                         <i class="fas fa-award"></i>
                     </div>
                     <span class="text-[9px] font-mono text-purple-400 border border-purple-500/30 px-2 py-1 rounded bg-purple-900/20">AWARDED</span>
                 </div>
-                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-purple-400 transition-colors">RBI State Level Quiz</h3>
-                <p class="text-gray-400 text-xs font-mono mb-4">Achieved state-level recognition in the official Reserve Bank of India knowledge quiz.</p>
+                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-purple-400 transition-colors tilt-content">RBI State Level Quiz</h3>
+                <p class="text-gray-400 text-xs font-mono mb-4 tilt-content">Achieved state-level recognition in the official Reserve Bank of India knowledge quiz.</p>
             </div>
 
-            <!-- Certificate 4 -->
-            <div class="glass-panel p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-green-400/50 hover:shadow-[0_0_20px_rgba(57,255,20,0.2)] transition-all">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-panel tilt-card p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-green-400/50 transition-all">
+                <div class="flex justify-between items-start mb-4 tilt-content">
                     <div class="w-10 h-10 rounded bg-green-900/30 flex items-center justify-center text-green-400 text-xl border border-green-500/30">
                         <i class="fas fa-brain"></i>
                     </div>
                     <span class="text-[9px] font-mono text-green-400 border border-green-500/30 px-2 py-1 rounded bg-green-900/20">VERIFIED</span>
                 </div>
-                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-green-400 transition-colors">Edge AI & Computer Vision</h3>
-                <p class="text-gray-400 text-xs font-mono mb-4">Hands-on certification in deploying OpenCV and machine learning models on edge devices.</p>
+                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-green-400 transition-colors tilt-content">Edge AI & Computer Vision</h3>
+                <p class="text-gray-400 text-xs font-mono mb-4 tilt-content">Hands-on certification in deploying OpenCV and machine learning models on edge devices.</p>
             </div>
 
-            <!-- Certificate 5 -->
-            <div class="glass-panel p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] transition-all">
-                <div class="flex justify-between items-start mb-4">
+            <div class="glass-panel tilt-card p-5 rounded-xl relative overflow-hidden group border border-gray-800 hover:border-cyan-400/50 transition-all">
+                <div class="flex justify-between items-start mb-4 tilt-content">
                     <div class="w-10 h-10 rounded bg-cyan-900/30 flex items-center justify-center text-cyan-400 text-xl border border-cyan-500/30">
                         <i class="fas fa-robot"></i>
                     </div>
                     <span class="text-[9px] font-mono text-cyan-400 border border-cyan-500/30 px-2 py-1 rounded bg-cyan-900/20">VERIFIED</span>
                 </div>
-                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors">Robotics & ROS 2</h3>
-                <p class="text-gray-400 text-xs font-mono mb-4">Masterclass certification covering autonomous navigation and ROS 2 middleware.</p>
+                <h3 class="font-orbitron text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors tilt-content">Robotics & ROS 2</h3>
+                <p class="text-gray-400 text-xs font-mono mb-4 tilt-content">Masterclass certification covering autonomous navigation and ROS 2 middleware.</p>
             </div>
 
-            <!-- View All Certificates Card -->
-            <a href="https://jeyaram1023.github.io/My-portfolio/certificate.html" class="glass-panel p-5 rounded-xl relative overflow-hidden group border border-gray-600 hover:border-white hover:bg-white/5 transition-all flex flex-col items-center justify-center min-h-[160px] cursor-pointer">
-                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl border border-white/20 group-hover:scale-110 transition-transform mb-3">
+            <a href="https://jeyaram1023.github.io/My-portfolio/certificate.html" class="glass-panel tilt-card p-5 rounded-xl relative overflow-hidden group border border-gray-600 hover:border-white hover:bg-white/5 transition-all flex flex-col items-center justify-center min-h-[160px]">
+                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl border border-white/20 group-hover:scale-110 transition-transform mb-3 tilt-content">
                     <i class="fas fa-folder-open"></i>
                 </div>
-                <h3 class="font-orbitron text-md font-bold text-white text-center tracking-widest">VIEW ALL CERTIFICATES</h3>
-                <p class="text-gray-400 text-[10px] font-mono mt-2 flex items-center gap-1 group-hover:text-white transition-colors">OPEN VAULT <i class="fas fa-arrow-right"></i></p>
+                <h3 class="font-orbitron text-md font-bold text-white text-center tracking-widest tilt-content">VIEW ALL CERTIFICATES</h3>
+                <p class="text-gray-400 text-[10px] font-mono mt-2 flex items-center gap-1 group-hover:text-white transition-colors tilt-content">OPEN VAULT <i class="fas fa-arrow-right"></i></p>
             </a>
 
         </div>
@@ -806,122 +934,88 @@
         </h2>
 
         <div class="relative max-w-5xl mx-auto px-4">
-            <!-- Timeline Line -->
             <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-cyan-500 shadow-[0_0_10px_var(--primary)] hidden md:block transform -translate-x-1/2"></div>
             <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-cyan-500 shadow-[0_0_10px_var(--primary)] md:hidden"></div>
 
-            <!-- Experience 1 (Left) -->
+            <!-- Experience 1 -->
             <div class="relative mb-16 md:mb-24">
                 <div class="flex flex-col md:flex-row items-center w-full group">
-                    <div class="absolute left-8 md:left-1/2 w-6 h-6 bg-black border-2 border-blue-500 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_15px_#3b82f6] group-hover:bg-blue-500 group-hover:scale-125 transition-all duration-300 flex items-center justify-center">
+                    <div class="absolute left-8 md:left-1/2 w-6 h-6 bg-black border-2 border-blue-500 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_15px_#3b82f6] group-hover:bg-blue-500 transition-all duration-300 flex items-center justify-center">
                         <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                     </div>
                     <div class="md:w-1/2 md:pr-12 pl-16 md:pl-0 w-full relative">
-                        <div class="glass-panel p-6 rounded-xl border-l-4 border-blue-500 relative overflow-hidden hover:bg-blue-900/10 transition-all group-hover:-translate-y-2">
-                            <div class="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-                            <div class="flex justify-between items-start mb-4">
+                        <div class="glass-panel tilt-card p-6 rounded-xl border-l-4 border-blue-500 relative overflow-hidden hover:bg-blue-900/10 transition-all">
+                            <div class="flex justify-between items-start mb-4 tilt-content">
                                 <div>
                                     <h3 class="font-orbitron text-lg md:text-xl text-blue-400 font-bold">AIML & n8n Intern / Team Lead</h3>
                                     <h4 class="text-gray-300 font-mono text-xs md:text-sm">Blue Planet Info Solutions</h4>
                                 </div>
                                 <i class="fas fa-robot text-4xl text-blue-500/20 absolute top-4 right-4"></i>
                             </div>
-                            <div class="text-xs font-mono text-gray-400 mb-4 flex items-center gap-2">
+                            <div class="text-xs font-mono text-gray-400 mb-4 flex items-center gap-2 tilt-content">
                                 <i class="far fa-clock text-blue-400"></i> 16 Nov 2025 – 16 May 2026
                             </div>
-                            <ul class="space-y-2 text-gray-400 text-sm list-none">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1">▹</span>
-                                    <span>Lead the AI/ML & n8n team in executing automation tasks.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1">▹</span>
-                                    <span>Developed ML models for data analysis & prediction.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1">▹</span>
-                                    <span>Designed n8n workflows for data pipelines & API integrations.</span>
-                                </li>
+                            <ul class="space-y-2 text-gray-400 text-sm list-none tilt-content">
+                                <li class="flex items-start gap-2"><span class="text-blue-500 mt-1">▹</span><span>Lead the AI/ML & n8n team in executing automation tasks.</span></li>
+                                <li class="flex items-start gap-2"><span class="text-blue-500 mt-1">▹</span><span>Developed ML models for data analysis & prediction.</span></li>
+                                <li class="flex items-start gap-2"><span class="text-blue-500 mt-1">▹</span><span>Designed n8n workflows for data pipelines & API integrations.</span></li>
                             </ul>
-                            <div class="mt-5 flex flex-wrap gap-2">
-                                <span class="px-2 py-1 text-[10px] font-mono border border-blue-500/30 rounded text-blue-300 bg-blue-500/10">Leadership</span>
-                                <span class="px-2 py-1 text-[10px] font-mono border border-blue-500/30 rounded text-blue-300 bg-blue-500/10">Machine Learning</span>
-                                <span class="px-2 py-1 text-[10px] font-mono border border-blue-500/30 rounded text-blue-300 bg-blue-500/10">Automation</span>
-                            </div>
                         </div>
                     </div>
                     <div class="md:w-1/2 hidden md:block"></div>
                 </div>
             </div>
 
-            <!-- Experience 2 (Right) -->
+            <!-- Experience 2 -->
             <div class="relative mb-16 md:mb-24">
                 <div class="flex flex-col md:flex-row items-center w-full group">
                     <div class="md:w-1/2 hidden md:block"></div>
-                    <div class="absolute left-8 md:left-1/2 w-6 h-6 bg-black border-2 border-purple-500 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_15px_#bc13fe] group-hover:bg-purple-500 group-hover:scale-125 transition-all duration-300 flex items-center justify-center">
+                    <div class="absolute left-8 md:left-1/2 w-6 h-6 bg-black border-2 border-purple-500 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_15px_#bc13fe] group-hover:bg-purple-500 transition-all duration-300 flex items-center justify-center">
                         <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
                     </div>
                     <div class="md:w-1/2 md:pl-12 pl-16 w-full relative">
-                        <div class="glass-panel p-6 rounded-xl border-r-4 md:border-r-0 md:border-l-4 border-purple-500 relative overflow-hidden hover:bg-purple-900/10 transition-all group-hover:-translate-y-2">
-                             <div class="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-                            <div class="flex justify-between items-start mb-4">
+                        <div class="glass-panel tilt-card p-6 rounded-xl border-r-4 md:border-r-0 md:border-l-4 border-purple-500 relative overflow-hidden hover:bg-purple-900/10 transition-all">
+                            <div class="flex justify-between items-start mb-4 tilt-content">
                                 <div>
                                     <h3 class="font-orbitron text-lg md:text-xl text-purple-400 font-bold">Campus Ambassador Intern</h3>
                                     <h4 class="text-gray-300 font-mono text-xs md:text-sm">AENEXZ Tech Pvt Ltd</h4>
                                 </div>
                                 <i class="fas fa-bullhorn text-4xl text-purple-500/20 absolute top-4 right-4"></i>
                             </div>
-                            <div class="text-xs font-mono text-gray-400 mb-4 flex items-center gap-2">
+                            <div class="text-xs font-mono text-gray-400 mb-4 flex items-center gap-2 tilt-content">
                                 <i class="far fa-clock text-purple-400"></i> 08 Dec 2025 – 08 Feb 2026
                             </div>
-                            <ul class="space-y-2 text-gray-400 text-sm list-none">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-purple-500 mt-1">▹</span>
-                                    <span>Promoted initiatives & coordinated student engagement events.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-purple-500 mt-1">▹</span>
-                                    <span>Represented the organization professionally on campus.</span>
-                                </li>
+                            <ul class="space-y-2 text-gray-400 text-sm list-none tilt-content">
+                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1">▹</span><span>Promoted initiatives & coordinated student engagement events.</span></li>
+                                <li class="flex items-start gap-2"><span class="text-purple-500 mt-1">▹</span><span>Represented the organization professionally on campus.</span></li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Experience 3 (Left) -->
+            <!-- Experience 3 -->
             <div class="relative">
                 <div class="flex flex-col md:flex-row items-center w-full group">
-                    <div class="absolute left-8 md:left-1/2 w-6 h-6 bg-black border-2 border-cyan-500 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_15px_#22d3ee] group-hover:bg-cyan-500 group-hover:scale-125 transition-all duration-300 flex items-center justify-center">
+                    <div class="absolute left-8 md:left-1/2 w-6 h-6 bg-black border-2 border-cyan-500 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_15px_#22d3ee] group-hover:bg-cyan-500 transition-all duration-300 flex items-center justify-center">
                         <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
                     </div>
                     <div class="md:w-1/2 md:pr-12 pl-16 md:pl-0 w-full relative">
-                        <div class="glass-panel p-6 rounded-xl border-l-4 border-cyan-500 relative overflow-hidden hover:bg-cyan-900/10 transition-all group-hover:-translate-y-2">
-                             <div class="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
-                            <div class="flex justify-between items-start mb-4">
+                        <div class="glass-panel tilt-card p-6 rounded-xl border-l-4 border-cyan-500 relative overflow-hidden hover:bg-cyan-900/10 transition-all">
+                            <div class="flex justify-between items-start mb-4 tilt-content">
                                 <div>
                                     <h3 class="font-orbitron text-lg md:text-xl text-cyan-400 font-bold">AC Technician Trainee</h3>
                                     <h4 class="text-gray-300 font-mono text-xs md:text-sm">Daikin Airconditioning</h4>
                                 </div>
                                 <i class="fas fa-tools text-4xl text-cyan-500/20 absolute top-4 right-4"></i>
                             </div>
-                            <div class="text-xs font-mono text-gray-400 mb-4 flex items-center gap-2">
+                            <div class="text-xs font-mono text-gray-400 mb-4 flex items-center gap-2 tilt-content">
                                 <i class="fas fa-industry text-cyan-400"></i> Manufacturing & Service
                             </div>
-                            <ul class="space-y-2 text-gray-400 text-sm list-none">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-cyan-500 mt-1">▹</span>
-                                    <span>Hands-on fault finding & repair of Inverter/Split AC units.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-cyan-500 mt-1">▹</span>
-                                    <span>PCB troubleshooting & understanding of control circuitry.</span>
-                                </li>
+                            <ul class="space-y-2 text-gray-400 text-sm list-none tilt-content">
+                                <li class="flex items-start gap-2"><span class="text-cyan-500 mt-1">▹</span><span>Hands-on fault finding & repair of Inverter/Split AC units.</span></li>
+                                <li class="flex items-start gap-2"><span class="text-cyan-500 mt-1">▹</span><span>PCB troubleshooting & understanding of control circuitry.</span></li>
                             </ul>
-                            <div class="mt-5 flex flex-wrap gap-2">
-                                <span class="px-2 py-1 text-[10px] font-mono border border-cyan-500/30 rounded text-cyan-300 bg-cyan-500/10">PCB Design</span>
-                                <span class="text-[10px] px-2 py-1 rounded border border-cyan-500/30 text-cyan-300 bg-cyan-500/10">Electronics Troubleshooting</span>
-                            </div>
                         </div>
                     </div>
                     <div class="md:w-1/2 hidden md:block"></div>
@@ -942,20 +1036,20 @@
 
             <div class="relative mb-12 flex flex-col md:flex-row items-center w-full group">
                 <div class="md:w-1/2 md:pr-12 text-left md:text-right pl-12 md:pl-0">
-                    <h3 class="font-orbitron text-xl text-cyan-400 group-hover:scale-105 transition-transform origin-right">B.Tech in ECE</h3>
+                    <h3 class="font-orbitron text-xl text-cyan-400">B.Tech in ECE</h3>
                     <p class="text-xs font-mono text-gray-400 mb-1">2023 - 2027</p>
                     <p class="text-sm mt-2 text-gray-300">PBR Visvodaya Institute Of Technology & Science</p>
                     <span class="inline-block px-2 py-1 mt-2 text-[10px] border border-cyan-500/30 rounded text-cyan-300">CGPA: 6.89 (Current)</span>
                 </div>
-                <div class="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-cyan-400 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_10px_#22d3ee] group-hover:bg-cyan-400 transition-colors"></div>
+                <div class="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-cyan-400 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_10px_#22d3ee]"></div>
                 <div class="md:w-1/2 md:pl-8 hidden md:block"></div>
             </div>
 
             <div class="relative mb-12 flex flex-col md:flex-row items-center w-full group">
                 <div class="md:w-1/2 md:pr-8 hidden md:block"></div>
-                <div class="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-green-400 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_10px_#39ff14] group-hover:bg-green-400 transition-colors"></div>
+                <div class="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-green-400 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_10px_#39ff14]"></div>
                 <div class="md:w-1/2 md:pl-12 pl-12 md:text-left">
-                    <h3 class="font-orbitron text-xl text-green-400 group-hover:scale-105 transition-transform origin-left">Intermediate (MPC)</h3>
+                    <h3 class="font-orbitron text-xl text-green-400">Intermediate (MPC)</h3>
                     <p class="text-xs font-mono text-gray-400 mb-1">2021 - 2023</p>
                     <p class="text-sm mt-2 text-gray-300">A.P. Model Jr. College, A.S.Peta</p>
                 </div>
@@ -963,12 +1057,12 @@
 
              <div class="relative flex flex-col md:flex-row items-center w-full group">
                 <div class="md:w-1/2 md:pr-12 text-left md:text-right pl-12 md:pl-0">
-                    <h3 class="font-orbitron text-xl text-purple-400 group-hover:scale-105 transition-transform origin-right">Secondary School (SSC)</h3>
+                    <h3 class="font-orbitron text-xl text-purple-400">Secondary School (SSC)</h3>
                     <p class="text-xs font-mono text-gray-400 mb-1">2016 - 2021</p>
                     <p class="text-sm mt-2 text-gray-300">Tagore EM High School</p>
                     <span class="inline-block px-2 py-1 mt-2 text-[10px] border border-purple-500/30 rounded text-purple-300">GPA: 8.5</span>
                 </div>
-                <div class="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-purple-400 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_10px_#bc13fe] group-hover:bg-purple-400 transition-colors"></div>
+                <div class="absolute left-4 md:left-1/2 w-4 h-4 bg-black border-2 border-purple-400 rounded-full transform -translate-x-1/2 z-10 shadow-[0_0_10px_#bc13fe]"></div>
                 <div class="md:w-1/2 md:pl-8 hidden md:block"></div>
             </div>
         </div>
@@ -985,30 +1079,28 @@
 
                     <div class="space-y-4 relative z-10">
                         <div class="flex items-center gap-4 text-gray-300 hover:text-cyan-400 transition-colors group">
-                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 group-hover:shadow-[0_0_10px_var(--primary)] transition-all"><i class="fas fa-envelope"></i></div>
+                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 transition-all"><i class="fas fa-envelope"></i></div>
                             <span class="font-mono text-sm">jeyaram.reddy.ece@gmail.com</span>
                         </div>
                         <div class="flex items-center gap-4 text-gray-300 hover:text-cyan-400 transition-colors group">
-                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 group-hover:shadow-[0_0_10px_var(--primary)] transition-all"><i class="fas fa-map-marker-alt"></i></div>
+                            <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-cyan-400 transition-all"><i class="fas fa-map-marker-alt"></i></div>
                             <span class="font-mono text-sm">Andhra Pradesh, India</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Social Icons in Contact -->
                 <div class="mt-8 flex flex-wrap gap-4 relative z-10">
-                    <a href="https://github.com/jeyaram1023" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 bg-black/40 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_10px_var(--primary)] transition-all duration-300 hover:-translate-y-1" title="GitHub">
+                    <a href="https://github.com/jeyaram1023" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 bg-black/40 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:border-cyan-400 transition-all duration-300" title="GitHub">
                         <i class="fab fa-github"></i>
                     </a>
-                    <a href="https://linkedin.com/in/jeyaram-ece-reddy" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 bg-black/40 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_10px_var(--primary)] transition-all duration-300 hover:-translate-y-1" title="LinkedIn">
+                    <a href="https://linkedin.com/in/jeyaram-ece-reddy" target="_blank" class="w-10 h-10 rounded-full border border-gray-600 bg-black/40 flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:border-cyan-400 transition-all duration-300" title="LinkedIn">
                         <i class="fab fa-linkedin-in"></i>
                     </a>
-                    <a href="mailto:jeyaram.reddy.ece@gmail.com" class="w-10 h-10 rounded-full border border-gray-600 bg-black/40 flex items-center justify-center text-gray-400 hover:text-green-400 hover:border-green-400 hover:shadow-[0_0_10px_var(--secondary)] transition-all duration-300 hover:-translate-y-1" title="Email">
+                    <a href="mailto:jeyaram.reddy.ece@gmail.com" class="w-10 h-10 rounded-full border border-gray-600 bg-black/40 flex items-center justify-center text-gray-400 hover:text-green-400 hover:border-green-400 transition-all duration-300" title="Email">
                         <i class="fas fa-envelope"></i>
                     </a>
                 </div>
 
-                <!-- Visitor Counter -->
                 <div class="mt-8 pt-6 border-t border-gray-700 relative z-10 font-mono text-[10px] text-gray-500 tracking-widest flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                     SYSTEM ACCESS LOG: <span id="visitor-count" class="text-cyan-400 font-bold">LOADING...</span>
@@ -1033,7 +1125,6 @@
                     </button>
                 </form>
 
-                <!-- Success Overlay -->
                 <div id="successMessage" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 z-20 hidden backdrop-blur-sm">
                     <i class="fas fa-check-circle text-5xl text-green-400 mb-4 animate-bounce"></i>
                     <h3 class="font-orbitron text-xl text-white">TRANSMISSION COMPLETE</h3>
@@ -1045,7 +1136,7 @@
 
 </main>
 
-<footer class="py-8 border-t border-gray-800 bg-black text-center relative z-10">
+<footer class="py-8 border-t border-gray-800 bg-black/90 text-center relative z-10">
     <p class="font-mono text-xs text-gray-500">
         &copy; <span id="year"></span> JEYARAM REDDY. <span class="text-cyan-400">HARDWARE SECURED.</span>
     </p>
@@ -1068,63 +1159,152 @@
 </div>
 
 <script>
-    // --- Typewriter Effect ---
-    const text = "Connecting Hardware with Intelligence...";
-    const typewriter = document.getElementById('typewriter');
-    let i = 0;
+    // =========================================================================
+    // 1. HERO 3D KINETIC EXTRUDED TEXT (Letters Pop-Out Toward Mouse!)
+    // =========================================================================
+    function buildKineticLetters(containerId, isSubName = false) {
+        const container = document.getElementById(containerId);
+        const text = container.getAttribute('data-text');
+        container.innerHTML = '';
 
-    function type() {
-        if (i < text.length) {
-            typewriter.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, 50 + Math.random() * 80);
+        for (let char of text) {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.className = `char-3d ${isSubName ? 'sub-name' : ''}`;
+            container.appendChild(span);
         }
     }
-    setTimeout(type, 1500);
 
-    // --- Interactive Neural Network Background ---
-    const canvas = document.getElementById('neural-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
-    let particles = [];
-    let mouse = { x: null, y: null, radius: 150 };
+    buildKineticLetters('kinetic-title-1', false);
+    buildKineticLetters('kinetic-title-2', true);
 
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = event.x;
-        mouse.y = event.y;
+    const all3DChars = document.querySelectorAll('.char-3d');
+    const heroCockpit = document.getElementById('hero-cockpit');
+
+    window.addEventListener('mousemove', (e) => {
+        const mx = e.clientX;
+        const my = e.clientY;
+
+        if (window.scrollY < window.innerHeight) {
+            if (window.innerWidth > 768 && heroCockpit) {
+                const rotY = ((mx / window.innerWidth) - 0.5) * 16;
+                const rotX = ((my / window.innerHeight) - 0.5) * -16;
+                heroCockpit.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+            }
+
+            all3DChars.forEach(charEl => {
+                const rect = charEl.getBoundingClientRect();
+                const charX = rect.left + rect.width / 2;
+                const charY = rect.top + rect.height / 2;
+
+                const dx = mx - charX;
+                const dy = my - charY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const maxRadius = 220;
+
+                if (dist < maxRadius) {
+                    const power = 1 - (dist / maxRadius);
+                    const liftY = -power * 28;
+                    const pushZ = power * 85;
+                    const scale = 1 + (power * 0.22);
+                    const rotX = (dy / maxRadius) * -25;
+                    const rotY = (dx / maxRadius) * 25;
+
+                    charEl.style.transform = `translate3d(0, ${liftY}px, ${pushZ}px) scale(${scale}) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+                    if (power > 0.45) {
+                        charEl.classList.add('active-pop');
+                    } else {
+                        charEl.classList.remove('active-pop');
+                    }
+                } else {
+                    charEl.style.transform = 'translate3d(0, 0, 0) scale(1) rotateX(0deg) rotateY(0deg)';
+                    charEl.classList.remove('active-pop');
+                }
+            });
+        }
+    }, { passive: true });
+
+    // =========================================================================
+    // 2. ULTRA-SMOOTH SCI-FI CURSOR (Hardware Accelerated, Never Disappears)
+    // =========================================================================
+    const cursorDot = document.getElementById("cursor-dot");
+    const cursorOutline = document.getElementById("cursor-outline");
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let outlineX = mouseX;
+    let outlineY = mouseY;
+
+    window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursorDot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+    }, { passive: true });
+
+    function renderCursor() {
+        outlineX += (mouseX - outlineX) * 0.2;
+        outlineY += (mouseY - outlineY) * 0.2;
+        const offset = cursorOutline.classList.contains("cursor-hover") ? 26 : 18;
+        cursorOutline.style.transform = `translate3d(${outlineX - offset}px, ${outlineY - offset}px, 0)`;
+        requestAnimationFrame(renderCursor);
+    }
+    requestAnimationFrame(renderCursor);
+
+    const interactables = document.querySelectorAll("a, button, input, textarea, .glass-panel, .char-3d");
+    interactables.forEach(el => {
+        el.addEventListener("mouseenter", () => cursorOutline.classList.add("cursor-hover"));
+        el.addEventListener("mouseleave", () => cursorOutline.classList.remove("cursor-hover"));
     });
 
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+    // =========================================================================
+    // 3. BOOSTED 2D MAGNETIC NEURAL PARTICLES (More Dots + Faster Speed!)
+    // =========================================================================
+    const nCanvas = document.getElementById('neural-canvas');
+    const ctx = nCanvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    // Increased magnetic attraction radius to 210px
+    let magneticMouse = { x: null, y: null, radius: 210 };
+
+    window.addEventListener('mousemove', (e) => {
+        magneticMouse.x = e.clientX;
+        magneticMouse.y = e.clientY;
+    }, { passive: true });
+
+    window.addEventListener('mouseout', () => {
+        magneticMouse.x = null;
+        magneticMouse.y = null;
+    });
+
+    function resizeNeural() {
+        width = nCanvas.width = window.innerWidth;
+        height = nCanvas.height = window.innerHeight;
     }
 
-    class Particle {
+    class MagneticParticle {
         constructor() {
             this.x = Math.random() * width;
             this.y = Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 1.5;
-            this.vy = (Math.random() - 0.5) * 1.5;
-            this.size = Math.random() * 2 + 1;
-            this.color = Math.random() > 0.5 ? '#00f3ff' : '#39ff14'; 
-            this.density = (Math.random() * 30) + 1;
+            // FASTER base movement speed (increased from 1.2 to 2.5)
+            this.vx = (Math.random() - 0.5) * 2.5;
+            this.vy = (Math.random() - 0.5) * 2.5;
+            this.size = Math.random() * 2.2 + 1.2;
+            this.color = Math.random() > 0.45 ? '#00f3ff' : '#39ff14';
+            this.density = (Math.random() * 35) + 10;
         }
 
         update() {
-            if (mouse.x != null) {
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
+            // Stronger & Faster Magnetic Pull toward Mouse
+            if (magneticMouse.x !== null) {
+                let dx = magneticMouse.x - this.x;
+                let dy = magneticMouse.y - this.y;
                 let distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance < mouse.radius) {
-                    const forceDirectionX = dx / distance;
-                    const forceDirectionY = dy / distance;
-                    const force = (mouse.radius - distance) / mouse.radius;
-                    const directionX = forceDirectionX * force * this.density;
-                    const directionY = forceDirectionY * force * this.density;
-
-                    this.x += directionX * 0.05; 
-                    this.y += directionY * 0.05;
+                if (distance < magneticMouse.radius && distance > 5) {
+                    const force = (magneticMouse.radius - distance) / magneticMouse.radius;
+                    // Increased magnetic pull multiplier from 0.08 to 0.16
+                    this.x += (dx / distance) * force * this.density * 0.16;
+                    this.y += (dy / distance) * force * this.density * 0.16;
                 }
             }
 
@@ -1143,85 +1323,177 @@
         }
     }
 
-    function initParticles() {
+    function initMagneticParticles() {
         particles = [];
-        const count = Math.min(window.innerWidth / 8, 120); 
+        // INCREASED DOTS COUNT: Up to 150 particles on desktop (was 85)
+        const count = Math.min(Math.floor(window.innerWidth / 8), 150);
         for (let i = 0; i < count; i++) {
-            particles.push(new Particle());
+            particles.push(new MagneticParticle());
         }
     }
 
-    function animate() {
+    function animateNeural() {
         ctx.clearRect(0, 0, width, height);
 
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-
-        ctx.lineWidth = 0.5;
         for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+                const distSq = dx * dx + dy * dy;
 
-                if (distance < 150) {
+                if (distSq < 19000) {
+                    const opacity = 1 - (distSq / 19000);
                     ctx.beginPath();
-                    const opacity = 1 - (distance / 150);
-                    ctx.strokeStyle = `rgba(0, 243, 255, ${opacity * 0.4})`;
+                    ctx.strokeStyle = `rgba(0, 243, 255, ${opacity * 0.45})`;
+                    ctx.lineWidth = 0.65;
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
                     ctx.stroke();
                 }
             }
 
-            if (mouse.x != null) {
-                const dx = particles[i].x - mouse.x;
-                const dy = particles[i].y - mouse.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 200) {
-                     ctx.beginPath();
-                     const opacity = 1 - (distance / 200);
-                     ctx.strokeStyle = `rgba(57, 255, 20, ${opacity * 0.5})`;
-                     ctx.moveTo(particles[i].x, particles[i].y);
-                     ctx.lineTo(mouse.x, mouse.y);
-                     ctx.stroke();
+            if (magneticMouse.x !== null) {
+                const dx = particles[i].x - magneticMouse.x;
+                const dy = particles[i].y - magneticMouse.y;
+                const distSq = dx * dx + dy * dy;
+                if (distSq < 40000) { // ~200px laser connection radius
+                    const opacity = 1 - (distSq / 40000);
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(57, 255, 20, ${opacity * 0.8})`;
+                    ctx.lineWidth = 1.0;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(magneticMouse.x, magneticMouse.y);
+                    ctx.stroke();
                 }
             }
         }
-        requestAnimationFrame(animate);
+        requestAnimationFrame(animateNeural);
     }
 
-    window.addEventListener('resize', () => {
-        resize();
-        initParticles();
-    });
+    resizeNeural();
+    initMagneticParticles();
+    requestAnimationFrame(animateNeural);
 
-    resize();
-    initParticles();
-    animate();
+    // =========================================================================
+    // 4. 3D QUANTUM GYROSCOPE REACTOR BACKGROUND (Three.js)
+    // =========================================================================
+    const initThreeJS = () => {
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false, powerPreference: "high-performance" });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
-    // --- Scroll Reveal Animation ---
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
+        const reactorGroup = new THREE.Group();
+        scene.add(reactorGroup);
+
+        const knotGeo = new THREE.TorusKnotGeometry(3.8, 0.8, 64, 12, 2, 3);
+        const knotMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.16 });
+        const knotMesh = new THREE.Mesh(knotGeo, knotMat);
+        reactorGroup.add(knotMesh);
+
+        const ring1Geo = new THREE.TorusGeometry(8.5, 0.12, 12, 80);
+        const ring1Mat = new THREE.MeshBasicMaterial({ color: 0x39ff14, wireframe: true, transparent: true, opacity: 0.3 });
+        const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+        reactorGroup.add(ring1);
+
+        const ring2Geo = new THREE.TorusGeometry(12, 0.15, 12, 90);
+        const ring2Mat = new THREE.MeshBasicMaterial({ color: 0xbc13fe, wireframe: true, transparent: true, opacity: 0.28 });
+        const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+        ring2.rotation.x = Math.PI / 3;
+        reactorGroup.add(ring2);
+
+        const ring3Geo = new THREE.OctahedronGeometry(16, 1);
+        const ring3Mat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.1 });
+        const ring3 = new THREE.Mesh(ring3Geo, ring3Mat);
+        reactorGroup.add(ring3);
+
+        camera.position.z = 26;
+
+        let scrollY = window.scrollY;
+        window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            knotMesh.rotation.x += 0.005;
+            knotMesh.rotation.y += 0.007;
+            ring1.rotation.y += 0.008;
+            ring1.rotation.x -= 0.004;
+            ring2.rotation.z += 0.006;
+            ring2.rotation.y -= 0.003;
+            ring3.rotation.y += 0.002;
+            ring3.rotation.z -= 0.002;
+
+            const targetRotY = ((mouseX / window.innerWidth) - 0.5) * 0.8;
+            const targetRotX = ((mouseY / window.innerHeight) - 0.5) * 0.8;
+
+            reactorGroup.rotation.y += (targetRotY - reactorGroup.rotation.y) * 0.05;
+            reactorGroup.rotation.x += (targetRotX - reactorGroup.rotation.x) * 0.05;
+            reactorGroup.rotation.z = scrollY * 0.0012;
+
+            renderer.render(scene, camera);
+        }
+        animate3D();
+
+        window.addEventListener('resize', () => {
+            resizeNeural();
+            initMagneticParticles();
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     };
 
-    const observer = new IntersectionObserver((entries, observer) => {
+    initThreeJS();
+
+    // =========================================================================
+    // 5. 3D CARD TILT INITIALIZATION
+    // =========================================================================
+    if (window.innerWidth > 768 && typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(document.querySelectorAll(".tilt-card"), {
+            max: 7,
+            speed: 400,
+            perspective: 1000,
+            scale: 1.02,
+            glare: false
+        });
+    }
+
+    // =========================================================================
+    // 6. TYPEWRITER, SCROLL REVEAL, MENU & EMAILJS
+    // =========================================================================
+    const text = "Connecting Hardware with Intelligence...";
+    const typewriter = document.getElementById('typewriter');
+    let i = 0;
+
+    function type() {
+        if (i < text.length) {
+            typewriter.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, 50 + Math.random() * 60);
+        }
+    }
+    setTimeout(type, 1000);
+
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.1 });
 
     document.querySelectorAll('.reveal-on-scroll').forEach(section => {
         observer.observe(section);
     });
 
-    // --- Mobile Menu ---
+    // Mobile Menu
     const menuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
     let isMenuOpen = false;
@@ -1245,16 +1517,7 @@
         });
     });
 
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('py-0');
-        } else {
-            navbar.classList.remove('py-0');
-        }
-    });
-
-    // --- Contact Form ---
+    // Contact Form
     (function() {
         emailjs.init("eJeMaVnixyHqnRzY-"); 
     })();
@@ -1270,20 +1533,17 @@
         btnText.innerText = "ENCRYPTING DATA...";
         const btn = form.querySelector('button');
         btn.disabled = true;
-        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        btn.classList.add('opacity-70');
 
         setTimeout(() => {
             btnText.innerText = "TRANSMITTING...";
-            const serviceID = 'service_a2auk1h';
-            const templateID = 'template_7661d3j';
-
-            emailjs.sendForm(serviceID, templateID, this)
+            emailjs.sendForm('service_a2auk1h', 'template_7661d3j', this)
                 .then(() => {
                     successMsg.classList.remove('hidden');
                     form.reset();
                     btnText.innerText = originalText;
                     btn.disabled = false;
-                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    btn.classList.remove('opacity-70');
                     setTimeout(() => successMsg.classList.add('hidden'), 4000);
                 }, (err) => {
                     btnText.innerText = "ERROR IN TRANSMISSION";
@@ -1291,13 +1551,13 @@
                     setTimeout(() => {
                         btnText.innerText = originalText;
                         btn.disabled = false;
-                        btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        btn.classList.remove('opacity-70');
                     }, 2000);
                 });
-        }, 1500);
+        }, 1200);
     });
 
-    // --- Music Player ---
+    // Music Player
     const musicToggle = document.getElementById('music-toggle');
     const audio = document.getElementById('bg-music');
     const playIcon = document.getElementById('play-icon');
@@ -1306,14 +1566,11 @@
 
     musicToggle.addEventListener('click', () => {
         if (audio.paused) {
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    playIcon.classList.add('hidden');
-                    pauseIcon.classList.remove('hidden');
-                    equalizer.classList.remove('opacity-0');
-                }).catch(error => console.error("Audio error:", error));
-            }
+            audio.play().then(() => {
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                equalizer.classList.remove('opacity-0');
+            }).catch(err => console.error("Audio error:", err));
         } else {
             audio.pause();
             playIcon.classList.remove('hidden');
@@ -1322,17 +1579,14 @@
         }
     });
 
-    // --- Simple Fallback Visitor Counter (CountAPI replacement) ---
+    // Visitor Counter
     const counterElement = document.getElementById('visitor-count');
     let count = localStorage.getItem('simulated_visit_count');
-
-    // Set a realistic base count if first time
     if (!count) {
         count = 14203 + Math.floor(Math.random() * 500);
     } else {
         count = parseInt(count) + 1;
     }
-
     localStorage.setItem('simulated_visit_count', count);
     counterElement.innerText = count.toLocaleString();
 
